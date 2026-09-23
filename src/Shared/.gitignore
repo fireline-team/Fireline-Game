@@ -1,0 +1,97 @@
+# .NET / Visual Studio / Rider standard ignore
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Bb]uild/
+bin/
+obj/
+[Bb]uild[Ll]og.*
+
+# VS and Rider folders
+.vs/
+.idea/
+.ReSharper*/
+_ReSharper*/
+*.DotSettings.user
+*.sln.iml
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Visual Studio Code
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Test results
+[Tt]est[Rr]esult*/
+[Tt]est[Rr]esults*/
+*.trx
+*.coverage
+*.coveragexml
+
+# BenchmarkDotNet artifacts
+BenchmarkDotNet.Artifacts/
+
+# NuGet
+*.nupkg
+# Packages folder can be restored
+packages/
+# NuGet v3 cache is in %userprofile%\.nuget\packages, which is outside repo
+.nuget/NuGet.Config
+.nuget/NuGet.exe
+.nuget/packages.config
+
+# Dotnet tools and artifacts
+artifacts/
+**/project.lock.json
+project.fragment.lock.json
+.project.json
+*.lock.json
+.global.json
+ASALocalRun/
+
+# Publish outputs
+app.publish/
+**/[Pp]ublish/
+PublishProfiles/
+
+# Logs
+*.log
+
+# StyleCop
+StyleCopReport.xml
+StyleCop.Cache
+
+# NCrunch
+*.ncrunch*
+_NCrunch_*/
+.ncrunchsolution
+
+# TFS
+$tf/
+
+# Azure Functions local settings
+local.settings.json
+
+# JetBrains Rider additional
+.idea/assetWizard/
+
+# Others
+*.ds_store
+Thumbs.db
+*.orig
+*.tmp
+~$*
