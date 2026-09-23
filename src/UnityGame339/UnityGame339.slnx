@@ -1,0 +1,4 @@
+﻿<Solution>
+  <Project Path="Game339.Shared.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+</Solution>

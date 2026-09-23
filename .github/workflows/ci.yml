@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+
+      - name: Restore
+        working-directory: src/Shared
+        run: dotnet restore Game339.sln
+
+      - name: Build
+        working-directory: src/Shared
+        run: dotnet build Game339.sln --configuration Release --no-restore
+
+      - name: Test
+        working-directory: src/Shared
+        run: dotnet test Game339.sln --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
