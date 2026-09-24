@@ -1,0 +1,20 @@
+
+Server arguments:
+  --memory-size 1073741824
+  --shared-postfix 37ab055cae1f237ea525ade9564455c7
+  --working-directory Library/DataStore
+  --silent-console
+  --shutdown-grace 0
+  --client-process-check 0
+  --uds-log-file /Users/jtk/Documents/GitHub/Fireline-Game/Logs/UDS-Service.log
+  --debug-log 2
+  -name Unity.DataStore
+
+Initialising UDS system complete:
+  - System type: Service
+  - Resource namespace: 37ab055cae1f237ea525ade9564455c7
+  - Shared memory size: 1073741824
+  - Command buffer id: 1052672
+  - Command buffer size: 8192
+  - Hashmap size: 4194304
+Starting Unity Data Store Application

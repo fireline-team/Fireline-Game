@@ -1,0 +1,10 @@
+{
+  "name": "com.unity.modules.timelinefoundation",
+  "version": "1.0.0",
+  "type": "module",
+  "displayName": "Timeline Foundation",
+  "description": "",
+  "dependencies": {
+    "com.unity.modules.jsonserialize": "1.0.0"
+  }
+}

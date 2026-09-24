@@ -22,12 +22,12 @@ jobs:
 
       - name: Restore
         working-directory: src/Shared
-        run: dotnet restore Game339.sln
+        run: dotnet restore Fireline.sln
 
       - name: Build
         working-directory: src/Shared
-        run: dotnet build Game339.sln --configuration Release --no-restore
+        run: dotnet build Fireline.sln --configuration Release --no-restore
 
       - name: Test
         working-directory: src/Shared
-        run: dotnet test Game339.sln --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"
+        run: dotnet test Fireline.sln --configuration Release --no-build --logger "trx;LogFileName=test_results.trx"

@@ -1,0 +1,10 @@
+{
+  "name": "com.unity.modules.cloth",
+  "version": "1.0.0",
+  "type": "module",
+  "displayName": "Cloth",
+  "description": "The Cloth module implements cloth physics simulation through the Cloth component. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.ClothModule.html",
+  "dependencies": {
+    "com.unity.modules.physics": "1.0.0"
+  }
+}
