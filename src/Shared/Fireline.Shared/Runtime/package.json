@@ -1,0 +1,8 @@
+{
+  "name": "com.fireline.shared",
+  "displayName": "Fireline Shared",
+  "version": "1.0.0",
+  "unity": "6000.2",
+  "description": "Shared game code for Fireline",
+  "author": { "name": "thdupont" }
+}
