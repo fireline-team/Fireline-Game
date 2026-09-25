@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcd5d0bfa036546d38b68491f200406c, type: 3}
+  m_Name: TankEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Runtime.EnemyDefinition
+  displayName: Horde Swarmer
+  moveSpeed: 2
+  maxHealth: 15
+  spriteVariants:
+  - {fileID: 412054802, guid: c8cb6f9a6dbd44b6183ad37b13b1a96a, type: 3}
+  tint: {r: 0.8962264, g: 0.5799675, b: 0.2747864, a: 1}
+  minScale: 0.3
+  maxScale: 0.7
+  artFacesLeft: 0
+  animatorController: {fileID: 9100000, guid: 91681605d423c43b6904474dadf0972e, type: 2}

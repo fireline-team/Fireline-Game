@@ -11,7 +11,6 @@ namespace Game.Runtime
         public static HordeManager Instance { get; private set; }
 
         [Header("Targeting")]
-        [Tooltip("Tags are case-sensitive. Unity's built-in tag is \"Player\" (capital P).")]
         [SerializeField] private string playerTag = "Player";
         [Tooltip("How often (seconds) to re-scan for Player-tagged objects. Scanning allocates, so don't do it every frame.")]
         [SerializeField, Min(0.05f)] private float playerRefreshInterval = 0.5f;
@@ -26,7 +25,7 @@ namespace Game.Runtime
         [SerializeField, Min(1)] private int maxNeighbors = 8;
 
         [Header("Facing")]
-        [Tooltip("Flip each enemy's SpriteRenderer so it faces the way it walks. Assumes the art faces RIGHT by default.")]
+        [Tooltip("Flip each enemy's SpriteRenderer so it faces the way it walks. Art is assumed to face right unless its EnemyDefinition says otherwise.")]
         [SerializeField] private bool flipSpriteToFaceMovement = true;
         [Tooltip("Ignore tiny sideways movement so sprites don't flicker when walking almost straight up/down.")]
         [SerializeField, Min(0f)] private float flipDeadZone = 0.1f;
@@ -43,7 +42,6 @@ namespace Game.Runtime
 
         public int EnemyCount => _enemies.Count;
         public int PlayerCount => _playerPositions.Count;
-        
         public float LastUpdateMs { get; private set; }
 
         private static PlaneVector ToPlane(Vector3 v) => new PlaneVector(v.x, v.y);
@@ -57,6 +55,7 @@ namespace Game.Runtime
                 return;
             }
             Instance = this;
+            // Cell size = separation radius, so a 3x3 query always covers the full radius.
             _hash = new SpatialHash(separationRadius);
         }
 
@@ -67,7 +66,7 @@ namespace Game.Runtime
 
         private void OnValidate()
         {
-            // for testing purposes by claude
+            // Keep the hash in sync if you tweak the radius in the Inspector during play.
             if (Application.isPlaying && _hash != null && !Mathf.Approximately(_hash.CellSize, separationRadius))
                 _hash = new SpatialHash(separationRadius);
         }
@@ -91,6 +90,7 @@ namespace Game.Runtime
             _enemies.RemoveAt(last);
             enemy.ManagerIndex = -1;
         }
+
         private void RefreshPlayerList()
         {
             _playerTransforms.Clear();
@@ -141,7 +141,7 @@ namespace Game.Runtime
             }
 
             float dt = Time.deltaTime;
-            
+
             for (int i = 0; i < count; i++)
             {
                 HordeEnemy enemy = _enemies[i];
@@ -164,14 +164,14 @@ namespace Game.Runtime
                 enemy.MoveDirection = new Vector2(seek.X, seek.Y);
 
                 if (flipSpriteToFaceMovement && enemy.Sprite != null && Mathf.Abs(seek.X) > flipDeadZone)
-                    enemy.Sprite.flipX = seek.X < 0f;
+                    enemy.Sprite.flipX = (seek.X < 0f) != enemy.ArtFacesLeft;
             }
 
             _stopwatch.Stop();
             LastUpdateMs = (float)_stopwatch.Elapsed.TotalMilliseconds;
         }
 
-#if UNITY_EDITOR // helpful spacing visualization tool from claude
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.35f);

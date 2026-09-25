@@ -164,7 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0a40eaefcb6b4af98b61052963b14e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Runtime.HordeStressTest
-  enemyPrefab: {fileID: -2784519892548576912, guid: a83cf33320a05449a932f4f0ecf68c6e, type: 3}
+  enemyPrefab: {fileID: -2784519892548576912, guid: b7f064a8f920c4ea4a99a1e3e72b5847, type: 3}
   prewarmCount: 300
   maxPoolSize: 2000
   spawnRadiusMin: 8
@@ -185,7 +185,7 @@ MonoBehaviour:
   playerTag: Player
   playerRefreshInterval: 0.5
   stopDistance: 0.6
-  separationRadius: 0.8
+  separationRadius: 0.6
   separationStrength: 3
   maxNeighbors: 8
   flipSpriteToFaceMovement: 1

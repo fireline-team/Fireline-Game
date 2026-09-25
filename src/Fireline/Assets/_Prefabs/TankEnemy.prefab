@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -2784519892548576912}
   - component: {fileID: -7189041587831395240}
   m_Layer: 0
-  m_Name: HordeEnemy
+  m_Name: TankEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 1728271943, guid: 398199d4fad214c07bd53ab97c17cabb, type: 3}
+  m_Sprite: {fileID: 412054802, guid: c8cb6f9a6dbd44b6183ad37b13b1a96a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad5b0e77c98b44e4ab1165001f0f144b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Runtime.HordeEnemy
-  definition: {fileID: 11400000, guid: 7c8f0baa7ab3c4eb5a61a223ab10b925, type: 2}
+  definition: {fileID: 11400000, guid: e92455087af1e4facad1ce6d12660e0e, type: 2}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
 --- !u!95 &-7189041587831395240
@@ -119,7 +119,7 @@ Animator:
   m_GameObject: {fileID: 7645219174382690847}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c2ed8036488074b579eb2fef5300b4d1, type: 2}
+  m_Controller: {fileID: 9100000, guid: 91681605d423c43b6904474dadf0972e, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
