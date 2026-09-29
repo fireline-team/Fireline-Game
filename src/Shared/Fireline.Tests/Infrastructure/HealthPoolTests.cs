@@ -50,7 +50,8 @@ public class HealthCombatTests
     public IEnumerator Cleanup()
     {
         foreach (var obj in created)
-            if (obj != null) Object.Destroy(obj);
+            if (obj != null)
+                Object.Destroy(obj);
         created.Clear();
         foreach (var device in devices) InputSystem.RemoveDevice(device);
         devices.Clear();
@@ -167,7 +168,8 @@ public class HealthCombatTests
 
         Assert.That(enemy.SpeedMultiplier, Is.LessThan(1f), "Mist must slow enemies.");
         Assert.That(enemy.CurrentHealth, Is.LessThan(10f), "Mist still does some damage.");
-        Assert.That(enemy.CurrentHealth, Is.GreaterThan(8f), "Mist does less than the standard hose's 2 damage per 0.1s.");
+        Assert.That(enemy.CurrentHealth, Is.GreaterThan(8f),
+            "Mist does less than the standard hose's 2 damage per 0.1s.");
 
         yield return new WaitForSeconds(1.1f);
         Assert.That(enemy.SpeedMultiplier, Is.EqualTo(1f), "The slow must wear off.");
@@ -201,7 +203,11 @@ public class HealthCombatTests
         enemy.gameObject.SetActive(false);
         int releases = 0;
         using (var pool = new ObjectPool<HordeEnemy>(() => enemy,
-            e => e.gameObject.SetActive(true), e => { releases++; e.gameObject.SetActive(false); }))
+                   e => e.gameObject.SetActive(true), e =>
+                   {
+                       releases++;
+                       e.gameObject.SetActive(false);
+                   }))
         {
             enemy.Pool = pool;
             pool.Get();
@@ -213,5 +219,7 @@ public class HealthCombatTests
             Assert.That(respawned.CurrentHealth, Is.EqualTo(10));
             Assert.That(respawned.gameObject.activeSelf, Is.True);
         }
+
         yield return null;
     }
+}
