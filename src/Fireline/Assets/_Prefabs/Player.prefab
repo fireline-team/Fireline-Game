@@ -433,6 +433,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   damagePerSecond: 20
+  extinguishPerSecond: 30
   range: 5
   width: 0.6
   hitLayers:

@@ -6,6 +6,7 @@ using UnityEngine;
 public class HoseWeapon : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float damagePerSecond = 50f;
+    [SerializeField, Min(0f)] private float extinguishPerSecond = 30f;
     [SerializeField, Min(0.1f)] private float range = 5f;
     [SerializeField, Min(0.01f)] private float width = 0.6f;
     [SerializeField] private LayerMask hitLayers = ~0;
@@ -14,6 +15,7 @@ public class HoseWeapon : MonoBehaviour
 
     private readonly List<Collider2D> hits = new List<Collider2D>(64);
     private readonly HashSet<HordeEnemy> damaged = new HashSet<HordeEnemy>();
+    private readonly HashSet<FireZone> watered = new HashSet<FireZone>();
     private LineRenderer stream;
     private PlayerHealth health;
 
@@ -59,12 +61,16 @@ public class HoseWeapon : MonoBehaviour
         Physics2D.OverlapBox((origin + end) * 0.5f, new Vector2(range, width),
             Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg, filter, hits);
         damaged.Clear();
+        watered.Clear();
         foreach (Collider2D hit in hits)
         {
             if (hit == null) continue;
             HordeEnemy enemy = hit.GetComponentInParent<HordeEnemy>();
             if (enemy != null && enemy.isActiveAndEnabled && damaged.Add(enemy))
                 enemy.TakeDamage(damagePerSecond * deltaTime);
+            FireZone fire = hit.GetComponentInParent<FireZone>();
+            if (fire != null && fire.isActiveAndEnabled && watered.Add(fire))
+                fire.ApplyWater(extinguishPerSecond * deltaTime);
         }
     }
 

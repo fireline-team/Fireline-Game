@@ -5,7 +5,7 @@ Open `src/Fireline` with Unity 6000.6.1f1, then open `Assets/_Scenes/BasicScene.
 1. Join using the keyboard or a gamepad. Move with WASD/arrows or the left stick; aim with the mouse or right stick.
 2. Click +10 in the horde panel to spawn enemies.
 3. Hold left mouse/right trigger to spray. The blue stream shows the rectangular damage area. Enemies inside it lose health, once per enemy per physics tick, even if they have several colliders.
-4. Touch enemies to lose health. Continuing contact deals another hit after 0.75 seconds. All enemies share that cooldown for each player; a crowd cannot apply dozens of hits in one frame.
+4. Touch enemies to lose health. Continuing contact deals another hit after 0.75 seconds. All enemies and environmental fire zones share that cooldown for each player; a crowd cannot apply dozens of hits in one frame.
 5. At zero health, movement, aiming, spraying, and normal interaction stop immediately. The player HUD offers Reset level; E or the controller's south face button also resets after a short input guard. This reloads the whole scene for all players. Players must join again.
 6. Test with two players: one can die while the survivor continues. Hordes stop targeting dead players.
 
@@ -27,3 +27,5 @@ BasicScene and Jake-Player are included in Build Settings so their reset flow wo
 - Run `dotnet test src/Shared/Fireline.sln` for health rules and the existing shared-code suite.
 - In Unity's Test Runner, run PlayMode / HealthCombatTests for trigger contact, cooldown, hose geometry, duplicate colliders, player death, pooling, and controller-driven scene reset using the actual player prefab.
 - Manually check the stream and HUD in Game view, including two controllers; headless tests cannot validate presentation or physical devices.
+
+Environmental fire zones now also respond to the hose. See [environmental-fire.md](environmental-fire.md) for placement, tuning, and playtesting.
