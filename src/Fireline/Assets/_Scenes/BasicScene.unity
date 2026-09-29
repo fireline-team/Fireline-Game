@@ -163,7 +163,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0a40eaefcb6b4af98b61052963b14e4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Runtime.HordeStressTest
+  m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.HordeStressTest
   enemyPrefab: {fileID: -2784519892548576912, guid: b7f064a8f920c4ea4a99a1e3e72b5847, type: 3}
   prewarmCount: 300
   maxPoolSize: 2000
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cec2b033db304fa9ac5bb0c239a809f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Runtime.HordeManager
+  m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.HordeManager
   playerTag: Player
   playerRefreshInterval: 0.5
   stopDistance: 0.6

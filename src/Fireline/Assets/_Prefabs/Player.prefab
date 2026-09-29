@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2497727158984493380}
   - component: {fileID: 3919953474488637353}
   - component: {fileID: 7034137372920833074}
+  - component: {fileID: 810000001}
+  - component: {fileID: 810000002}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -404,3 +406,37 @@ Transform:
   - {fileID: 4377830768944491630}
   m_Father: {fileID: 5933821776725555064}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &810000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75557b8445c8442abfb8cbb917c1eb94, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  maxHealth: 100
+  contactDamageCooldown: 0.75
+--- !u!114 &810000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77128d351bd142fab2038be6054cecb5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  damagePerSecond: 20
+  range: 5
+  width: 0.6
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  muzzle: {fileID: 4377830768944491630}
+  streamMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}

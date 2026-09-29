@@ -11,10 +11,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcd5d0bfa036546d38b68491f200406c, type: 3}
   m_Name: HordeSwarmer
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Runtime.EnemyDefinition
+  m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.EnemyDefinition
   displayName: Horde Swarmer
   moveSpeed: 2
   maxHealth: 15
+  contactDamage: 10
   spriteVariants:
   - {fileID: 1728271943, guid: 398199d4fad214c07bd53ab97c17cabb, type: 3}
   tint: {r: 0.8962264, g: 0.5799675, b: 0.2747864, a: 1}
