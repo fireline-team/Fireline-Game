@@ -10,7 +10,7 @@ public class CameraTargetSetter : MonoBehaviour
 
     private void Awake()
     {
-        targetGroup = GetComponentInChildren<CinemachineTargetGroup>();
+        targetGroup = FindAnyObjectByType<CinemachineTargetGroup>();
     }
 
 
@@ -26,16 +26,7 @@ public class CameraTargetSetter : MonoBehaviour
         targetGroup.AddMember(target, 1f, 0.75f);
     }
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        targetGroup = GetComponentInChildren<CinemachineTargetGroup>();
-        
-    }
     
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
+   
 }
