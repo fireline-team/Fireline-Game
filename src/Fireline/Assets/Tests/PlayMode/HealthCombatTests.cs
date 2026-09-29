@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using Game.Runtime;
 using NUnit.Framework;
 using UnityEngine;
@@ -97,6 +98,9 @@ public class HealthCombatTests
     {
         PlayerHealth player = Player(new Vector2(100, 100));
         HoseWeapon hose = player.gameObject.AddComponent<HoseWeapon>();
+        // Fix this scenario's damage independently of designer-tuned defaults.
+        typeof(HoseWeapon).GetField("damagePerSecond", BindingFlags.Instance | BindingFlags.NonPublic)
+            .SetValue(hose, 20f);
         HordeEnemy hit = Enemy(new Vector2(102, 100));
         hit.gameObject.AddComponent<BoxCollider2D>().isTrigger = true;
         HordeEnemy behind = Enemy(new Vector2(98, 100));
