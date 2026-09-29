@@ -2,17 +2,7 @@ using UnityEngine;
 
 namespace Game.Runtime
 {
-    /// <summary>
-    /// Shared stats and looks for one TYPE of enemy (swarmer, brute, boss...). Every
-    /// enemy of that type points at the same asset, so tweaking it changes all of them.
-    ///
-    /// Create one via Assets > Create > Fireline > Enemy Definition.
-    ///
-    /// IMPORTANT: treat this as read-only at runtime. Per-enemy state (current health,
-    /// which sprite variant it rolled, its size) lives on HordeEnemy. Writing to this
-    /// asset from code would change every enemy of this type, and in the Editor the
-    /// change is saved to disk.
-    /// </summary>
+    // recently added knockback
     [CreateAssetMenu(fileName = "NewEnemy", menuName = "Fireline/Enemy Definition")]
     public class EnemyDefinition : ScriptableObject
     {
@@ -22,6 +12,8 @@ namespace Game.Runtime
         [SerializeField, Min(0f)] private float moveSpeed = 2f;
         [SerializeField, Min(1f)] private float maxHealth = 10f;
         [SerializeField, Min(0f)] private float contactDamage = 10f;
+        [Tooltip("0 = full knockback from hoses, 1 = can't be pushed at all (tanks, bosses).")]
+        [SerializeField, Range(0f, 1f)] private float knockbackResistance = 0f;
 
         [Header("Looks")]
         [Tooltip("Each spawn picks one at random, so a single enemy type doesn't look copy-pasted. One entry is fine. Leave empty to keep the prefab's sprite.")]
@@ -42,18 +34,17 @@ namespace Game.Runtime
         public float MoveSpeed => moveSpeed;
         public float MaxHealth => maxHealth;
         public float ContactDamage => contactDamage;
+        public float KnockbackResistance => knockbackResistance;
         public Color Tint => tint;
         public bool ArtFacesLeft => artFacesLeft;
         public RuntimeAnimatorController AnimatorController => animatorController;
-
-        /// <summary>A random sprite from the variants, or null if there are none.</summary>
+        
         public Sprite PickSprite()
         {
             if (spriteVariants == null || spriteVariants.Length == 0) return null;
             return spriteVariants[Random.Range(0, spriteVariants.Length)];
         }
-
-        /// <summary>A random uniform scale between min and max.</summary>
+        
         public float PickScale() => Random.Range(minScale, maxScale);
 
         private void OnValidate()

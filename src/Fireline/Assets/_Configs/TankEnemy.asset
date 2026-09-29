@@ -16,6 +16,7 @@ MonoBehaviour:
   moveSpeed: 2
   maxHealth: 15
   contactDamage: 10
+  knockbackResistance: 0
   spriteVariants:
   - {fileID: 412054802, guid: c8cb6f9a6dbd44b6183ad37b13b1a96a, type: 3}
   tint: {r: 0.8962264, g: 0.5799675, b: 0.2747864, a: 1}

@@ -23,6 +23,15 @@ namespace Game.Runtime
         public float ContactDamage => definition != null ? definition.ContactDamage : 10f;
         
         public Vector2 MoveDirection { get; internal set; }
+
+        /// <summary>Extra velocity from hose hits. HordeManager adds it to movement and makes it wear off.</summary>
+        public Vector2 KnockbackVelocity { get; internal set; }
+
+        /// <summary>Multiplier on walking speed: 1 normally, lower while slowed.</summary>
+        public float SpeedMultiplier => Time.time < _slowUntil ? _slowMultiplier : 1f;
+
+        private float _slowMultiplier = 1f;
+        private float _slowUntil;
         
         internal int ManagerIndex = -1;
         
@@ -64,6 +73,23 @@ namespace Game.Runtime
                 Despawn();
         }
         
+        public void ApplyKnockback(Vector2 velocity)
+        {
+            if (CurrentHealth <= 0f) return;
+            float resistance = definition != null ? definition.KnockbackResistance : 0f;
+            KnockbackVelocity += velocity * (1f - resistance);
+        }
+        
+        public void ApplySlow(float multiplier, float duration)
+        {
+            if (CurrentHealth <= 0f) return;
+            multiplier = Mathf.Clamp01(multiplier);
+            float now = Time.time;
+
+            _slowMultiplier = now < _slowUntil ? Mathf.Min(_slowMultiplier, multiplier) : multiplier;
+            _slowUntil = Mathf.Max(_slowUntil, now + duration);
+        }
+
         public void Despawn()
         {
             if (!gameObject.activeSelf) return;
@@ -78,6 +104,9 @@ namespace Game.Runtime
         private void ResetState()
         {
             MoveDirection = Vector2.zero;
+            KnockbackVelocity = Vector2.zero;
+            _slowMultiplier = 1f;
+            _slowUntil = 0f;
             float maximum = definition != null ? definition.MaxHealth : 1f;
             if (health == null) health = new HealthPool(maximum);
             else health.Reset(maximum);

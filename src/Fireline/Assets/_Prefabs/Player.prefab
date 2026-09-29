@@ -14,7 +14,11 @@ GameObject:
   - component: {fileID: 3919953474488637353}
   - component: {fileID: 7034137372920833074}
   - component: {fileID: 810000001}
-  - component: {fileID: 810000002}
+  - component: {fileID: -1705890303777178772}
+  - component: {fileID: 7800621042710821106}
+  - component: {fileID: 7095639359526502683}
+  - component: {fileID: 1000283584469985828}
+  - component: {fileID: 3818691781568856148}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -159,6 +163,115 @@ MonoBehaviour:
   aimPivot: {fileID: 374009599070947445}
   aimCamera: {fileID: 0}
   stickDeadzone: 0.2
+--- !u!114 &810000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75557b8445c8442abfb8cbb917c1eb94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  contactDamageCooldown: 0.75
+--- !u!114 &-1705890303777178772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8236f5252e0c4515b2648245e18b83b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::PlayerInteractor
+  promptHeight: 1.2
+--- !u!114 &7800621042710821106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbbf873a1470c450c83a676d98d5f339, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::HoseLoadout
+  startingNozzle: 0
+--- !u!114 &7095639359526502683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f00fa280f65094b6c9b328455b256249, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::StandardHose
+  range: 5
+  width: 0.6
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  muzzle: {fileID: 4377830768944491630}
+  streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
+  streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
+  damagePerSecond: 20
+  knockbackStrength: 24
+--- !u!114 &1000283584469985828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 900a8dcebd66842369ff725e2f81e064, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::MistHose
+  range: 2.5
+  width: 3
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  muzzle: {fileID: 4377830768944491630}
+  streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
+  streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
+  damagePerSecond: 8
+  slowMultiplier: 0.4
+  slowDuration: 1
+--- !u!114 &3818691781568856148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8067cc8d668cb4df1a4039e37a9cd165, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::JetHose
+  range: 9
+  width: 0.25
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  muzzle: {fileID: 4377830768944491630}
+  streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
+  streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
+  damagePerShot: 15
+  fireInterval: 0.5
+  knockbackImpulse: 6
+  flashDuration: 0.12
 --- !u!1 &1376534921308105634
 GameObject:
   m_ObjectHideFlags: 0
@@ -406,37 +519,3 @@ Transform:
   - {fileID: 4377830768944491630}
   m_Father: {fileID: 5933821776725555064}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &810000001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 591240336905840500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75557b8445c8442abfb8cbb917c1eb94, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  maxHealth: 100
-  contactDamageCooldown: 0.75
---- !u!114 &810000002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 591240336905840500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77128d351bd142fab2038be6054cecb5, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  damagePerSecond: 20
-  range: 5
-  width: 0.6
-  hitLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  muzzle: {fileID: 4377830768944491630}
-  streamMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
