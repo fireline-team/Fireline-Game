@@ -21,6 +21,7 @@ namespace Game.Runtime
         [Header("Stats")]
         [SerializeField, Min(0f)] private float moveSpeed = 2f;
         [SerializeField, Min(1f)] private float maxHealth = 10f;
+        [SerializeField, Min(0f)] private float contactDamage = 10f;
 
         [Header("Looks")]
         [Tooltip("Each spawn picks one at random, so a single enemy type doesn't look copy-pasted. One entry is fine. Leave empty to keep the prefab's sprite.")]
@@ -40,6 +41,7 @@ namespace Game.Runtime
         public string DisplayName => displayName;
         public float MoveSpeed => moveSpeed;
         public float MaxHealth => maxHealth;
+        public float ContactDamage => contactDamage;
         public Color Tint => tint;
         public bool ArtFacesLeft => artFacesLeft;
         public RuntimeAnimatorController AnimatorController => animatorController;

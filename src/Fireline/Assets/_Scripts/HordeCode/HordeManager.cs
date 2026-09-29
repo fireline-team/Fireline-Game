@@ -31,6 +31,7 @@ namespace Game.Runtime
         [SerializeField, Min(0f)] private float flipDeadZone = 0.1f;
         
         private readonly List<HordeEnemy> _enemies = new List<HordeEnemy>(512);
+        private readonly List<PlayerHealth> _playerHealth = new List<PlayerHealth>(4);
         private readonly List<Transform> _playerTransforms = new List<Transform>(4);
         private readonly List<PlaneVector> _playerPositions = new List<PlaneVector>(4);
         private readonly List<int> _neighborBuffer = new List<int>(64);
@@ -94,9 +95,13 @@ namespace Game.Runtime
         private void RefreshPlayerList()
         {
             _playerTransforms.Clear();
+            _playerHealth.Clear();
             GameObject[] found = GameObject.FindGameObjectsWithTag(playerTag);
             for (int i = 0; i < found.Length; i++)
+            {
                 _playerTransforms.Add(found[i].transform);
+                _playerHealth.Add(found[i].GetComponent<PlayerHealth>());
+            }
         }
 
         private void SnapshotPlayerPositions()
@@ -105,7 +110,8 @@ namespace Game.Runtime
             for (int i = 0; i < _playerTransforms.Count; i++)
             {
                 Transform t = _playerTransforms[i];
-                if (t == null || !t.gameObject.activeInHierarchy) continue;
+                if (t == null || !t.gameObject.activeInHierarchy
+                    || (_playerHealth[i] != null && _playerHealth[i].IsDead)) continue;
                 _playerPositions.Add(ToPlane(t.position));
             }
         }

@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(PlayerHealth), typeof(HoseWeapon))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
@@ -14,6 +15,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float stickDeadzone = 0.2f;
 
     private Rigidbody2D rb;
+    private PlayerHealth health;
+    private HoseWeapon hose;
+    private bool spraying;
+    private float diedAt;
     private PlayerInput playerInput;
 
     private InputAction moveAction;
@@ -29,6 +34,9 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        health = GetComponent<PlayerHealth>();
+        hose = GetComponent<HoseWeapon>();
+        health.Died += OnDied;
         playerInput = GetComponent<PlayerInput>();
 
         moveAction = playerInput.actions["Move"];
@@ -44,6 +52,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (health.IsDead)
+        {
+            if (Time.unscaledTime - diedAt > 0.3f && interactAction.WasPressedThisFrame())
+                health.ResetScene();
+            return;
+        }
+
         ReadMovement();
         ReadAim();
         ReadActions();
@@ -51,7 +66,10 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (health.IsDead) return;
         Move();
+        if (spraying) hose.Spray(aimDirection, Time.fixedDeltaTime);
+        else hose.StopSpraying();
     }
 
     private void ReadMovement()
@@ -116,10 +134,8 @@ public class PlayerController : MonoBehaviour
 
     private void ReadActions()
     {
-        if (useWeaponAction.IsPressed())
-        {
-            UseWeapon();
-        }
+        spraying = useWeaponAction.IsPressed();
+        if (!spraying) hose.StopSpraying();
 
         if (interactAction.WasPressedThisFrame())
         {
@@ -127,12 +143,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void UseWeapon()
+    private void OnDied()
     {
-        // Temporary test
-        Debug.Log(
-            $"Player {playerInput.playerIndex + 1} using weapon"
-        );
+        diedAt = Time.unscaledTime;
+        moveInput = Vector2.zero;
+        spraying = false;
+        hose.StopSpraying();
+    }
+
+    private void OnDisable()
+    {
+        spraying = false;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (hose != null) hose.StopSpraying();
+    }
+
+    private void OnDestroy()
+    {
+        if (health != null) health.Died -= OnDied;
     }
 
     private void Interact()

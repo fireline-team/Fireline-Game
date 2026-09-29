@@ -1,0 +1,11 @@
+{
+  "name": "Fireline.Gameplay.Tests",
+  "references": [
+    "Fireline.Gameplay",
+    "Fireline.Shared",
+    "Unity.InputSystem"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

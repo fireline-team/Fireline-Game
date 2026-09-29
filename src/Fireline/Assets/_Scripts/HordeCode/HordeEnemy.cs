@@ -1,3 +1,4 @@
+using Fireline.Shared.Infrastructure;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -17,7 +18,9 @@ namespace Game.Runtime
 
         public float MoveSpeed => definition != null ? definition.MoveSpeed : 0f;
         public bool ArtFacesLeft => definition != null && definition.ArtFacesLeft;
-        public float CurrentHealth { get; private set; }
+        private HealthPool health;
+        public float CurrentHealth => health != null ? health.Current : 0f;
+        public float ContactDamage => definition != null ? definition.ContactDamage : 10f;
         
         public Vector2 MoveDirection { get; internal set; }
         
@@ -57,23 +60,27 @@ namespace Game.Runtime
         
         public void TakeDamage(float amount)
         {
-            if (amount <= 0f || CurrentHealth <= 0f) return;
-
-            CurrentHealth -= amount;
-            if (CurrentHealth <= 0f)
+            if (health != null && health.TakeDamage(amount))
                 Despawn();
         }
         
         public void Despawn()
         {
+            if (!gameObject.activeSelf) return;
             if (Pool != null) Pool.Release(this);
-            else Destroy(gameObject);
+            else
+            {
+                gameObject.SetActive(false);
+                Destroy(gameObject);
+            }
         }
         
         private void ResetState()
         {
             MoveDirection = Vector2.zero;
-            CurrentHealth = definition != null ? definition.MaxHealth : 1f;
+            float maximum = definition != null ? definition.MaxHealth : 1f;
+            if (health == null) health = new HealthPool(maximum);
+            else health.Reset(maximum);
 
             if (definition == null) return;
             
