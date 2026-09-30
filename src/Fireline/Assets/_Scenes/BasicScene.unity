@@ -206,7 +206,7 @@ Transform:
   m_GameObject: {fileID: 31603661}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.99, y: 3.85, z: 0}
+  m_LocalPosition: {x: -4.99, y: 6.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -274,8 +274,8 @@ MonoBehaviour:
   enemyPrefab: {fileID: -2784519892548576912, guid: b7f064a8f920c4ea4a99a1e3e72b5847, type: 3}
   prewarmCount: 300
   maxPoolSize: 2000
-  spawnRadiusMin: 8
-  spawnRadiusMax: 12
+  spawnRadiusMin: 10
+  spawnRadiusMax: 13
   showPanel: 1
 --- !u!114 &532505318
 MonoBehaviour:
@@ -399,7 +399,7 @@ Transform:
   m_GameObject: {fileID: 1030778142}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.85, z: 0}
+  m_LocalPosition: {x: 0, y: 6.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -594,7 +594,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 6.83
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -770,7 +770,7 @@ Transform:
   m_GameObject: {fileID: 1831628984}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.07, y: 3.85, z: 0}
+  m_LocalPosition: {x: 5.07, y: 6.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
