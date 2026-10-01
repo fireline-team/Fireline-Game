@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Pool;
 
 namespace Game.Runtime
 {
     /// <summary>
-    /// Enemy spawner cheat tool.
+    /// Enemy spawner cheat tool for testing and demos.
+    /// Pick an enemy type in the panel, then spawn a ring of them with the buttons,
+    /// or right-click anywhere in the Game view to drop them at the cursor.
     /// </summary>
     public class HordeStressTest : MonoBehaviour
     {
@@ -17,8 +20,23 @@ namespace Game.Runtime
         [SerializeField, Min(0f)] private float spawnRadiusMin = 8f;
         [SerializeField, Min(0f)] private float spawnRadiusMax = 12f;
 
+        [Header("Enemy Types")]
+        [Tooltip("Configs you can pick from in the panel. Leave empty to spawn whatever config is on the prefab.")]
+        [SerializeField] private EnemyDefinition[] enemyTypes = new EnemyDefinition[0];
+
+        [Header("Right-Click Spawning")]
+        [SerializeField] private bool rightClickToSpawn = true;
+        [Tooltip("How many enemies each right-click spawns.")]
+        [SerializeField, Min(1)] private int enemiesPerClick = 1;
+        [Tooltip("Random spread around the cursor, so several enemies don't stack on one spot.")]
+        [SerializeField, Min(0f)] private float clickScatter = 0.4f;
+
         [Header("Debug UI")]
         [SerializeField] private bool showPanel = true;
+
+        private const float PanelWidth = 280f;
+        private Rect _panelRect;
+        private int _selectedType;
 
         private ObjectPool<HordeEnemy> _pool;
         private readonly HashSet<HordeEnemy> _active = new HashSet<HordeEnemy>();
@@ -64,19 +82,43 @@ namespace Game.Runtime
             return e;
         }
 
-        public void Spawn(int amount)
-        {
-            if (_pool == null) return;
+        /// <summary>The config new enemies get, or null to keep the prefab's own.</summary>
+        public EnemyDefinition SelectedType =>
+            enemyTypes != null && enemyTypes.Length > 0 ? enemyTypes[Mathf.Clamp(_selectedType, 0, enemyTypes.Length - 1)] : null;
 
+        /// <summary>Spawns enemies of the selected type in a ring around this object.</summary>
+        public void Spawn(int amount) => Spawn(amount, SelectedType);
+
+        /// <summary>Spawns enemies with a specific config in a ring around this object.</summary>
+        public void Spawn(int amount, EnemyDefinition type)
+        {
             Vector3 center = transform.position;
             for (int i = 0; i < amount; i++)
             {
-                HordeEnemy e = _pool.Get();
                 Vector2 dir = Random.insideUnitCircle.normalized;
                 if (dir == Vector2.zero) dir = Vector2.up;
                 float r = Random.Range(spawnRadiusMin, spawnRadiusMax);
-                e.CachedTransform.position = center + new Vector3(dir.x, dir.y, 0f) * r;
+                SpawnOne(type, center + new Vector3(dir.x, dir.y, 0f) * r);
             }
+        }
+
+        /// <summary>Spawns enemies with a specific config scattered around a world position.</summary>
+        public void SpawnAt(Vector2 position, int amount, EnemyDefinition type)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                Vector2 p = position + Random.insideUnitCircle * clickScatter;
+                SpawnOne(type, new Vector3(p.x, p.y, transform.position.z));
+            }
+        }
+
+        private void SpawnOne(EnemyDefinition type, Vector3 position)
+        {
+            if (_pool == null) return;
+            HordeEnemy e = _pool.Get();
+            // Pooled enemies remember their last config, so always set it.
+            if (type != null) e.SetDefinition(type);
+            e.CachedTransform.position = position;
         }
 
         public void DespawnAll()
@@ -96,13 +138,34 @@ namespace Game.Runtime
 
             if (HordeManager.Instance != null)
                 _smoothedHordeMs = Mathf.Lerp(_smoothedHordeMs, HordeManager.Instance.LastUpdateMs, 0.05f);
+
+            HandleRightClick();
+        }
+
+        private void HandleRightClick()
+        {
+            Mouse mouse = Mouse.current;
+            Camera cam = Camera.main;
+            if (!rightClickToSpawn || mouse == null || cam == null || !mouse.rightButton.wasPressedThisFrame)
+                return;
+
+            Vector2 screen = mouse.position.ReadValue();
+            // IMGUI measures y from the top of the screen; the mouse measures from the bottom.
+            if (showPanel && _panelRect.Contains(new Vector2(screen.x, Screen.height - screen.y)))
+                return;
+
+            Vector3 world = cam.ScreenToWorldPoint(new Vector3(screen.x, screen.y, Mathf.Abs(cam.transform.position.z)));
+            SpawnAt(world, enemiesPerClick, SelectedType);
         }
 
         private void OnGUI()
         {
             if (!showPanel) return;
 
-            GUILayout.BeginArea(new Rect(10, 10, 260, 200), GUI.skin.box);
+            int typeCount = enemyTypes != null ? enemyTypes.Length : 0;
+            float height = 200f + (typeCount > 0 ? 30f + 24f * Mathf.Ceil(typeCount / 2f) : 0f) + (rightClickToSpawn ? 22f : 0f);
+            _panelRect = new Rect(10, 10, PanelWidth, height);
+            GUILayout.BeginArea(_panelRect, GUI.skin.box);
 
             HordeManager manager = HordeManager.Instance;
             int enemyCount = manager != null ? manager.EnemyCount : 0;
@@ -118,8 +181,21 @@ namespace Game.Runtime
             else if (playerCount == 0)
                 GUILayout.Label("No Player-tagged objects found!");
 
+            if (typeCount > 0)
+            {
+                GUILayout.Space(4);
+                GUILayout.Label("Enemy type:");
+                string[] names = new string[typeCount];
+                for (int i = 0; i < typeCount; i++)
+                    names[i] = enemyTypes[i] != null ? enemyTypes[i].DisplayName : "(empty)";
+                _selectedType = GUILayout.SelectionGrid(Mathf.Clamp(_selectedType, 0, typeCount - 1), names, 2);
+            }
+            if (rightClickToSpawn)
+                GUILayout.Label($"Right-click to place {enemiesPerClick}");
+
             GUILayout.Space(6);
             GUILayout.BeginHorizontal();
+            if (GUILayout.Button("+1")) Spawn(1);
             if (GUILayout.Button("+10")) Spawn(10);
             if (GUILayout.Button("+50")) Spawn(50);
             if (GUILayout.Button("+100")) Spawn(100);

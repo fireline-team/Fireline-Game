@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerInput))]
-[RequireComponent(typeof(PlayerHealth), typeof(HoseWeapon))]
+[RequireComponent(typeof(PlayerHealth))] // plus at least one hose: StandardHose, MistHose, or JetHose
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
@@ -14,9 +14,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera aimCamera;
     [SerializeField] private float stickDeadzone = 0.2f;
 
+    [Header("Animation")] 
+    [SerializeField] private Animator _animator;
+    private static readonly int IsMovingParam = Animator.StringToHash("IsMoving");
+
     private Rigidbody2D rb;
     private PlayerHealth health;
-    private HoseWeapon hose;
+    private HoseLoadout loadout;
+    private PlayerInteractor interactor;
+    private HoseWeapon fixedHose;
+    private HoseWeapon hose => loadout != null && loadout.Current != null ? loadout.Current : fixedHose;
     private bool spraying;
     private float diedAt;
     private PlayerInput playerInput;
@@ -35,7 +42,11 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<PlayerHealth>();
-        hose = GetComponent<HoseWeapon>();
+        loadout = GetComponent<HoseLoadout>();
+        interactor = GetComponent<PlayerInteractor>();
+        fixedHose = GetComponent<HoseWeapon>();
+        if (hose == null)
+            Debug.LogError($"{name} needs a hose component (StandardHose, MistHose, or JetHose).", this);
         health.Died += OnDied;
         playerInput = GetComponent<PlayerInput>();
 
@@ -68,6 +79,7 @@ public class PlayerController : MonoBehaviour
     {
         if (health.IsDead) return;
         Move();
+        if (hose == null) return;
         if (spraying) hose.Spray(aimDirection, Time.fixedDeltaTime);
         else hose.StopSpraying();
     }
@@ -135,7 +147,7 @@ public class PlayerController : MonoBehaviour
     private void ReadActions()
     {
         spraying = useWeaponAction.IsPressed();
-        if (!spraying) hose.StopSpraying();
+        if (!spraying && hose != null) hose.StopSpraying();
 
         if (interactAction.WasPressedThisFrame())
         {
@@ -148,7 +160,7 @@ public class PlayerController : MonoBehaviour
         diedAt = Time.unscaledTime;
         moveInput = Vector2.zero;
         spraying = false;
-        hose.StopSpraying();
+        if (hose != null) hose.StopSpraying();
     }
 
     private void OnDisable()
@@ -162,12 +174,27 @@ public class PlayerController : MonoBehaviour
     {
         if (health != null) health.Died -= OnDied;
     }
-
+    
     private void Interact()
     {
-        // Temporary test
-        Debug.Log(
-            $"Player {playerInput.playerIndex + 1} interacting"
-        );
+        if (interactor != null && interactor.TryInteract())
+            return;
+
+        UseOffhand();
+    }
+
+    private void UseOffhand()
+    {
+        // TODO: off-hand axe/weapon
+        Debug.Log($"Player {playerInput.playerIndex + 1} swings axe (not implemented yet)");
+    }
+    
+    
+    // animation stuff
+
+    private void UpdateAnimation()
+    {
+        if (_animator == null) return;
+        _animator.SetBool(IsMovingParam, moveInput.sqrMagnitude > 0.01f);
     }
 }

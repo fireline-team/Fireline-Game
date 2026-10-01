@@ -2,6 +2,7 @@
   "name": "Fireline.Gameplay",
   "references": [
     "Fireline.Shared",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.Cinemachine"
   ]
 }
