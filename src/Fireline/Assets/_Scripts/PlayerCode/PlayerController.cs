@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
     {
         if (health.IsDead)
         {
+            UpdateAnimation();
             if (Time.unscaledTime - diedAt > 0.3f && interactAction.WasPressedThisFrame())
                 health.ResetScene();
             return;
@@ -72,6 +73,7 @@ public class PlayerController : MonoBehaviour
 
         ReadMovement();
         ReadAim();
+        UpdateAnimation();
         ReadActions();
     }
 
