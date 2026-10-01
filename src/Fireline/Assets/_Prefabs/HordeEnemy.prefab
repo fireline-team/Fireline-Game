@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad5b0e77c98b44e4ab1165001f0f144b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.HordeEnemy
-  definition: {fileID: 11400000, guid: 7c8f0baa7ab3c4eb5a61a223ab10b925, type: 2}
+  definition: {fileID: 11400000, guid: e92455087af1e4facad1ce6d12660e0e, type: 2}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
 --- !u!95 &-7189041587831395240
