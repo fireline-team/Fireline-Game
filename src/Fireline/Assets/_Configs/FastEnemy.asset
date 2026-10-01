@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fcd5d0bfa036546d38b68491f200406c, type: 3}
-  m_Name: TankEnemy
+  m_Name: FastEnemy
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.EnemyDefinition
-  displayName: Tank Enemy
-  moveSpeed: 1
-  maxHealth: 30
-  contactDamage: 20
-  knockbackResistance: 1
+  displayName: Fast Enemy
+  moveSpeed: 5
+  maxHealth: 5
+  contactDamage: 7
+  knockbackResistance: 0
   spriteVariants:
   - {fileID: 177952670, guid: 7a72b1ee4b8984c8082f570d486c6b9c, type: 3}
-  tint: {r: 0.6226415, g: 0.085172676, b: 0.19405432, a: 1}
-  minScale: 2
-  maxScale: 3
+  tint: {r: 0.08627452, g: 0.62352943, b: 0.17617168, a: 1}
+  minScale: 1
+  maxScale: 2
   artFacesLeft: 1
   animatorController: {fileID: 9100000, guid: c9d0f4afb23b24124a8e384fb2f4cdcf, type: 2}

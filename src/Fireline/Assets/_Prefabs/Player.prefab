@@ -317,7 +317,11 @@ MonoBehaviour:
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
-  streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
+  streamColor: {r: 1, g: 1, b: 1, a: 1}
+  particlesPerSecond: 60
+  particleLifetime: 0.3
+  particleSize: 0.6
+  splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
   damagePerSecond: 20
   knockbackStrength: 24
 --- !u!114 &1000283584469985828
@@ -340,7 +344,11 @@ MonoBehaviour:
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
-  streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
+  streamColor: {r: 1, g: 1, b: 1, a: 1}
+  particlesPerSecond: 90
+  particleLifetime: 0.35
+  particleSize: 0.9
+  splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
   damagePerSecond: 8
   slowMultiplier: 0.4
   slowDuration: 1
@@ -364,7 +372,11 @@ MonoBehaviour:
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
-  streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
+  streamColor: {r: 1, g: 1, b: 1, a: 1}
+  particlesPerSecond: 60
+  particleLifetime: 0.2
+  particleSize: 0.45
+  splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
   damagePerShot: 15
   fireInterval: 0.5
   knockbackImpulse: 6

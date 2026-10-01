@@ -151,12 +151,14 @@ namespace Game.Runtime
             }
 
             float dt = Time.deltaTime;
+            float now = Time.time;
             float knockbackKeep = Mathf.Exp(-knockbackDamping * dt);
 
             for (int i = 0; i < count; i++)
             {
                 HordeEnemy enemy = _enemies[i];
                 PlaneVector pos = _positions[i];
+                if (enemy.IsFlashing) enemy.UpdateFlash(now);
 
                 PlaneVector seek = PlaneVector.Zero;
                 int target = HordeSteering.FindNearest(pos, _playerPositions);

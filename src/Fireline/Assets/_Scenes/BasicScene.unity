@@ -276,6 +276,13 @@ MonoBehaviour:
   maxPoolSize: 2000
   spawnRadiusMin: 10
   spawnRadiusMax: 13
+  enemyTypes:
+  - {fileID: 11400000, guid: 7c8f0baa7ab3c4eb5a61a223ab10b925, type: 2}
+  - {fileID: 11400000, guid: e92455087af1e4facad1ce6d12660e0e, type: 2}
+  - {fileID: 11400000, guid: 3d240795ddcd44faeb04d153f50a233c, type: 2}
+  rightClickToSpawn: 1
+  enemiesPerClick: 1
+  clickScatter: 0.4
   showPanel: 1
 --- !u!114 &532505318
 MonoBehaviour:

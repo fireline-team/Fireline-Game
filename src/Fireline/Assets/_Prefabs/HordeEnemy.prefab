@@ -147,6 +147,9 @@ MonoBehaviour:
   definition: {fileID: 11400000, guid: e92455087af1e4facad1ce6d12660e0e, type: 2}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
+  hitFlashMaterial: {fileID: 2100000, guid: addf6bd8a7adb43238a0bf72d1f7a0bb, type: 2}
+  flashDuration: 0.06
+  flashInterval: 0.12
 --- !u!95 &-7189041587831395240
 Animator:
   serializedVersion: 7

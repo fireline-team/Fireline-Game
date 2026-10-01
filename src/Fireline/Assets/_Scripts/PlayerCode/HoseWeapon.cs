@@ -3,6 +3,17 @@ using Game.Runtime;
 using UnityEngine;
 
 /// <summary>
+/// Base class for every nozzle. It handles everything nozzles have in common:
+/// aiming, the rectangular hitbox, finding the enemies inside it, and drawing the stream.
+/// Subclasses only decide WHEN the hose hits and WHAT HAPPENS to the enemies it catches.
+///
+/// The hitbox is a rectangle that starts at the muzzle: Range long (along the aim) and
+/// Width wide (across it). The water visual (HoseStreamVisual) is sized from the same
+/// numbers, so what you see roughly matches what hits, but particles never decide damage.
+///
+/// One physics query per step finds both enemies and fire zones in the hitbox;
+/// FindEnemiesInHitbox and FindFiresInHitbox just read its results.
+///
 /// To make a new nozzle: inherit from this, then override OnSpray.
 /// </summary>
 public abstract class HoseWeapon : MonoBehaviour
@@ -20,8 +31,28 @@ public abstract class HoseWeapon : MonoBehaviour
     [SerializeField, Min(0f)] private float extinguishPerSecond = 30f;
 
     [Header("Stream Visual")]
+    [Tooltip("Optional particle prefab from VFX that replaces the built-in stream. Author it pointing RIGHT (+X); the hose aims it.")]
+    [SerializeField] private ParticleSystem streamPrefab;
+    [Tooltip("Material for the water blobs: a horizontal sprite sheet, e.g. WaterStreamParticle.")]
     [SerializeField] private Material streamMaterial;
-    [SerializeField] private Color streamColor = new Color(0.25f, 0.8f, 1f, 0.7f);
+    [Tooltip("How many frames are in the stream material's sprite sheet, left to right.")]
+    [SerializeField, Min(1)] private int streamSheetFrames = 3;
+    [Tooltip("Tint for the water. White shows the art's own colors.")]
+    [SerializeField] private Color streamColor = Color.white;
+    [SerializeField, Min(0f)] private float particlesPerSecond = 60f;
+    [Tooltip("Seconds a blob takes to reach the end of the range. Lower = faster, punchier water.")]
+    [SerializeField, Min(0.05f)] private float particleLifetime = 0.3f;
+    [SerializeField, Min(0.05f)] private float particleSize = 0.6f;
+    [Tooltip("Optional droplet puffs where blobs land, e.g. WaterDroplet.")]
+    [SerializeField] private Material splashMaterial;
+    [SerializeField, Min(1)] private int splashSheetFrames = 6;
+    [Tooltip("Chance that a blob leaves a splash when it fades out.")]
+    [SerializeField, Range(0f, 1f)] private float splashChance = 0.3f;
+    [Tooltip("Draw order. Backgrounds like tilemaps must be on a lower layer or order than this.")]
+    [SerializeField] private string sortingLayerName = "Default";
+    [SerializeField] private int sortingOrder = 10;
+    [Tooltip("Tick this if the water blobs tilt the wrong way when aiming diagonally.")]
+    [SerializeField] private bool flipParticleRotation;
 
     private readonly List<Collider2D> _colliderHits = new List<Collider2D>(64);
     private readonly HashSet<HordeEnemy> _seen = new HashSet<HordeEnemy>();
@@ -29,34 +60,44 @@ public abstract class HoseWeapon : MonoBehaviour
     private readonly HashSet<FireZone> _seenFires = new HashSet<FireZone>();
     private readonly List<FireZone> _fireHits = new List<FireZone>(8);
     private bool _scannedThisStep;
-    private LineRenderer _stream;
+    private HoseStreamVisual _stream;
     private PlayerHealth _health;
 
     public float Range => range;
     public float Width => width;
+    /// <summary>True while the continuous water visual is running (pulses don't count).</summary>
+    public bool IsStreamActive => _stream != null && _stream.IsEmitting;
     protected float ExtinguishPerSecond => extinguishPerSecond;
 
+    /// <summary>Normalized aim direction from the current Spray call.</summary>
     protected Vector2 AimDirection { get; private set; } = Vector2.right;
+    /// <summary>Where the stream starts this step (the muzzle, or this object if no muzzle is set).</summary>
     protected Vector2 Origin { get; private set; }
+    /// <summary>Where the stream ends this step.</summary>
     protected Vector2 End { get; private set; }
 
     protected virtual void Awake()
     {
         _health = GetComponent<PlayerHealth>();
 
-        GameObject visual = new GameObject("Hose stream");
-        visual.transform.SetParent(transform, false);
-        _stream = visual.AddComponent<LineRenderer>();
-        _stream.sharedMaterial = streamMaterial;
-        _stream.positionCount = 2;
-        _stream.useWorldSpace = true;
-        _stream.startColor = _stream.endColor = streamColor;
-        _stream.sortingOrder = 2;
-        _stream.enabled = false;
+        _stream = new HoseStreamVisual(transform, streamPrefab, new HoseStreamVisual.Look
+        {
+            StreamMaterial = streamMaterial,
+            StreamFrames = streamSheetFrames,
+            StreamColor = streamColor,
+            SplashMaterial = splashMaterial,
+            SplashFrames = splashSheetFrames,
+            SplashChance = splashChance,
+            SortingLayerName = sortingLayerName,
+            SortingOrder = sortingOrder,
+        }, flipParticleRotation);
     }
 
     protected virtual void OnDisable() => StopSpraying();
-    
+
+    // ---------------------------------------------------------------- called by PlayerController
+
+    /// <summary>Call every physics step while the spray button is held.</summary>
     public void Spray(Vector2 direction, float deltaTime)
     {
         if (!isActiveAndEnabled || (_health != null && _health.IsDead) || direction.sqrMagnitude < 0.001f)
@@ -71,39 +112,69 @@ public abstract class HoseWeapon : MonoBehaviour
         _scannedThisStep = false;
 
         OnSpray(deltaTime);
-        DrawStream(ShouldShowStream());
+        _stream.SetSpraying(ShowsContinuousStream(), Origin, AimDirection, transform.position.z,
+            range, width, particleLifetime, particlesPerSecond, particleSize);
     }
 
+    /// <summary>Call when the spray button is released.</summary>
     public void StopSpraying()
     {
-        if (_stream != null) _stream.enabled = false;
+        if (_stream != null) _stream.Stop();
         OnStopSpraying();
     }
-    
+
+    // ---------------------------------------------------------------- for subclasses
+
+    /// <summary>
+    /// One physics step of spraying. Use FindEnemiesInHitbox() to get what's in the stream,
+    /// then apply this nozzle's effects (damage, knockback, slow...).
+    /// </summary>
     protected abstract void OnSpray(float deltaTime);
 
+    /// <summary>Optional: react to the spray button being released.</summary>
     protected virtual void OnStopSpraying() { }
 
-    protected virtual bool ShouldShowStream() => true;
+    /// <summary>
+    /// Whether water flows continuously while the button is held. Pulsing nozzles return
+    /// false and call PulseStream when they fire instead.
+    /// </summary>
+    protected virtual bool ShowsContinuousStream() => true;
 
+    /// <summary>Fires one burst of water along the current aim. Call from OnSpray.</summary>
+    protected void PulseStream(int particleCount)
+    {
+        _stream.Pulse(Origin, AimDirection, transform.position.z,
+            range, width, particleLifetime, particleSize, particleCount);
+    }
+
+    /// <summary>Lets a nozzle pick its own default hitbox size when it's added in the Inspector.</summary>
     protected void SetHitboxSize(float newRange, float newWidth)
     {
         range = newRange;
         width = newWidth;
     }
-    
+
+    /// <summary>
+    /// Every live enemy inside the hitbox right now, each listed once even if it has
+    /// several colliders. The list is reused, so use it right away and don't keep it.
+    ///
+    /// Always collect first, then apply effects. Killing enemies while still searching
+    /// can make the search skip others.
+    /// </summary>
     protected List<HordeEnemy> FindEnemiesInHitbox()
     {
         ScanHitbox();
         return _enemyHits;
     }
 
+    /// <summary>Every burning fire zone inside the hitbox right now, each listed once.</summary>
     protected List<FireZone> FindFiresInHitbox()
     {
         ScanHitbox();
         return _fireHits;
     }
 
+    /// <summary>Puts out every fire zone in the hitbox by <paramref name="amount"/>.</summary>
     protected void WaterFiresInHitbox(float amount)
     {
         List<FireZone> fires = FindFiresInHitbox();
@@ -111,6 +182,7 @@ public abstract class HoseWeapon : MonoBehaviour
             fires[i].ApplyWater(amount);
     }
 
+    // One physics query per Spray step, shared by the enemy and fire lists.
     private void ScanHitbox()
     {
         if (_scannedThisStep) return;
@@ -121,6 +193,7 @@ public abstract class HoseWeapon : MonoBehaviour
         _fireHits.Clear();
         _seenFires.Clear();
 
+        // Horde movement writes Transforms directly, so queries need current physics poses.
         Physics2D.SyncTransforms();
         ContactFilter2D filter = new ContactFilter2D { useTriggers = true };
         filter.SetLayerMask(hitLayers);
@@ -143,18 +216,8 @@ public abstract class HoseWeapon : MonoBehaviour
         }
     }
 
-    private void DrawStream(bool visible)
-    {
-        _stream.enabled = visible;
-        if (!visible) return;
-
-        float z = transform.position.z;
-        _stream.startWidth = _stream.endWidth = width;
-        _stream.SetPosition(0, new Vector3(Origin.x, Origin.y, z));
-        _stream.SetPosition(1, new Vector3(End.x, End.y, z));
-    }
-
 #if UNITY_EDITOR
+    // Select the player to see this nozzle's hitbox, even when not spraying.
     protected virtual void OnDrawGizmosSelected()
     {
         Vector2 dir = Application.isPlaying ? AimDirection : (Vector2)transform.right;

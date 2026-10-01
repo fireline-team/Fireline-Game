@@ -13,16 +13,27 @@ public class PlayerHealth : MonoBehaviour
     [Tooltip("Brief immunity shared across all touching enemies and fire zones, in seconds.")]
     [SerializeField, Min(0.05f)] private float contactDamageCooldown = 0.75f;
 
+    [Header("Damage Feedback")]
+    [Tooltip("Blinks per second while invulnerable after a hit.")]
+    [SerializeField, Min(1f)] private float blinkRate = 10f;
+    [Tooltip("How see-through the player gets on each blink. 0 = invisible, 1 = no blink.")]
+    [SerializeField, Range(0f, 1f)] private float blinkAlpha = 0.3f;
+
     private HealthPool health;
     private Rigidbody2D body;
     private PlayerInput input;
     private float nextContactTime;
     private bool resetting;
     private readonly HashSet<Collider2D> contacts = new HashSet<Collider2D>();
+    private SpriteRenderer[] sprites;
+    private float[] spriteAlphas;
+    private bool blinkedOut;
 
     public float CurrentHealth => health.Current;
     public float MaxHealth => health.Maximum;
     public bool IsDead => health != null && health.IsDead;
+    /// <summary>True during the brief immunity after a hit (the "i-frames").</summary>
+    public bool IsInvulnerable => !IsDead && Time.time < nextContactTime;
     public event Action Died;
 
     private void Awake()
@@ -30,6 +41,36 @@ public class PlayerHealth : MonoBehaviour
         health = new HealthPool(maxHealth);
         body = GetComponent<Rigidbody2D>();
         input = GetComponent<PlayerInput>();
+
+        // Every sprite on the player (body, hands, hose) blinks together.
+        sprites = GetComponentsInChildren<SpriteRenderer>(true);
+        spriteAlphas = new float[sprites.Length];
+        for (int i = 0; i < sprites.Length; i++)
+            spriteAlphas[i] = sprites[i].color.a;
+    }
+
+    private void Update()
+    {
+        bool fadeNow = false;
+        if (IsInvulnerable)
+        {
+            // Alternate between faded and solid, starting faded right after the hit.
+            float elapsed = contactDamageCooldown - (nextContactTime - Time.time);
+            fadeNow = Mathf.FloorToInt(elapsed * blinkRate * 2f) % 2 == 0;
+        }
+        if (fadeNow != blinkedOut) SetBlink(fadeNow);
+    }
+
+    private void SetBlink(bool faded)
+    {
+        blinkedOut = faded;
+        for (int i = 0; i < sprites.Length; i++)
+        {
+            if (sprites[i] == null) continue;
+            Color c = sprites[i].color;
+            c.a = faded ? spriteAlphas[i] * blinkAlpha : spriteAlphas[i];
+            sprites[i].color = c;
+        }
     }
 
     public void TakeDamage(float amount)
@@ -63,7 +104,11 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    private void OnDisable() => contacts.Clear();
+    private void OnDisable()
+    {
+        contacts.Clear();
+        if (blinkedOut) SetBlink(false);
+    }
 
     private void TryContactDamage(Collider2D other)
     {
