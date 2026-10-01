@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Animation")] 
     [SerializeField] private Animator _animator;
+    private static readonly int IsMovingParam = Animator.StringToHash("IsMoving");
 
     private Rigidbody2D rb;
     private PlayerHealth health;
@@ -186,5 +187,14 @@ public class PlayerController : MonoBehaviour
     {
         // TODO: off-hand axe/weapon
         Debug.Log($"Player {playerInput.playerIndex + 1} swings axe (not implemented yet)");
+    }
+    
+    
+    // animation stuff
+
+    private void UpdateAnimation()
+    {
+        if (_animator == null) return;
+        _animator.SetBool(IsMovingParam, moveInput.sqrMagnitude > 0.01f);
     }
 }

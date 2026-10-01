@@ -256,7 +256,7 @@ MonoBehaviour:
   aimPivot: {fileID: 374009599070947445}
   aimCamera: {fileID: 0}
   stickDeadzone: 0.2
-  _animator: {fileID: 0}
+  _animator: {fileID: 1017592944127437050}
 --- !u!114 &810000001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -271,6 +271,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   contactDamageCooldown: 0.75
+  blinkRate: 10
+  blinkAlpha: 0.3
 --- !u!114 &-1705890303777178772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -316,12 +318,19 @@ MonoBehaviour:
     m_Bits: 4294967295
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
+  streamPrefab: {fileID: 0}
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
+  streamSheetFrames: 3
   streamColor: {r: 1, g: 1, b: 1, a: 1}
   particlesPerSecond: 60
   particleLifetime: 0.3
   particleSize: 0.6
   splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
+  splashSheetFrames: 6
+  splashChance: 0.3
+  sortingLayerName: Default
+  sortingOrder: 10
+  flipParticleRotation: 0
   damagePerSecond: 20
   knockbackStrength: 24
 --- !u!114 &1000283584469985828
@@ -343,12 +352,19 @@ MonoBehaviour:
     m_Bits: 4294967295
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
+  streamPrefab: {fileID: 0}
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
+  streamSheetFrames: 3
   streamColor: {r: 1, g: 1, b: 1, a: 1}
   particlesPerSecond: 90
   particleLifetime: 0.35
   particleSize: 0.9
   splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
+  splashSheetFrames: 6
+  splashChance: 0.3
+  sortingLayerName: Default
+  sortingOrder: 10
+  flipParticleRotation: 0
   damagePerSecond: 8
   slowMultiplier: 0.4
   slowDuration: 1
@@ -371,16 +387,23 @@ MonoBehaviour:
     m_Bits: 4294967295
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
+  streamPrefab: {fileID: 0}
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
+  streamSheetFrames: 3
   streamColor: {r: 1, g: 1, b: 1, a: 1}
   particlesPerSecond: 60
   particleLifetime: 0.2
   particleSize: 0.45
   splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
+  splashSheetFrames: 6
+  splashChance: 0.3
+  sortingLayerName: Default
+  sortingOrder: 10
+  flipParticleRotation: 0
   damagePerShot: 15
   fireInterval: 0.5
   knockbackImpulse: 6
-  flashDuration: 0.12
+  particlesPerShot: 18
 --- !u!1 &1376534921308105634
 GameObject:
   m_ObjectHideFlags: 0
