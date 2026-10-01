@@ -7,8 +7,8 @@ using UnityEngine;
 /// </summary>
 public abstract class HoseWeapon : MonoBehaviour
 {
-    [Header("Hitbox")]
-    [Tooltip("How far the stream reaches from the muzzle.")]
+    [SerializeField, Min(0f)] private float damagePerSecond = 50f;
+    [SerializeField, Min(0f)] private float extinguishPerSecond = 30f;
     [SerializeField, Min(0.1f)] private float range = 5f;
     [Tooltip("How wide the stream is, across the aim direction.")]
     [SerializeField, Min(0.01f)] private float width = 0.6f;
@@ -25,8 +25,11 @@ public abstract class HoseWeapon : MonoBehaviour
     private LineRenderer _stream;
     private PlayerHealth _health;
 
-    public float Range => range;
-    public float Width => width;
+    private readonly List<Collider2D> hits = new List<Collider2D>(64);
+    private readonly HashSet<HordeEnemy> damaged = new HashSet<HordeEnemy>();
+    private readonly HashSet<FireZone> watered = new HashSet<FireZone>();
+    private LineRenderer stream;
+    private PlayerHealth health;
 
     protected Vector2 AimDirection { get; private set; } = Vector2.right;
     protected Vector2 Origin { get; private set; }
@@ -91,17 +94,20 @@ public abstract class HoseWeapon : MonoBehaviour
         Physics2D.SyncTransforms();
         ContactFilter2D filter = new ContactFilter2D { useTriggers = true };
         filter.SetLayerMask(hitLayers);
-
-        float angle = Mathf.Atan2(AimDirection.y, AimDirection.x) * Mathf.Rad2Deg;
-        Physics2D.OverlapBox((Origin + End) * 0.5f, new Vector2(range, width), angle, filter, _colliderHits);
-
-        for (int i = 0; i < _colliderHits.Count; i++)
+        Physics2D.OverlapBox((origin + end) * 0.5f, new Vector2(range, width),
+            Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg, filter, hits);
+        damaged.Clear();
+        watered.Clear();
+        foreach (Collider2D hit in hits)
         {
             Collider2D hit = _colliderHits[i];
             if (hit == null) continue;
             HordeEnemy enemy = hit.GetComponentInParent<HordeEnemy>();
-            if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHealth > 0f && _seen.Add(enemy))
-                _enemyHits.Add(enemy);
+            if (enemy != null && enemy.isActiveAndEnabled && damaged.Add(enemy))
+                enemy.TakeDamage(damagePerSecond * deltaTime);
+            FireZone fire = hit.GetComponentInParent<FireZone>();
+            if (fire != null && fire.isActiveAndEnabled && watered.Add(fire))
+                fire.ApplyWater(extinguishPerSecond * deltaTime);
         }
         return _enemyHits;
     }

@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField, Min(1f)] private float maxHealth = 100f;
-    [Tooltip("Brief immunity shared across all touching enemies, in seconds.")]
+    [Tooltip("Brief immunity shared across all touching enemies and fire zones, in seconds.")]
     [SerializeField, Min(0.05f)] private float contactDamageCooldown = 0.75f;
 
     private HealthPool health;
@@ -69,10 +69,15 @@ public class PlayerHealth : MonoBehaviour
     {
         if (IsDead || Time.time < nextContactTime) return;
         HordeEnemy enemy = other.GetComponentInParent<HordeEnemy>();
-        if (enemy == null || !enemy.isActiveAndEnabled || enemy.CurrentHealth <= 0f
-            || enemy.ContactDamage <= 0f) return;
+        float damage = 0f;
+        if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHealth > 0f)
+            damage = enemy.ContactDamage;
+        FireZone fire = other.GetComponentInParent<FireZone>();
+        if (fire != null && fire.isActiveAndEnabled)
+            damage = Mathf.Max(damage, fire.ContactDamage);
+        if (damage <= 0f) return;
         nextContactTime = Time.time + contactDamageCooldown;
-        TakeDamage(enemy.ContactDamage);
+        TakeDamage(damage);
     }
 
     public void ResetScene()
