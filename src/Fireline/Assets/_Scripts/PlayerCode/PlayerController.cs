@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera aimCamera;
     [SerializeField] private float stickDeadzone = 0.2f;
 
+    [Header("Animation")] 
+    [SerializeField] private Animator _animator;
+
     private Rigidbody2D rb;
     private PlayerHealth health;
     private HoseLoadout loadout;
