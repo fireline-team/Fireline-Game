@@ -29,6 +29,10 @@ namespace Game.Runtime
         [SerializeField] private bool flipSpriteToFaceMovement = true;
         [Tooltip("Ignore tiny sideways movement so sprites don't flicker when walking almost straight up/down.")]
         [SerializeField, Min(0f)] private float flipDeadZone = 0.1f;
+
+        [Header("Knockback")]
+        [Tooltip("How quickly hose knockback wears off. Higher = enemies stop sliding sooner.")]
+        [SerializeField, Min(0f)] private float knockbackDamping = 8f;
         
         private readonly List<HordeEnemy> _enemies = new List<HordeEnemy>(512);
         private readonly List<PlayerHealth> _playerHealth = new List<PlayerHealth>(4);
@@ -147,6 +151,7 @@ namespace Game.Runtime
             }
 
             float dt = Time.deltaTime;
+            float knockbackKeep = Mathf.Exp(-knockbackDamping * dt);
 
             for (int i = 0; i < count; i++)
             {
@@ -161,8 +166,17 @@ namespace Game.Runtime
                 _hash.QueryNeighbors(pos, _neighborBuffer);
                 PlaneVector push = HordeSteering.Separation(i, _positions, _neighborBuffer, separationRadius, maxNeighbors);
 
-                PlaneVector velocity = seek * enemy.MoveSpeed + push * separationStrength;
+                Vector2 knockback = enemy.KnockbackVelocity;
+                PlaneVector velocity = seek * (enemy.MoveSpeed * enemy.SpeedMultiplier)
+                                       + push * separationStrength
+                                       + new PlaneVector(knockback.x, knockback.y);
                 PlaneVector newPos = pos + velocity * dt;
+
+                if (knockback != Vector2.zero)
+                {
+                    knockback *= knockbackKeep;
+                    enemy.KnockbackVelocity = knockback.sqrMagnitude < 0.0001f ? Vector2.zero : knockback;
+                }
 
                 Transform tr = enemy.CachedTransform;
                 tr.position = new Vector3(newPos.X, newPos.Y, tr.position.z);
