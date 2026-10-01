@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0a40eaefcb6b4af98b61052963b14e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.HordeStressTest
-  enemyPrefab: {fileID: -2784519892548576912, guid: b7f064a8f920c4ea4a99a1e3e72b5847, type: 3}
+  enemyPrefab: {fileID: -2784519892548576912, guid: a83cf33320a05449a932f4f0ecf68c6e, type: 3}
   prewarmCount: 300
   maxPoolSize: 2000
   spawnRadiusMin: 10
@@ -372,7 +372,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1.6}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
 --- !u!4 &565888473
@@ -698,7 +698,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1.6}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
 --- !u!4 &1282463873

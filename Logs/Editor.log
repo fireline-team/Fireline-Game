@@ -1,0 +1,103 @@
+Unity Editor version:    6000.6.1f1 (7efac9f6c10e)
+Branch:                  6000.6/staging
+Build type:              Release
+Batch mode:              NO
+macOS version:           Version 26.5.2 (Build 25F84)
+Darwin version:          25.5.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        8192 MB
+Date:                    2026-10-01T10:44:56Z
+VBCSCompilerPreWarmer: pre-warm launched (dotnet PID 56189)
+VBCSCompiler prewarm took 7.03 ms
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-jtk" at "2026-10-01T10:44:56.858055Z"
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              bc5e8d0d3f6d407fb301260cd646fc9a
+  Correlation Id:          23bf35e466ae3c0ef22b5a553e19a0cf
+  External correlation Id: 7508739623767405762
+  Machine Id:              sor1rGLzyYA6fMRxEyI6+McjRp4=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-jtk" (connect: 0.00s, validation: 0.01s, handshake: 0.60s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-jtk-notifications" at "2026-10-01T10:44:57.46946Z"
+[Licensing::Client] Successfully updated the access token
+[Licensing::Module] Successfully updated the access token 5fmmFaplYT...
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 1375780493595-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.01
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.63s
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/6000.6.1f1/Unity.app/Contents/MacOS/Unity
+-projectpath
+/Users/jtk/Documents/GitHub/Fireline-Game
+-acceptSoftwareTermsForThisRunOnly
+-useHub
+-hubIPC
+-cloudEnvironment
+production
+-licensingIpc
+LicenseClient-jtk
+-hubSessionId
+9c027a24-8e1f-473b-9904-f797bcb49756
+-accessToken
+5fmmFaplYTBPg4gd8SK5VcVi_QJIn-ciG81gsVTF4t8001f
+Successfully changed project path to: /Users/jtk/Documents/GitHub/Fireline-Game
+/Users/jtk/Documents/GitHub/Fireline-Game
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-main-allocator-mimalloc-enabled=1"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+Player connection [8437030272]  Target information:
+
+Player connection [8437030272]  * "[IP] 10.208.179.90 [Port] 55504 [Flags] 2 [Guid] 3583152959 [EditorId] 3583152959 [Version] 1048832 [Id] OSXEditor(0,JTKs-MacBook-Air-808.local) [Debug] 1 [PackageName] OSXEditor [ProjectName] Editor" 
+
+Player connection [8437030272] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [8437030272] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Package Manager] Connected to IPC stream "Upm-56188" after 0.1 seconds.
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+Rebuilding Library because the asset database could not be found!
+[ExitDontLaunchBugReporter] Exiting without the bug reporter. Application will exit with return code 0
+[Package Manager] Server process was shutdown

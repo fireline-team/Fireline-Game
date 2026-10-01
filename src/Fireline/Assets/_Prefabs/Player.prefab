@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 500129299363126778}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.526, y: 0.02, z: 0}
+  m_LocalPosition: {x: -0.41, y: 0.02, z: 0}
   m_LocalScale: {x: 1.25, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -204,8 +204,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.57, y: 1.6}
-    newSize: {x: 0.57, y: 1.6}
+    oldSize: {x: 0.68, y: 1.6}
+    newSize: {x: 0.68, y: 1.6}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -317,6 +317,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   muzzle: {fileID: 4377830768944491630}
+  extinguishPerSecond: 30
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
   streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
   damagePerSecond: 20
@@ -339,6 +340,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   muzzle: {fileID: 4377830768944491630}
+  extinguishPerSecond: 30
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
   streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
   damagePerSecond: 8
@@ -362,6 +364,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   muzzle: {fileID: 4377830768944491630}
+  extinguishPerSecond: 30
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
   streamColor: {r: 0.25, g: 0.8, b: 1, a: 0.7}
   damagePerShot: 15
@@ -378,7 +381,7 @@ Animator:
   m_GameObject: {fileID: 591240336905840500}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 1c7fc87d6023140a5a0e68b731ae75bb, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0e669740be2044bb89d29c4fab2e05bd, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -439,12 +442,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2353094741450111946, guid: 1bea9c3b5117b45adaece7a9e72484eb, type: 3}
+  m_Sprite: {fileID: 2353094741450111946, guid: 402e81363babf4b989fabcf1a18989d5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.57, y: 1.6}
+  m_Size: {x: 0.68, y: 1.6}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -813,38 +816,3 @@ Transform:
   - {fileID: 6246584468556133135}
   m_Father: {fileID: 5933821776725555064}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &810000001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 591240336905840500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75557b8445c8442abfb8cbb917c1eb94, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  maxHealth: 100
-  contactDamageCooldown: 0.75
---- !u!114 &810000002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 591240336905840500}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77128d351bd142fab2038be6054cecb5, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
-  damagePerSecond: 20
-  extinguishPerSecond: 30
-  range: 5
-  width: 0.6
-  hitLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  muzzle: {fileID: 4377830768944491630}
-  streamMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}

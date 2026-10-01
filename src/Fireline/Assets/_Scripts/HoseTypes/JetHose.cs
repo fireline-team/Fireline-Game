@@ -35,6 +35,8 @@ public class JetHose : HoseWeapon
             hits[i].ApplyKnockback(knock);
             hits[i].TakeDamage(damagePerShot);
         }
+        
+        WaterFiresInHitbox(ExtinguishPerSecond * fireInterval);
     }
 
     protected override bool ShouldShowStream() => Time.time - _lastShotTime < flashDuration;

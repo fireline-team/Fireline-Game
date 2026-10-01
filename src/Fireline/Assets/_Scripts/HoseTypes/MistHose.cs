@@ -10,7 +10,7 @@ public class MistHose : HoseWeapon
     [SerializeField, Range(0.05f, 1f)] private float slowMultiplier = 0.4f;
     [Tooltip("How long the slow lasts after an enemy leaves the mist, in seconds.")]
     [SerializeField, Min(0f)] private float slowDuration = 1f;
-    
+
     private void Reset() => SetHitboxSize(2.5f, 3f);
 
     protected override void OnSpray(float deltaTime)
@@ -23,5 +23,7 @@ public class MistHose : HoseWeapon
             hits[i].ApplySlow(slowMultiplier, slowDuration);
             hits[i].TakeDamage(damage);
         }
+
+        WaterFiresInHitbox(ExtinguishPerSecond * deltaTime);
     }
 }

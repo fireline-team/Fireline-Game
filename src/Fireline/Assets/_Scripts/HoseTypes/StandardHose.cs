@@ -8,7 +8,7 @@ public class StandardHose : HoseWeapon
     [SerializeField, Min(0f)] private float damagePerSecond = 20f;
     [Tooltip("How hard the stream shoves enemies away while they're in it. Enemies walking at speed 2 get pushed back once this is above roughly 2 x the HordeManager's Knockback Damping.")]
     [SerializeField, Min(0f)] private float knockbackStrength = 24f;
-    
+
     private void Reset() => SetHitboxSize(5f, 0.6f);
 
     protected override void OnSpray(float deltaTime)
@@ -22,5 +22,7 @@ public class StandardHose : HoseWeapon
             hits[i].ApplyKnockback(push);
             hits[i].TakeDamage(damage);
         }
+
+        WaterFiresInHitbox(ExtinguishPerSecond * deltaTime);
     }
 }

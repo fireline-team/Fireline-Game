@@ -1,0 +1,4 @@
+[2026-10-01T10:44:58.768Z][INFO] Command-line: /Applications/Unity/Hub/Editor/6000.6.1f1/Unity.app/Contents/Helpers/PackageManager/Server/UnityPackageManager server -s 56188 --ipc-path /tmp/Unity-Upm-56188.sock -l 2 --log-file /Users/jtk/Documents/GitHub/Fireline-Game/Logs/upm.log
+[2026-10-01T10:44:58.808Z][INFO] IPC server started (IPC path=/tmp/Unity-Upm-56188.sock).
+[2026-10-01T10:44:58.808Z][INFO] Hint: To connect to this UPM instance, launch Unity with the command-line parameter -upmIpcPath Upm-56188.
+[2026-10-01T10:45:05.075Z][INFO] Received shutdown request (SIGTERM), shutting down Unity Package Manager
