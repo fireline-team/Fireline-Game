@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(PlayerHealth))] // plus at least one hose: StandardHose, MistHose, or JetHose
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
@@ -13,7 +14,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Camera aimCamera;
     [SerializeField] private float stickDeadzone = 0.2f;
 
+    [Header("Animation")] 
+    [SerializeField] private Animator _animator;
+    private static readonly int IsMovingParam = Animator.StringToHash("IsMoving");
+
     private Rigidbody2D rb;
+    private PlayerHealth health;
+    private HoseLoadout loadout;
+    private PlayerInteractor interactor;
+    private HoseWeapon fixedHose;
+    private HoseWeapon hose => loadout != null && loadout.Current != null ? loadout.Current : fixedHose;
+    private bool spraying;
+    private float diedAt;
     private PlayerInput playerInput;
 
     private InputAction moveAction;
@@ -29,6 +41,13 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        health = GetComponent<PlayerHealth>();
+        loadout = GetComponent<HoseLoadout>();
+        interactor = GetComponent<PlayerInteractor>();
+        fixedHose = GetComponent<HoseWeapon>();
+        if (hose == null)
+            Debug.LogError($"{name} needs a hose component (StandardHose, MistHose, or JetHose).", this);
+        health.Died += OnDied;
         playerInput = GetComponent<PlayerInput>();
 
         moveAction = playerInput.actions["Move"];
@@ -44,6 +63,13 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (health.IsDead)
+        {
+            if (Time.unscaledTime - diedAt > 0.3f && interactAction.WasPressedThisFrame())
+                health.ResetScene();
+            return;
+        }
+
         ReadMovement();
         ReadAim();
         ReadActions();
@@ -51,7 +77,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (health.IsDead) return;
         Move();
+        if (hose == null) return;
+        if (spraying) hose.Spray(aimDirection, Time.fixedDeltaTime);
+        else hose.StopSpraying();
     }
 
     private void ReadMovement()
@@ -116,10 +146,8 @@ public class PlayerController : MonoBehaviour
 
     private void ReadActions()
     {
-        if (useWeaponAction.IsPressed())
-        {
-            UseWeapon();
-        }
+        spraying = useWeaponAction.IsPressed();
+        if (!spraying && hose != null) hose.StopSpraying();
 
         if (interactAction.WasPressedThisFrame())
         {
@@ -127,19 +155,46 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void UseWeapon()
+    private void OnDied()
     {
-        // Temporary test
-        Debug.Log(
-            $"Player {playerInput.playerIndex + 1} using weapon"
-        );
+        diedAt = Time.unscaledTime;
+        moveInput = Vector2.zero;
+        spraying = false;
+        if (hose != null) hose.StopSpraying();
     }
 
+    private void OnDisable()
+    {
+        spraying = false;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (hose != null) hose.StopSpraying();
+    }
+
+    private void OnDestroy()
+    {
+        if (health != null) health.Died -= OnDied;
+    }
+    
     private void Interact()
     {
-        // Temporary test
-        Debug.Log(
-            $"Player {playerInput.playerIndex + 1} interacting"
-        );
+        if (interactor != null && interactor.TryInteract())
+            return;
+
+        UseOffhand();
+    }
+
+    private void UseOffhand()
+    {
+        // TODO: off-hand axe/weapon
+        Debug.Log($"Player {playerInput.playerIndex + 1} swings axe (not implemented yet)");
+    }
+    
+    
+    // animation stuff
+
+    private void UpdateAnimation()
+    {
+        if (_animator == null) return;
+        _animator.SetBool(IsMovingParam, moveInput.sqrMagnitude > 0.01f);
     }
 }

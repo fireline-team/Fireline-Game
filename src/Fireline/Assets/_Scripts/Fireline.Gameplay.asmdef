@@ -1,0 +1,8 @@
+{
+  "name": "Fireline.Gameplay",
+  "references": [
+    "Fireline.Shared",
+    "Unity.InputSystem",
+    "Unity.Cinemachine"
+  ]
+}

@@ -9,10 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3723580299414581353}
+  - component: {fileID: 810000003}
   - component: {fileID: 8049177413187370694}
   - component: {fileID: -2784519892548576912}
   - component: {fileID: -7189041587831395240}
-  m_Layer: 0
+  - component: {fileID: -7706934376786935346}
+  m_Layer: 6
   m_Name: HordeEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34,6 +36,42 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &810000003
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7645219174382690847}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.5
 --- !u!212 &8049177413187370694
 SpriteRenderer:
   serializedVersion: 3
@@ -83,7 +121,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 1728271943, guid: 398199d4fad214c07bd53ab97c17cabb, type: 3}
+  m_Sprite: {fileID: 177952670, guid: 7a72b1ee4b8984c8082f570d486c6b9c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -105,10 +143,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ad5b0e77c98b44e4ab1165001f0f144b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Runtime.HordeEnemy
-  definition: {fileID: 11400000, guid: 7c8f0baa7ab3c4eb5a61a223ab10b925, type: 2}
+  m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.HordeEnemy
+  definition: {fileID: 11400000, guid: e92455087af1e4facad1ce6d12660e0e, type: 2}
   spriteRenderer: {fileID: 0}
   animator: {fileID: 0}
+  hitFlashMaterial: {fileID: 2100000, guid: addf6bd8a7adb43238a0bf72d1f7a0bb, type: 2}
+  flashDuration: 0.06
+  flashInterval: 0.12
 --- !u!95 &-7189041587831395240
 Animator:
   serializedVersion: 7
@@ -119,7 +160,7 @@ Animator:
   m_GameObject: {fileID: 7645219174382690847}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c2ed8036488074b579eb2fef5300b4d1, type: 2}
+  m_Controller: {fileID: 9100000, guid: c9d0f4afb23b24124a8e384fb2f4cdcf, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -131,3 +172,30 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!50 &-7706934376786935346
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7645219174382690847}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

@@ -29,8 +29,13 @@ namespace Game.Runtime
         [SerializeField] private bool flipSpriteToFaceMovement = true;
         [Tooltip("Ignore tiny sideways movement so sprites don't flicker when walking almost straight up/down.")]
         [SerializeField, Min(0f)] private float flipDeadZone = 0.1f;
+
+        [Header("Knockback")]
+        [Tooltip("How quickly hose knockback wears off. Higher = enemies stop sliding sooner.")]
+        [SerializeField, Min(0f)] private float knockbackDamping = 8f;
         
         private readonly List<HordeEnemy> _enemies = new List<HordeEnemy>(512);
+        private readonly List<PlayerHealth> _playerHealth = new List<PlayerHealth>(4);
         private readonly List<Transform> _playerTransforms = new List<Transform>(4);
         private readonly List<PlaneVector> _playerPositions = new List<PlaneVector>(4);
         private readonly List<int> _neighborBuffer = new List<int>(64);
@@ -94,9 +99,13 @@ namespace Game.Runtime
         private void RefreshPlayerList()
         {
             _playerTransforms.Clear();
+            _playerHealth.Clear();
             GameObject[] found = GameObject.FindGameObjectsWithTag(playerTag);
             for (int i = 0; i < found.Length; i++)
+            {
                 _playerTransforms.Add(found[i].transform);
+                _playerHealth.Add(found[i].GetComponent<PlayerHealth>());
+            }
         }
 
         private void SnapshotPlayerPositions()
@@ -105,7 +114,8 @@ namespace Game.Runtime
             for (int i = 0; i < _playerTransforms.Count; i++)
             {
                 Transform t = _playerTransforms[i];
-                if (t == null || !t.gameObject.activeInHierarchy) continue;
+                if (t == null || !t.gameObject.activeInHierarchy
+                    || (_playerHealth[i] != null && _playerHealth[i].IsDead)) continue;
                 _playerPositions.Add(ToPlane(t.position));
             }
         }
@@ -141,11 +151,14 @@ namespace Game.Runtime
             }
 
             float dt = Time.deltaTime;
+            float now = Time.time;
+            float knockbackKeep = Mathf.Exp(-knockbackDamping * dt);
 
             for (int i = 0; i < count; i++)
             {
                 HordeEnemy enemy = _enemies[i];
                 PlaneVector pos = _positions[i];
+                if (enemy.IsFlashing) enemy.UpdateFlash(now);
 
                 PlaneVector seek = PlaneVector.Zero;
                 int target = HordeSteering.FindNearest(pos, _playerPositions);
@@ -155,8 +168,17 @@ namespace Game.Runtime
                 _hash.QueryNeighbors(pos, _neighborBuffer);
                 PlaneVector push = HordeSteering.Separation(i, _positions, _neighborBuffer, separationRadius, maxNeighbors);
 
-                PlaneVector velocity = seek * enemy.MoveSpeed + push * separationStrength;
+                Vector2 knockback = enemy.KnockbackVelocity;
+                PlaneVector velocity = seek * (enemy.MoveSpeed * enemy.SpeedMultiplier)
+                                       + push * separationStrength
+                                       + new PlaneVector(knockback.x, knockback.y);
                 PlaneVector newPos = pos + velocity * dt;
+
+                if (knockback != Vector2.zero)
+                {
+                    knockback *= knockbackKeep;
+                    enemy.KnockbackVelocity = knockback.sqrMagnitude < 0.0001f ? Vector2.zero : knockback;
+                }
 
                 Transform tr = enemy.CachedTransform;
                 tr.position = new Vector3(newPos.X, newPos.Y, tr.position.z);
