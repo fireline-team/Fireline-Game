@@ -154,7 +154,10 @@ namespace Game.Runtime
             if (showPanel && _panelRect.Contains(new Vector2(screen.x, Screen.height - screen.y)))
                 return;
 
-            Vector3 world = cam.ScreenToWorldPoint(new Vector3(screen.x, screen.y, Mathf.Abs(cam.transform.position.z)));
+            Ray ray = cam.ScreenPointToRay(screen);
+            if (!new Plane(Vector3.forward, transform.position).Raycast(ray, out float distance)) return;
+            Vector3 world = ray.GetPoint(distance);
+            
             SpawnAt(world, enemiesPerClick, SelectedType);
         }
 

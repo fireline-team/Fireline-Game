@@ -109,8 +109,7 @@ public class PlayerController : MonoBehaviour
         if (playerInput.currentControlScheme == "KeyboardMouse")
         {
             // Mouse gives us a SCREEN POSITION
-            Vector3 mouseWorldPosition =
-                aimCamera.ScreenToWorldPoint(aimInput);
+            Vector2 mouseWorldPosition = ScreenToGround(aimInput);
 
             Vector2 direction =
                 (Vector2)mouseWorldPosition - rb.position;
@@ -198,5 +197,12 @@ public class PlayerController : MonoBehaviour
     {
         if (_animator == null) return;
         _animator.SetBool(IsMovingParam, moveInput.sqrMagnitude > 0.01f);
+    }
+    
+    private Vector2 ScreenToGround(Vector2 screenPos)
+    {
+        Ray ray = aimCamera.ScreenPointToRay(screenPos);
+        Plane ground = new Plane(Vector3.forward, new Vector3(0f, 0f, transform.position.z));
+        return ground.Raycast(ray, out float distance) ? (Vector2)ray.GetPoint(distance) : rb.position;
     }
 }
