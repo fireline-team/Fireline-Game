@@ -97,10 +97,9 @@ public class HealthCombatTests
     public IEnumerator HoseOnlyHitsItsAreaAndDamagesEachEnemyOnce()
     {
         PlayerHealth player = Player(new Vector2(100, 100));
-        HoseWeapon hose = player.gameObject.AddComponent<HoseWeapon>();
+        StandardHose hose = player.gameObject.AddComponent<StandardHose>();
         // Fix this scenario's damage independently of designer-tuned defaults.
-        typeof(HoseWeapon).GetField("damagePerSecond", BindingFlags.Instance | BindingFlags.NonPublic)
-            .SetValue(hose, 20f);
+        SetPrivate(hose, "damagePerSecond", 20f);
         HordeEnemy hit = Enemy(new Vector2(102, 100));
         hit.gameObject.AddComponent<BoxCollider2D>().isTrigger = true;
         HordeEnemy behind = Enemy(new Vector2(98, 100));
@@ -117,6 +116,176 @@ public class HealthCombatTests
         hit.TakeDamage(100);
         yield return null;
         Assert.That(hit == null, Is.True, "Unpooled enemies are destroyed.");
+    }
+
+    // Private serialized fields live on the class that declares them, so look them up there.
+    private static void SetPrivate<T>(T target, string field, object value)
+    {
+        FieldInfo info = typeof(T).GetField(field, BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.That(info, Is.Not.Null, $"{typeof(T).Name} has no private field '{field}'. Was it renamed?");
+        info.SetValue(target, value);
+    }
+
+    [UnityTest]
+    public IEnumerator StandardHosePushesEnemiesAlongTheAim()
+    {
+        PlayerHealth player = Player(new Vector2(100, 100));
+        StandardHose hose = player.gameObject.AddComponent<StandardHose>();
+        HordeEnemy enemy = Enemy(new Vector2(102, 100));
+
+        hose.Spray(Vector2.right, 0.1f);
+
+        Assert.That(enemy.KnockbackVelocity.x, Is.GreaterThan(0f), "Aiming right must push the enemy right.");
+        Assert.That(enemy.KnockbackVelocity.y, Is.EqualTo(0f).Within(0.001f));
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator KnockbackResistanceReducesPush()
+    {
+        PlayerHealth player = Player(new Vector2(100, 100));
+        StandardHose hose = player.gameObject.AddComponent<StandardHose>();
+        HordeEnemy normal = Enemy(new Vector2(102, 100.1f));
+        HordeEnemy tank = Enemy(new Vector2(102, 99.9f));
+        SetPrivate(tank.Definition, "knockbackResistance", 1f);
+
+        hose.Spray(Vector2.right, 0.1f);
+
+        Assert.That(normal.KnockbackVelocity.x, Is.GreaterThan(0f));
+        Assert.That(tank.KnockbackVelocity, Is.EqualTo(Vector2.zero), "Full resistance means no push.");
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator MistHoseSlowsAndDamagesLessThanStandard()
+    {
+        PlayerHealth player = Player(new Vector2(100, 100));
+        MistHose mist = player.gameObject.AddComponent<MistHose>();
+        HordeEnemy enemy = Enemy(new Vector2(102, 100));
+
+        mist.Spray(Vector2.right, 0.1f);
+
+        Assert.That(enemy.SpeedMultiplier, Is.LessThan(1f), "Mist must slow enemies.");
+        Assert.That(enemy.CurrentHealth, Is.LessThan(10f), "Mist still does some damage.");
+        Assert.That(enemy.CurrentHealth, Is.GreaterThan(8f), "Mist does less than the standard hose's 2 damage per 0.1s.");
+
+        yield return new WaitForSeconds(1.1f);
+        Assert.That(enemy.SpeedMultiplier, Is.EqualTo(1f), "The slow must wear off.");
+    }
+
+    [UnityTest]
+    public IEnumerator JetHoseFiresOnceThenWaitsForItsInterval()
+    {
+        PlayerHealth player = Player(new Vector2(100, 100));
+        JetHose jet = player.gameObject.AddComponent<JetHose>();
+        SetPrivate(jet, "damagePerShot", 3f);
+        HordeEnemy enemy = Enemy(new Vector2(102, 100));
+
+        jet.Spray(Vector2.right, 0.02f);
+        Assert.That(enemy.CurrentHealth, Is.EqualTo(7f).Within(0.001f), "First pull fires immediately.");
+
+        jet.Spray(Vector2.right, 0.02f);
+        jet.StopSpraying();
+        jet.Spray(Vector2.right, 0.02f);
+        Assert.That(enemy.CurrentHealth, Is.EqualTo(7f).Within(0.001f), "Holding or re-tapping can't fire early.");
+
+        yield return new WaitForSeconds(0.55f);
+        jet.Spray(Vector2.right, 0.02f);
+        Assert.That(enemy.CurrentHealth, Is.EqualTo(4f).Within(0.001f), "Fires again after the interval.");
+    }
+
+    // A player carrying all three nozzles, managed by a loadout.
+    private HoseLoadout PlayerWithLoadout(Vector2 position, out PlayerInteractor interactor)
+    {
+        PlayerHealth player = Player(position);
+        player.gameObject.AddComponent<StandardHose>();
+        player.gameObject.AddComponent<MistHose>();
+        player.gameObject.AddComponent<JetHose>();
+        interactor = player.gameObject.AddComponent<PlayerInteractor>();
+        return player.gameObject.AddComponent<HoseLoadout>(); // last, so it finds every nozzle
+    }
+
+    [UnityTest]
+    public IEnumerator LoadoutKeepsExactlyOneNozzleEnabled()
+    {
+        HoseLoadout loadout = PlayerWithLoadout(new Vector2(100, 100), out _);
+
+        Assert.That(loadout.CurrentType, Is.EqualTo(NozzleType.Standard), "Starts on the standard nozzle.");
+        Assert.That(loadout.Equip(NozzleType.Jet), Is.True);
+
+        Assert.That(loadout.Current, Is.InstanceOf<JetHose>());
+        Assert.That(loadout.GetComponent<JetHose>().enabled, Is.True);
+        Assert.That(loadout.GetComponent<StandardHose>().enabled, Is.False);
+        Assert.That(loadout.GetComponent<MistHose>().enabled, Is.False);
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator NozzleStationSwapsNozzleOnlyWhenInReach()
+    {
+        HoseLoadout loadout = PlayerWithLoadout(new Vector2(100, 100), out PlayerInteractor interactor);
+        var station = NewObject("Mist station", new Vector2(110, 100)).AddComponent<NozzleStation>(); // default: Mist
+
+        Assert.That(interactor.TryInteract(), Is.False, "Too far away: E should fall through to the axe.");
+        Assert.That(loadout.CurrentType, Is.EqualTo(NozzleType.Standard));
+
+        station.transform.position = new Vector2(100.5f, 100);
+        Assert.That(interactor.TryInteract(), Is.True);
+        Assert.That(loadout.CurrentType, Is.EqualTo(NozzleType.Mist));
+
+        Assert.That(interactor.TryInteract(), Is.False, "Already equipped: nothing to do, so E swings the axe.");
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator DamagedEnemyFlashesButNotEveryTick()
+    {
+        HordeEnemy enemy = Enemy(new Vector2(100, 100));
+        SpriteRenderer sprite = enemy.gameObject.AddComponent<SpriteRenderer>();
+        SetPrivate(enemy, "spriteRenderer", sprite);
+        Material normal = sprite.sharedMaterial;
+        SetPrivate(enemy, "_normalMaterial", normal); // normally captured in Awake
+        var flash = new Material(normal);
+        created.Add(flash);
+        SetPrivate(enemy, "hitFlashMaterial", flash);
+
+        enemy.TakeDamage(1f);
+        Assert.That(enemy.IsFlashing, Is.True);
+        Assert.That(sprite.sharedMaterial, Is.SameAs(flash));
+
+        enemy.gameObject.SetActive(false); // as if despawned...
+        enemy.gameObject.SetActive(true);  // ...and reused from the pool
+        Assert.That(enemy.IsFlashing, Is.False, "Reused enemies must not come back mid-flash.");
+        Assert.That(sprite.sharedMaterial, Is.SameAs(normal));
+        yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator PlayerBlinksDuringInvulnerabilityThenReturnsToNormal()
+    {
+        PlayerHealth player = Player(new Vector2(100, 100));
+        SpriteRenderer sprite = player.gameObject.AddComponent<SpriteRenderer>();
+        // The player caches its sprites on Awake, so re-run it now that one exists.
+        typeof(PlayerHealth).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(player, null);
+        Enemy(new Vector2(100, 100));
+
+        yield return new WaitForFixedUpdate();
+        yield return null;
+        Assert.That(player.IsInvulnerable, Is.True, "Contact damage starts the i-frames.");
+
+        // Watch a few frames rather than one, so a slow test frame can't skip the faded phase.
+        float lowestAlpha = 1f;
+        for (float t = 0f; t < 0.3f; t += Time.deltaTime)
+        {
+            lowestAlpha = Mathf.Min(lowestAlpha, sprite.color.a);
+            yield return null;
+        }
+        Assert.That(lowestAlpha, Is.LessThan(1f), "The player must blink while invulnerable.");
+
+        player.GetComponent<Rigidbody2D>().position = new Vector2(110, 110); // step out of contact
+        yield return new WaitForSeconds(0.85f);
+        Assert.That(player.IsInvulnerable, Is.False);
+        Assert.That(sprite.color.a, Is.EqualTo(1f), "Fully visible again once the i-frames end.");
     }
 
     [UnityTest]
@@ -154,7 +323,7 @@ public class HealthCombatTests
         created.Add(input.gameObject);
         var player = input.GetComponent<PlayerHealth>();
         var controller = input.GetComponent<PlayerController>();
-        var stream = input.GetComponentInChildren<LineRenderer>();
+        HoseWeapon hose = input.GetComponent<HoseLoadout>().Current;
         InputSystem.QueueStateEvent(gamepad, new GamepadState
         {
             leftStick = Vector2.right, rightStick = Vector2.right, rightTrigger = 1
@@ -163,7 +332,7 @@ public class HealthCombatTests
         yield return new WaitForFixedUpdate();
         yield return null;
         Assert.That(input.GetComponent<Rigidbody2D>().linearVelocity.x, Is.GreaterThan(0));
-        Assert.That(stream.enabled, Is.True);
+        Assert.That(hose.IsStreamActive, Is.True, "Holding the trigger must show water.");
         player.TakeDamage(100);
         Vector3 deathPosition = player.transform.position;
         Vector2 deathAim = controller.AimDirection;
@@ -174,7 +343,7 @@ public class HealthCombatTests
         yield return new WaitForSeconds(0.4f);
         Assert.That(player.transform.position, Is.EqualTo(deathPosition));
         Assert.That(controller.AimDirection, Is.EqualTo(deathAim));
-        Assert.That(stream.enabled, Is.False);
+        Assert.That(hose.IsStreamActive, Is.False, "Dead players stop spraying.");
         var oldSceneHandle = SceneManager.GetActiveScene().handle;
         InputSystem.QueueStateEvent(gamepad, new GamepadState().WithButton(GamepadButton.South));
         for (int frame = 0; frame < 120 && SceneManager.GetActiveScene().handle == oldSceneHandle; frame++)
