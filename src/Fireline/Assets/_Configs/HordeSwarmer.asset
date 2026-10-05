@@ -20,7 +20,7 @@ MonoBehaviour:
   spriteVariants:
   - {fileID: 1728271943, guid: 398199d4fad214c07bd53ab97c17cabb, type: 3}
   tint: {r: 0.8962264, g: 0.5799675, b: 0.2747864, a: 1}
-  minScale: 0.2
-  maxScale: 0.5
+  minScale: 1
+  maxScale: 2
   artFacesLeft: 1
   animatorController: {fileID: 9100000, guid: c9d0f4afb23b24124a8e384fb2f4cdcf, type: 2}
