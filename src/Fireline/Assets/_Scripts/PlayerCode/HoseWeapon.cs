@@ -52,6 +52,9 @@ public abstract class HoseWeapon : MonoBehaviour
     private HoseStreamVisual _stream;
     private PlayerHealth _health;
 
+    /// <summary>The held nozzle transform, used by the supply hose attachment.</summary>
+    public Transform NozzleTransform => muzzle != null ? muzzle : transform;
+
     public float Range => range;
     public float Width => width;
     /// <summary>True while the continuous water visual is running (pulses don't count).</summary>
