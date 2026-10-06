@@ -1,59 +1,85 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-/// <summary>Scene-local water supply. Gives each joining player a separately simulated hose.</summary>
-public class HoseRopeSource : MonoBehaviour
+/// <summary>An interactable outlet. Connection ownership lives on each player.</summary>
+public class HoseRopeSource : Interactable
 {
     [SerializeField] private Transform sourcePoint;
     [SerializeField] private Transform groundPlane;
-    [Tooltip("Local up axis of the ground plane. This project's ground is XY, so use (0,0,-1).")]
+    [Tooltip("Local up axis of the ground plane. XY ground uses (0,0,-1).")]
     [SerializeField] private Vector3 groundNormal = Vector3.back;
     [SerializeField] private HoseRope ropePrefab;
 
-    private readonly Dictionary<PlayerInput, HoseRope> hoses = new Dictionary<PlayerInput, HoseRope>();
-    private readonly List<PlayerInput> departed = new List<PlayerInput>();
-    public int ConnectedPlayers => hoses.Count;
+    private static readonly List<HoseRopeSource> Sources = new List<HoseRopeSource>();
+    private readonly HashSet<PlayerHoseConnection> connections = new HashSet<PlayerHoseConnection>();
+    public int ConnectedPlayers => connections.Count;
+    public bool IsAvailable => isActiveAndEnabled && sourcePoint != null && ropePrefab != null;
 
-    private void Update()
+    protected override void OnEnable()
     {
-        if (sourcePoint == null || ropePrefab == null) return;
-        foreach (PlayerInput player in PlayerInput.all)
+        base.OnEnable();
+        Sources.Add(this);
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        Sources.Remove(this);
+        // Detach mutates connections, so iterate a snapshot.
+        foreach (var connection in new List<PlayerHoseConnection>(connections))
+            if (connection != null) connection.Detach();
+        connections.Clear();
+    }
+
+    public override bool CanInteract(PlayerInteractor player)
+    {
+        if (!IsAvailable || player == null || player.gameObject.scene != gameObject.scene) return false;
+        var health = player.GetComponent<PlayerHealth>();
+        return (health == null || !health.IsDead) && player.GetComponent<HoseWeapon>() != null;
+    }
+
+    public override string GetPrompt(PlayerInteractor player)
+    {
+        var connection = player.GetComponent<PlayerHoseConnection>();
+        if (connection == null || !connection.IsConnected) return "Attach hose";
+        return connection.Source == this ? "Detach hose" : "Transfer hose here";
+    }
+
+    public override void Interact(PlayerInteractor player)
+    {
+        if (!CanInteract(player) || ((Vector2)(player.transform.position - transform.position)).sqrMagnitude
+            > InteractRadius * InteractRadius) return;
+        var connection = player.GetComponent<PlayerHoseConnection>();
+        if (connection == null) connection = player.gameObject.AddComponent<PlayerHoseConnection>();
+        if (connection.Source == this) connection.Detach();
+        else connection.Attach(this);
+    }
+
+    public static HoseRopeSource FindNearest(GameObject player)
+    {
+        HoseRopeSource best = null;
+        float distance = float.PositiveInfinity;
+        foreach (var candidate in Sources)
         {
-            if (player.gameObject.scene != gameObject.scene || hoses.ContainsKey(player)) continue;
-            HoseWeapon nozzle = GetNozzle(player);
-            if (nozzle == null) continue;
-            HoseRope rope = Instantiate(ropePrefab, player.transform);
-            rope.name = "Supply hose";
-            Transform plane = groundPlane != null ? groundPlane : transform;
-            rope.Bind(sourcePoint, nozzle.NozzleTransform, plane.position, plane.TransformDirection(groundNormal));
-            hoses.Add(player, rope);
+            if (candidate == null || !candidate.IsAvailable || candidate.gameObject.scene != player.scene) continue;
+            float next = (candidate.transform.position - player.transform.position).sqrMagnitude;
+            if (next < distance) { best = candidate; distance = next; }
         }
-        departed.Clear();
-        foreach (var pair in hoses)
-        {
-            if (pair.Key == null || !pair.Key.isActiveAndEnabled || pair.Value == null)
-            {
-                if (pair.Value != null) Destroy(pair.Value.gameObject);
-                departed.Add(pair.Key);
-                continue;
-            }
-            HoseWeapon nozzle = GetNozzle(pair.Key);
-            pair.Value.SetNozzle(nozzle != null ? nozzle.NozzleTransform : null);
-        }
-        foreach (var player in departed) hoses.Remove(player);
+        return best;
     }
 
-    private static HoseWeapon GetNozzle(PlayerInput player)
+    public HoseRope CreateRope(PlayerHoseConnection player, Transform nozzle)
     {
-        HoseLoadout loadout = player.GetComponent<HoseLoadout>();
-        return loadout != null ? loadout.Current : player.GetComponent<HoseWeapon>();
+        var rope = Instantiate(ropePrefab, player.transform);
+        rope.name = "Supply hose";
+        var plane = groundPlane != null ? groundPlane : transform;
+        rope.Bind(sourcePoint, nozzle, plane.position, plane.TransformDirection(groundNormal));
+        connections.Add(player);
+        return rope;
     }
 
-    private void OnDisable()
-    {
-        foreach (var rope in hoses.Values)
-            if (rope != null) Destroy(rope.gameObject);
-        hoses.Clear();
-    }
+    public void Release(PlayerHoseConnection player) => connections.Remove(player);
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ClearSources() => Sources.Clear();
 }

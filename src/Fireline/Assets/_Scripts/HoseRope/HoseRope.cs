@@ -60,6 +60,18 @@ public class HoseRope : MonoBehaviour
 
     public void SetNozzle(Transform value) => nozzle = value;
 
+    public void SetColor(Color color)
+    {
+        // URP Unlit uses _BaseColor rather than LineRenderer vertex colors.
+        var renderer = GetComponent<LineRenderer>();
+        var properties = new MaterialPropertyBlock();
+        renderer.GetPropertyBlock(properties);
+        properties.SetColor("_BaseColor", color);
+        properties.SetColor("_Color", color);
+        renderer.SetPropertyBlock(properties);
+    }
+
+
     private void LayOut()
     {
         Vector3 start = source.position;

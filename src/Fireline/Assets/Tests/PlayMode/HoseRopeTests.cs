@@ -112,7 +112,7 @@ public class HoseRopeTests
         created.Add(second.gameObject);
         yield return null;
         yield return null;
-        var supply = Object.FindAnyObjectByType<HoseRopeSource>();
+        var supply = first.GetComponent<PlayerHoseConnection>().Source;
         Assert.That(supply.ConnectedPlayers, Is.EqualTo(2));
         var rope = first.GetComponentInChildren<HoseRope>();
         Assert.That(rope, Is.Not.Null);

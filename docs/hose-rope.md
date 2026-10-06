@@ -1,6 +1,6 @@
 # Supply hose rope prototype
 
-Open `Assets/_Scenes/Isometric HoseRope Jake.unity` and enter Play Mode. Join using the usual keyboard/gamepad controls. A yellow hose connects the red prototype hydrant to the held nozzle. Walk in a circle, double back, and rotate the nozzle to see slack dragging behind you. Additional players get independent hoses from the same supply. Nozzle switching keeps the connection.
+Open `Assets/_Scenes/Isometric HoseRope Jake.unity` and enter Play Mode. Join using the usual keyboard/gamepad controls. A hose connects a prototype hydrant to the held nozzle. Player colors are **P1 red, P2 yellow, P3 green, P4 blue**. Walk in a circle, double back, and rotate the nozzle to see slack dragging behind you. Additional players get independent hoses from the same supply. Nozzle switching keeps the connection.
 
 ## How it works
 
@@ -12,13 +12,35 @@ The supply pays out extra hose as the player moves farther away. Returning towar
 
 ## Scene setup
 
-- **Water supply - Hose rope prototype**: scene-local `HoseRopeSource` with the hydrant placeholder at (-4, -1, 0).
+- **Water supply - Hose rope prototype**: scene-local `HoseRopeSource` with the hydrant placeholder at (-4, 1.17, 0).
 - **Source point**: move this child to the outlet of your eventual truck or hydrant.
 - **Hose ground plane (XY)**: defines the static flat collision plane; its local normal is configured on the source.
 - **SupplyHose prefab**: simulation and rendering settings. Runtime instances appear under each player as `Supply hose`.
 - **NozzleTransform** on `HoseWeapon`: exposes the existing muzzle reference, allowing each equipped nozzle to provide the hose endpoint. A missing muzzle falls back to the hose component's Transform.
 
-`HoseRopeSource` checks players in its own scene, connects them automatically, follows nozzle changes, and cleans up hoses on departure or when the source is disabled. Use one supply manager per scene in this prototype.
+`HoseWaterRules` initializes joining players once. `PlayerHoseConnection` owns each player's single connection and follows nozzle changes. `HoseRopeSource` is an `Interactable` outlet; duplicate a source to add more outlets. Sources can supply multiple players. Disabling/destroying a source disconnects its players.
+
+## Attach, detach, and transfer
+
+Walk within 1.25 units of a source and use **E / the melee-interact action (gamepad South)**. The nearby prompt describes the action:
+
+- **Detach hose** at the player's current source.
+- **Attach hose** when disconnected.
+- **Transfer hose here** at a different source; this releases the old connection and connects to the new one in a single interaction.
+
+The scene has outlets at (-4, 1.17, 0) and (4, -1, 0). Each player controls their own connection. Detaching removes that player's rope visual; reattaching lays out a new rope from the chosen outlet. Detached players do not automatically reconnect. Dead players cannot interact.
+
+## Switch firing rules
+
+Select **Hose gameplay settings** in the scene Hierarchy, then use `HoseWaterRules`:
+
+- **Require Water Source ON**: disconnected players cannot emit water, damage enemies, or extinguish fires with any nozzle.
+- **Require Water Source OFF**: legacy behavior; all nozzles can fire while detached. Source interactions and colored rope visuals still work.
+- **Start Connected**: new players connect to their nearest available source once. Turn this off before joining to start disconnected.
+
+The firing checkbox can change during Play Mode. Changes made during Play Mode are temporary, as usual in Unity; change it outside Play Mode to save the scene default. Scenes without `HoseWaterRules` keep always-available firing. Use one rules object per scene, regardless of the number of sources.
+
+Colors use each `PlayerInput.playerIndex` and a per-renderer property block, so transferring or changing one player's color does not mutate the shared material. Indices above four repeat the palette.
 
 ## Tuning SupplyHose
 
@@ -43,6 +65,6 @@ Collision is against the configured flat plane. Props, walls, height-varying ter
 
 ## Verification
 
-Run Unity PlayMode `HoseRopeTests` for grounded particles, endpoint attachment, segment-length stability, moving endpoints, payout, teleport recovery, missing endpoints, two-player connection, nozzle changes, and departure cleanup in the target scene.
+Run Unity PlayMode `HoseConnectionTests` and `HoseRopeTests` for grounded particles, endpoint attachment, segment-length stability, moving endpoints, payout, teleport recovery, missing endpoints, two-player connection, nozzle changes, and departure cleanup in the target scene.
 
-Validation on 2026-10-06 with Unity 6000.6.1f1: all four hose tests passed in an isolated project copy, and a rendered Play Mode preview confirmed the hose is visible and connected. The full Play Mode suite passed 19/20 tests. The existing `PlayerPrefabStopsAllActionsOnDeathAndControllerCanResetScene` test fails because it references `Assets/_Scenes/BasicScene.unity`, which is absent from the current project.
+Validation on 2026-10-06 with Unity 6000.6.1f1: all seven connection/rope tests passed in an isolated copy of the current project. Coverage includes the actual gamepad melee action while spraying, detach persistence, transfer distance, source shutdown, all three nozzle types under both firing rules, four independent player colors, and existing rope physics. A rendered four-player Play Mode preview confirmed the colors and hydrant visuals. The project Play Mode suite passed 22/23 tests (the additional temporary visual-capture check also passed). The existing `PlayerPrefabStopsAllActionsOnDeathAndControllerCanResetScene` test still fails because it references the absent `Assets/_Scenes/BasicScene.unity`.

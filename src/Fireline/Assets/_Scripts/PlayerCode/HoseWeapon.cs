@@ -98,7 +98,8 @@ public abstract class HoseWeapon : MonoBehaviour
     /// <summary>Call every physics step while the spray button is held.</summary>
     public void Spray(Vector2 direction, float deltaTime)
     {
-        if (!isActiveAndEnabled || (_health != null && _health.IsDead) || direction.sqrMagnitude < 0.001f)
+        if (!isActiveAndEnabled || (_health != null && _health.IsDead)
+            || !HoseWaterRules.CanSpray(gameObject) || direction.sqrMagnitude < 0.001f)
         {
             StopSpraying();
             return;
