@@ -25,13 +25,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 500129299363126778}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.41, y: 0.02, z: 0}
+  m_LocalRotation: {x: 0.00000004470348, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.41, y: 0.55, z: 0.010000001}
   m_LocalScale: {x: 1.25, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5933821776725555064}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Father: {fileID: 3370365459608866585}
+  m_LocalEulerAnglesHint: {x: -30, y: 0, z: 0}
 --- !u!212 &54014289339304533
 SpriteRenderer:
   serializedVersion: 3
@@ -90,7 +90,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
   m_BlendShapeWeights: []
 --- !u!1 &591240336905840500
 GameObject:
@@ -128,11 +128,10 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3370365459608866585}
-  - {fileID: 214903788933792270}
   - {fileID: 374009599070947445}
   - {fileID: 5370900210424625486}
   m_Father: {fileID: 0}
@@ -415,6 +414,7 @@ GameObject:
   - component: {fileID: 3370365459608866585}
   - component: {fileID: 1087674415940790308}
   - component: {fileID: 1017592944127437050}
+  - component: {fileID: 4316567627025758878}
   m_Layer: 0
   m_Name: PlayerSprite
   m_TagString: Untagged
@@ -430,13 +430,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1376534921308105634}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.25881907, y: -0, z: -0, w: 0.9659259}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 214903788933792270}
   m_Father: {fileID: 5933821776725555064}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -30, y: 0, z: 0}
 --- !u!212 &1087674415940790308
 SpriteRenderer:
   serializedVersion: 3
@@ -495,7 +496,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
   m_BlendShapeWeights: []
 --- !u!95 &1017592944127437050
 Animator:
@@ -519,6 +520,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &4316567627025758878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376534921308105634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60df815fc63464d618fc887fec714527, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::StandUpright
+  feetOnGround: 1
+  groundOffset: {x: 0, y: 0}
 --- !u!1 &1500676528642636846
 GameObject:
   m_ObjectHideFlags: 0
@@ -609,7 +624,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
   m_BlendShapeWeights: []
 --- !u!1 &2611849274289732262
 GameObject:
@@ -732,7 +747,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
   m_BlendShapeWeights: []
 --- !u!1 &6388043016819899405
 GameObject:
@@ -743,6 +758,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 374009599070947445}
+  - component: {fileID: 1011713134993879516}
   m_Layer: 0
   m_Name: AimPivot
   m_TagString: Untagged
@@ -759,7 +775,7 @@ Transform:
   m_GameObject: {fileID: 6388043016819899405}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.4330127, z: -0.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -767,3 +783,17 @@ Transform:
   - {fileID: 6246584468556133135}
   m_Father: {fileID: 5933821776725555064}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1011713134993879516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6388043016819899405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83f383bfe972145f28fdc58b3a511da1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::HeightAboveGround
+  height: 0.5
+  groundOffset: {x: 0, y: 0}

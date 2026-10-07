@@ -3,17 +3,6 @@ using Game.Runtime;
 using UnityEngine;
 
 /// <summary>
-/// Base class for every nozzle. It handles everything nozzles have in common:
-/// aiming, the rectangular hitbox, finding the enemies inside it, and drawing the stream.
-/// Subclasses only decide WHEN the hose hits and WHAT HAPPENS to the enemies it catches.
-///
-/// The hitbox is a rectangle that starts at the muzzle: Range long (along the aim) and
-/// Width wide (across it). The water visual (HoseStreamVisual) is sized from the same
-/// numbers, so what you see roughly matches what hits, but particles never decide damage.
-///
-/// One physics query per step finds both enemies and fire zones in the hitbox;
-/// FindEnemiesInHitbox and FindFiresInHitbox just read its results.
-///
 /// To make a new nozzle: inherit from this, then override OnSpray.
 /// </summary>
 public abstract class HoseWeapon : MonoBehaviour
@@ -71,8 +60,14 @@ public abstract class HoseWeapon : MonoBehaviour
 
     /// <summary>Normalized aim direction from the current Spray call.</summary>
     protected Vector2 AimDirection { get; private set; } = Vector2.right;
-    /// <summary>Where the stream starts this step (the muzzle, or this object if no muzzle is set).</summary>
+    /// <summary>
+    /// Where the stream starts this step, on the ground: the point directly below the muzzle.
+    /// The hitbox uses this, so holding the hose at waist height doesn't shift what it hits.
+    /// </summary>
     protected Vector2 Origin { get; private set; }
+
+    /// <summary>The muzzle's actual position, possibly raised off the ground. Visuals use this.</summary>
+    protected Vector3 MuzzlePosition { get; private set; }
     /// <summary>Where the stream ends this step.</summary>
     protected Vector2 End { get; private set; }
 
@@ -107,12 +102,13 @@ public abstract class HoseWeapon : MonoBehaviour
         }
 
         AimDirection = direction.normalized;
-        Origin = muzzle != null ? (Vector2)muzzle.position : (Vector2)transform.position;
+        MuzzlePosition = muzzle != null ? muzzle.position : transform.position;
+        Origin = TiltedView.ToGround(MuzzlePosition, transform.position.z);
         End = Origin + AimDirection * range;
         _scannedThisStep = false;
 
         OnSpray(deltaTime);
-        _stream.SetSpraying(ShowsContinuousStream(), Origin, AimDirection, transform.position.z,
+        _stream.SetSpraying(ShowsContinuousStream(), MuzzlePosition, AimDirection,
             range, width, particleLifetime, particlesPerSecond, particleSize);
     }
 
@@ -143,7 +139,7 @@ public abstract class HoseWeapon : MonoBehaviour
     /// <summary>Fires one burst of water along the current aim. Call from OnSpray.</summary>
     protected void PulseStream(int particleCount)
     {
-        _stream.Pulse(Origin, AimDirection, transform.position.z,
+        _stream.Pulse(MuzzlePosition, AimDirection,
             range, width, particleLifetime, particleSize, particleCount);
     }
 
@@ -221,7 +217,8 @@ public abstract class HoseWeapon : MonoBehaviour
     protected virtual void OnDrawGizmosSelected()
     {
         Vector2 dir = Application.isPlaying ? AimDirection : (Vector2)transform.right;
-        Vector2 start = muzzle != null ? (Vector2)muzzle.position : (Vector2)transform.position;
+        Vector3 muzzlePosition = muzzle != null ? muzzle.position : transform.position;
+        Vector2 start = TiltedView.ToGround(muzzlePosition, transform.position.z);
         Vector2 center = start + dir * (range * 0.5f);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
