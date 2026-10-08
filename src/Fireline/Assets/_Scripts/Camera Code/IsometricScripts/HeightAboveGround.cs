@@ -14,6 +14,17 @@ public class HeightAboveGround : MonoBehaviour
     [SerializeField] private float height = 0.6f;
     [Tooltip("Offset along the ground, relative to the parent (X = right, Y = up the screen).")]
     [SerializeField] private Vector2 groundOffset;
+    
+    public float Height
+    {
+        get => height;
+        set { height = value; Apply(); }
+    }
+    public Vector2 GroundOffset
+    {
+        get => groundOffset;
+        set { groundOffset = value; Apply(); }
+    }
 
     private void OnEnable() => Apply();
 

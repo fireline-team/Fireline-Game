@@ -315,6 +315,9 @@ MonoBehaviour:
   hitLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  blockingLayers:
+    serializedVersion: 2
+    m_Bits: 0
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
   streamPrefab: {fileID: 0}
@@ -349,6 +352,9 @@ MonoBehaviour:
   hitLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  blockingLayers:
+    serializedVersion: 2
+    m_Bits: 0
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
   streamPrefab: {fileID: 0}
@@ -384,6 +390,9 @@ MonoBehaviour:
   hitLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  blockingLayers:
+    serializedVersion: 2
+    m_Bits: 0
   muzzle: {fileID: 4377830768944491630}
   extinguishPerSecond: 30
   streamPrefab: {fileID: 0}
@@ -758,7 +767,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 374009599070947445}
-  - component: {fileID: 1011713134993879516}
+  - component: {fileID: 1133547690721760708}
   m_Layer: 0
   m_Name: AimPivot
   m_TagString: Untagged
@@ -775,7 +784,7 @@ Transform:
   m_GameObject: {fileID: 6388043016819899405}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.4330127, z: -0.25}
+  m_LocalPosition: {x: 0, y: 0.51961523, z: -0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -783,7 +792,7 @@ Transform:
   - {fileID: 6246584468556133135}
   m_Father: {fileID: 5933821776725555064}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1011713134993879516
+--- !u!114 &1133547690721760708
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -792,8 +801,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 6388043016819899405}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83f383bfe972145f28fdc58b3a511da1, type: 3}
+  m_Script: {fileID: 11500000, guid: 12d791b6eb6b14797b34cbff66857175, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::HeightAboveGround
-  height: 0.5
+  height: 0.6
   groundOffset: {x: 0, y: 0}
