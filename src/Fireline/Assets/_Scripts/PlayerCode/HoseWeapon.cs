@@ -54,6 +54,9 @@ public abstract class HoseWeapon : MonoBehaviour
     private HoseStreamVisual _stream;
     private PlayerHealth _health;
 
+    /// <summary>The held nozzle transform, used by the supply hose attachment.</summary>
+    public Transform NozzleTransform => muzzle != null ? muzzle : transform;
+
     public float Range => range;
     /// <summary>How far the water actually reaches this step: Range, or less if a wall is in the way.</summary>
     public float CurrentRange { get; private set; }
@@ -101,7 +104,8 @@ public abstract class HoseWeapon : MonoBehaviour
     /// <summary>Call every physics step while the spray button is held.</summary>
     public void Spray(Vector2 direction, float deltaTime)
     {
-        if (!isActiveAndEnabled || (_health != null && _health.IsDead) || direction.sqrMagnitude < 0.001f)
+        if (!isActiveAndEnabled || (_health != null && _health.IsDead)
+            || !HoseWaterRules.CanSpray(gameObject) || direction.sqrMagnitude < 0.001f)
         {
             StopSpraying();
             return;
