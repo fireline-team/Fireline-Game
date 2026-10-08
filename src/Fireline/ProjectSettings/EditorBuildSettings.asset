@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_Scenes/StringReverseScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/BasicScene.unity
     guid: ddeb732e48d9342a69c81aa0f37c4406
   - enabled: 0
