@@ -10,6 +10,31 @@ public class HoseWaterRules : MonoBehaviour
     [SerializeField] private bool requireWaterSource = true;
     [Tooltip("Connect newly joining players to their nearest source once. Detaching never auto-reconnects.")]
     [SerializeField] private bool startConnected = true;
+    [Header("Hose tether")]
+    [Tooltip("Turn off to restore unlimited payout and unrestricted movement.")]
+    [SerializeField] private bool limitHoseLength = true;
+    [Tooltip("Maximum source-to-nozzle distance in world units, including nozzle height.")]
+    [SerializeField, Min(1f)] private float hoseLength = 12f;
+    [Tooltip("Seconds of pushing outward at normal movement speed before the hose breaks.")]
+    [SerializeField, Min(0.1f)] private float secondsToBreak = 2f;
+    [Tooltip("Seconds to recover from full strain after releasing the pull.")]
+    [SerializeField, Min(0.1f)] private float strainRecoveryTime = 1f;
+    [Tooltip("Outward speed counted as a full-strength pull. Matches the default player speed.")]
+    [SerializeField, Min(0.1f)] private float fullPullSpeed = 5f;
+
+    public bool LimitHoseLength { get => limitHoseLength; set => limitHoseLength = value; }
+    public float HoseLength { get => Mathf.Max(1f, hoseLength); set => hoseLength = Mathf.Max(1f, value); }
+    public float SecondsToBreak => Mathf.Max(0.1f, secondsToBreak);
+    public float StrainRecoveryTime => Mathf.Max(0.1f, strainRecoveryTime);
+    public float FullPullSpeed => Mathf.Max(0.1f, fullPullSpeed);
+
+    public static HoseWaterRules ForPlayer(GameObject player)
+    {
+        foreach (var rules in Active)
+            if (rules != null && rules.gameObject.scene == player.scene) return rules;
+        return null;
+    }
+
     private static readonly List<HoseWaterRules> Active = new List<HoseWaterRules>();
 
     public bool RequireWaterSource { get => requireWaterSource; set => requireWaterSource = value; }

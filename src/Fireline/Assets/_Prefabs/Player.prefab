@@ -284,7 +284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8236f5252e0c4515b2648245e18b83b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::PlayerInteractor
-  promptHeight: 1.2
+  promptHeight: 2.4
 --- !u!114 &7800621042710821106
 MonoBehaviour:
   m_ObjectHideFlags: 0

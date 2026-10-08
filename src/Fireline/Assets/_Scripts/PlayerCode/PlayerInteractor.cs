@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerInteractor : MonoBehaviour
 {
     [Tooltip("How far above the player the prompt is drawn, in world units.")]
-    [SerializeField] private float promptHeight = 1.2f;
+    [SerializeField] private float promptHeight = 2.4f;
 
     private PlayerHealth _health;
     private PlayerInput _input;

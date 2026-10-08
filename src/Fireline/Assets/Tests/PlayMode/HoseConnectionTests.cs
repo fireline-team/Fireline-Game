@@ -153,4 +153,93 @@ public class HoseConnectionTests
         }
         Assert.That(sources[0].ConnectedPlayers, Is.EqualTo(4));
     }
+    private static void PlaceAtLimit(PlayerInput player, PlayerHoseConnection connection, float length)
+    {
+        var nozzle = player.GetComponent<HoseLoadout>().Current.NozzleTransform;
+        Vector3 heldOffset = nozzle.position - player.transform.position;
+        Vector3 anchor = connection.Rope.Source.position;
+        float height = player.transform.position.z + heldOffset.z - anchor.z;
+        float reach = Mathf.Sqrt(length * length - height * height);
+        player.GetComponent<Rigidbody2D>().position = (Vector2)(anchor - heldOffset) + Vector2.right * reach;
+        Physics2D.SyncTransforms();
+    }
+
+    [UnityTest]
+    public IEnumerator FiniteHoseRestrainsWarnsRecoversAndBreaksUnderSustainedPull()
+    {
+        yield return LoadScene();
+        var player = Join(0);
+        player.GetComponent<PlayerController>().enabled = false;
+        yield return null;
+        yield return null;
+        var connection = player.GetComponent<PlayerHoseConnection>();
+        var source = connection.Source;
+        var rules = Object.FindAnyObjectByType<HoseWaterRules>();
+        rules.HoseLength = 6f;
+        var body = player.GetComponent<Rigidbody2D>();
+        PlaceAtLimit(player, connection, rules.HoseLength);
+        for (int step = 0; step < 30; step++)
+        {
+            body.linearVelocity = Vector2.right * 5f;
+            yield return new WaitForFixedUpdate();
+        }
+        Assert.That(connection.IsConnected, Is.True);
+        Assert.That(connection.Strain01, Is.GreaterThan(0.1f));
+        Assert.That(Vector3.Distance(connection.Rope.Source.position, connection.Rope.Nozzle.position),
+            Is.LessThanOrEqualTo(rules.HoseLength + 0.05f));
+        Assert.That(connection.Rope.PaidOutLength, Is.LessThanOrEqualTo(rules.HoseLength));
+        yield return null;
+        Assert.That(connection.Rope.GetComponent<LineRenderer>().widthMultiplier,
+            Is.GreaterThan(connection.Rope.Radius * 2f), "Strain has a visible thickness cue.");
+        body.linearVelocity = Vector2.zero;
+        yield return new WaitForSeconds(1.1f);
+        Assert.That(connection.Strain01, Is.Zero);
+        Assert.That(connection.IsConnected, Is.True, "Standing at the boundary does not break a hose.");
+        body.linearVelocity = Vector2.left * 3;
+        yield return new WaitForFixedUpdate();
+        Assert.That(body.linearVelocity.x, Is.LessThan(-2.9f), "Returning toward the source is unrestricted.");
+        PlaceAtLimit(player, connection, rules.HoseLength);
+        for (int step = 0; step < 130 && connection.IsConnected; step++)
+        {
+            body.linearVelocity = Vector2.right * 5f;
+            yield return new WaitForFixedUpdate();
+        }
+        Assert.That(connection.IsConnected, Is.False);
+        Assert.That(source.ConnectedPlayers, Is.Zero);
+        Assert.That(body.linearVelocity.x, Is.GreaterThan(4.9f));
+        var nozzle = player.GetComponent<HoseLoadout>().Current;
+        nozzle.Spray(Vector2.right, 0.02f);
+        Assert.That(nozzle.IsStreamActive, Is.False);
+        player.transform.position = source.transform.position;
+        Assert.That(player.GetComponent<PlayerInteractor>().TryInteract(), Is.True);
+        Assert.That(connection.IsConnected, Is.True);
+        Assert.That(connection.Strain01, Is.Zero);
+    }
+
+    [UnityTest]
+    public IEnumerator UnlimitedToggleRemovesTetherWithoutChangingWaterRules()
+    {
+        yield return LoadScene();
+        var player = Join(0);
+        player.GetComponent<PlayerController>().enabled = false;
+        yield return null;
+        yield return null;
+        var connection = player.GetComponent<PlayerHoseConnection>();
+        var rules = Object.FindAnyObjectByType<HoseWaterRules>();
+        rules.LimitHoseLength = false;
+        var body = player.GetComponent<Rigidbody2D>();
+        body.position += Vector2.right * 25f;
+        yield return new WaitForFixedUpdate(); // let the body pose reach the held nozzle transform
+        body.linearVelocity = Vector2.right * 5f;
+        yield return new WaitForFixedUpdate();
+        Assert.That(body.linearVelocity.x, Is.EqualTo(5f).Within(0.01f));
+        Assert.That(connection.IsConnected, Is.True);
+        Assert.That(connection.Strain01, Is.Zero);
+        Assert.That(connection.Rope.PaidOutLength, Is.GreaterThan(rules.HoseLength));
+        connection.Detach();
+        Assert.That(HoseWaterRules.CanSpray(player.gameObject), Is.False);
+        rules.RequireWaterSource = false;
+        Assert.That(HoseWaterRules.CanSpray(player.gameObject), Is.True);
+    }
+
 }

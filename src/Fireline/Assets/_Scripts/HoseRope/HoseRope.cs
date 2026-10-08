@@ -27,6 +27,8 @@ public class HoseRope : MonoBehaviour
     private Vector3[] points;
     private Vector3[] previous;
     private LineRenderer line;
+    private float maximumLength;
+    private MaterialPropertyBlock colorProperties;
     private Vector3 lastSource;
     private Vector3 lastNozzle;
 
@@ -58,13 +60,28 @@ public class HoseRope : MonoBehaviour
         Render();
     }
 
+    public void SetMaximumLength(float length)
+    {
+        float next = Mathf.Max(0f, length);
+        if (Mathf.Approximately(maximumLength, next)) return;
+        maximumLength = next;
+        if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
+        if (points != null && source != null && nozzle != null) LayOut();
+    }
+
+    public void SetWarning(float strain)
+    {
+        if (line != null)
+            line.widthMultiplier = radius * 2f * (1f + Mathf.Clamp01(strain) * 0.5f);
+    }
+
     public void SetNozzle(Transform value) => nozzle = value;
 
     public void SetColor(Color color)
     {
         // URP Unlit uses _BaseColor rather than LineRenderer vertex colors.
         var renderer = GetComponent<LineRenderer>();
-        var properties = new MaterialPropertyBlock();
+        var properties = colorProperties ?? (colorProperties = new MaterialPropertyBlock());
         renderer.GetPropertyBlock(properties);
         properties.SetColor("_BaseColor", color);
         properties.SetColor("_Color", color);
@@ -105,6 +122,7 @@ public class HoseRope : MonoBehaviour
             || float.IsNaN(deltaTime) || float.IsInfinity(deltaTime)) return;
         // The source is a reel: pay out when taut, but keep the trail when returning.
         PaidOutLength = Mathf.Max(PaidOutLength, Vector3.Distance(source.position, nozzle.position) + payoutSlack);
+        if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
         if ((source.position - lastSource).sqrMagnitude > teleportDistance * teleportDistance
             || (nozzle.position - lastNozzle).sqrMagnitude > teleportDistance * teleportDistance)
             LayOut();
