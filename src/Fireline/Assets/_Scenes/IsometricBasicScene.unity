@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
   interactRadius: 1.25
   nozzle: 0
@@ -533,7 +533,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0a40eaefcb6b4af98b61052963b14e4, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.HordeStressTest
   enemyPrefab: {fileID: -2784519892548576912, guid: a83cf33320a05449a932f4f0ecf68c6e, type: 3}
   prewarmCount: 300
@@ -558,7 +558,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7cec2b033db304fa9ac5bb0c239a809f, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.HordeManager
   playerTag: Player
   playerRefreshInterval: 0.5
@@ -870,7 +870,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
   interactRadius: 1.25
   nozzle: 1
@@ -1088,7 +1088,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
   m_UsePipelineSettings: 1
   m_AdditionalLightsShadowResolutionTier: 2
@@ -2820,8 +2820,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
-  orthographic size: 6
+  orthographic: 0
+  orthographic size: 7.17
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2862,7 +2862,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
   m_RenderShadows: 1
   m_RequiresDepthTextureOption: 2
@@ -2906,12 +2906,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72ece51f2901e7445ab60da3685d6b5f, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineBrain
   ShowDebugText: 0
   ShowCameraFrustum: 1
   IgnoreTimeScale: 0
-  WorldUpOverride: {fileID: 408395435}
+  WorldUpOverride: {fileID: 0}
   ChannelMask: -1
   UpdateMethod: 2
   BlendUpdateMethod: 1
@@ -2956,7 +2956,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
   interactRadius: 1.25
   nozzle: 2
@@ -3326,7 +3326,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 62730615}
   - {fileID: 234857520}
-  - {fileID: 408395435}
   - {fileID: 1769662500}
   - {fileID: 1211496948}
   - {fileID: 532505316}
@@ -3349,3 +3348,4 @@ SceneRoots:
   - {fileID: 591620990}
   - {fileID: 2105520885}
   - {fileID: 717488245}
+  - {fileID: 408395435}
