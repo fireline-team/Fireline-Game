@@ -95,6 +95,7 @@ GameObject:
   - component: {fileID: 7305867236919871984}
   - component: {fileID: 6778326169049765097}
   - component: {fileID: 593135103658467004}
+  - component: {fileID: 5542903862434363185}
   m_Layer: 0
   m_Name: Target Group
   m_TagString: Untagged
@@ -207,9 +208,24 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3735915088388944288}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80ae9c2cd7264449f84bcffb4511a6e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::TiltedCamera
   distance: 10
+--- !u!114 &5542903862434363185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3735915088388944288}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4700f9f03ad19f94baf0367cb7a9c988, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollowZoom
+  Width: 9.26
+  Damping: 1
+  FovRange: {x: 18.746178, y: 75.74617}
