@@ -357,6 +357,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Camera Configuration
       objectReference: {fileID: 0}
+    - target: {fileID: 593135103658467004, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6157268166703812395, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -397,10 +401,33 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7483209182727381533, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7483209182727381533, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.660254
+      objectReference: {fileID: 0}
+    - target: {fileID: 7661058477175376899, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: Lens.ModeOverride
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8074303655674492881, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8074303655674492881, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3735915088388944288, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 882540981}
   m_SourcePrefab: {fileID: 100100000, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
 --- !u!1 &408395434
 GameObject:
@@ -842,6 +869,26 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
+--- !u!1 &882540975 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3735915088388944288, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+  m_PrefabInstance: {fileID: 234857520}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &882540981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882540975}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4700f9f03ad19f94baf0367cb7a9c988, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollowZoom
+  Width: 9.26
+  Damping: 1
+  FovRange: {x: 18.746178, y: 75.74617}
 --- !u!1 &1030778142
 GameObject:
   m_ObjectHideFlags: 0
@@ -2820,7 +2867,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 6
   m_Depth: -1
   m_CullingMask:
@@ -2875,7 +2922,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -2916,7 +2963,7 @@ MonoBehaviour:
   UpdateMethod: 2
   BlendUpdateMethod: 1
   LensModeOverride:
-    Enabled: 1
+    Enabled: 0
     DefaultMode: 2
   DefaultBlend:
     Style: 1
