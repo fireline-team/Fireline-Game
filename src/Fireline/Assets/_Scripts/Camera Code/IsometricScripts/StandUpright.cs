@@ -1,17 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Makes a sprite stand up and face the tilted camera. Add it to any sprite that should
-/// look upright: characters, enemies, flames, trees, the firetruck. Leave it off anything
-/// that lies on the ground (tilemaps, puddles, scorch marks) or points along the ground
-/// (the hose).
-///
-/// Put this on a CHILD sprite object, not on the object that holds the Rigidbody2D or
-/// collider, so physics stays flat. Use the menu Fireline > Tilted View > Stand Up Selected
-/// to add it to several objects at once.
-///
-/// It controls this object's rotation and (with Feet On Ground) its position, so edit the
-/// settings here instead of the Transform.
+/// Makes a sprite stand up. Put on a child object that has a sprite, not on a collider.
 /// </summary>
 [ExecuteAlways, DisallowMultipleComponent]
 public class StandUpright : MonoBehaviour
@@ -24,11 +14,9 @@ public class StandUpright : MonoBehaviour
     private void OnEnable() => Apply();
 
 #if UNITY_EDITOR
-    // Transforms shouldn't be changed during OnValidate itself, so apply right after it.
     private void OnValidate() => UnityEditor.EditorApplication.delayCall += () => { if (this != null) Apply(); };
 #endif
-
-    /// <summary>Re-applies the standing rotation and feet placement.</summary>
+    
     public void Apply()
     {
         transform.rotation = TiltedView.StandingRotation;
@@ -39,7 +27,13 @@ public class StandUpright : MonoBehaviour
         float lift = 0f;
         SpriteRenderer sprite = GetComponent<SpriteRenderer>();
         if (sprite != null && sprite.sprite != null)
-            lift = -sprite.sprite.bounds.min.y * transform.lossyScale.y;
+        {
+            // Tiled/Sliced sprites are drawn at sprite.size around the same normalized pivot,
+            // so measure from the drawn size rather than the source image.
+            float pivot01 = sprite.sprite.pivot.y / sprite.sprite.rect.height;
+            float drawnHeight = sprite.drawMode == SpriteDrawMode.Simple ? sprite.sprite.bounds.size.y : sprite.size.y;
+            lift = pivot01 * drawnHeight * transform.lossyScale.y;
+        }
 
         transform.localPosition = TiltedView.RaisedLocalPosition(transform.parent, groundOffset, lift);
     }

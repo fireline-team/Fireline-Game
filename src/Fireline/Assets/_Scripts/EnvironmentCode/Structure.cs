@@ -4,33 +4,31 @@ using UnityEngine.Rendering;
 /// <summary>
 /// A solid thing that stands in the world and blocks movement and water: a wall segment,
 /// a building, the firetruck, a barricade. Its parts:
-///
-///   Root (this)  - flat. Holds the footprint collider. Its position is the MIDDLE OF THE
-///                  FRONT EDGE of the footprint (the edge nearest the bottom of the screen).
-///   Front        - the upright face, with StandUpright.
-///   Top          - optional flat roof/top surface, with HeightAboveGround. This script raises
-///                  it to exactly the height of the Front sprite, so the two always line up.
-///
-/// The collider, layer, top placement and draw order are set from the Footprint, so the
-/// only things to fill in by hand are the sprites. Create one with
-/// Fireline > Tilted View > Create Structure.
-///
-/// Walls: use one-cell segments (footprint 1 x 1) so draw order stays correct along long walls.
-/// Buildings: one Structure with a footprint matching the building's base.
 /// </summary>
 [ExecuteAlways, DisallowMultipleComponent]
 [RequireComponent(typeof(BoxCollider2D), typeof(SortingGroup))]
 public class Structure : MonoBehaviour
 {
-    /// <summary>Layer that blocks hose water. Create it in Project Settings > Tags and Layers.</summary>
     public const string ObstacleLayer = "Obstacles";
 
     [Tooltip("Ground area this blocks, in world units. X = width, Y = depth going up the screen. Usually whole grid cells.")]
     [SerializeField] private Vector2 footprint = Vector2.one;
+    [Tooltip("How tall the front face stands, in world units. 0 = keep the Front sprite's current height.")]
+    [SerializeField, Min(0f)] private float height = 0f;
     [Tooltip("The upright front face (should have StandUpright).")]
     [SerializeField] private SpriteRenderer front;
     [Tooltip("Optional flat top surface. It's raised to the top of the Front sprite automatically.")]
     [SerializeField] private HeightAboveGround top;
+    public enum SpriteFit
+    {
+        None,
+        Stretch,
+        Tile
+    }
+
+    [Tooltip("How the Front and Top sprites fill the footprint. Stretch scales the whole image; Tile repeats it. " +
+             "Stretch also respects 9-slice borders if the sprite has them, so corners/edges won't distort.")]
+    [SerializeField] private SpriteFit spriteFit = SpriteFit.Stretch;
 
     public Vector2 Footprint => footprint;
 
@@ -54,14 +52,41 @@ public class Structure : MonoBehaviour
         else Debug.LogWarning($"{name}: there's no \"{ObstacleLayer}\" layer, so it won't block water. Add it in Project Settings > Tags and Layers.", this);
 #endif
 
-        // The SortingGroup draws Front and Top together, sorted by this root's position
-        // (the front edge). Without it, a player behind the wall could be drawn over its top.
-        if (top != null && front != null && front.sprite != null)
+        if (front == null || front.sprite == null) return;
+
+        // Front face: as wide as the footprint, and Height tall.
+        if (spriteFit != SpriteFit.None)
         {
-            float frontHeight = front.sprite.bounds.size.y * front.transform.lossyScale.y;
-            top.GroundOffset = new Vector2(0f, footprint.y * 0.5f);
-            top.Height = frontHeight;
+            float frontHeight = height > 0f ? height : DrawnHeight(front);
+            FitSprite(front, new Vector2(footprint.x, frontHeight), spriteFit);
+            StandUpright upright = front.GetComponent<StandUpright>();
+            if (upright != null) upright.Apply();
         }
+        
+        if (top != null)
+        {
+            top.GroundOffset = new Vector2(0f, footprint.y * 0.5f);
+            top.Height = DrawnHeight(front);
+            
+            SpriteRenderer topSprite = top.GetComponent<SpriteRenderer>();
+            if (spriteFit != SpriteFit.None && topSprite != null && topSprite.sprite != null)
+                FitSprite(topSprite, footprint, spriteFit);
+        }
+    }
+    
+    private static void FitSprite(SpriteRenderer sprite, Vector2 worldSize, SpriteFit fit)
+    {
+        sprite.drawMode = fit == SpriteFit.Tile ? SpriteDrawMode.Tiled : SpriteDrawMode.Sliced;
+
+        Vector3 scale = sprite.transform.lossyScale;
+        sprite.size = new Vector2(
+            worldSize.x / Mathf.Max(Mathf.Abs(scale.x), 0.0001f),
+            worldSize.y / Mathf.Max(Mathf.Abs(scale.y), 0.0001f));
+    }
+    public static float DrawnHeight(SpriteRenderer sprite)
+    {
+        float local = sprite.drawMode == SpriteDrawMode.Simple ? sprite.sprite.bounds.size.y : sprite.size.y;
+        return local * sprite.transform.lossyScale.y;
     }
 
 #if UNITY_EDITOR
