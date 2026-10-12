@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: 7459642988121664409}
   - component: {fileID: 2627532492962399250}
   - component: {fileID: 2109946662711708551}
+  - component: {fileID: 5913907959130893562}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -275,6 +276,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   contactDamageCooldown: 0.75
+  waterToRevive: 90
+  revivedHealthPercent: 50
+  reviveInvulnerabilitySeconds: 2
   blinkRate: 10
   blinkAlpha: 0.3
 --- !u!114 &-1705890303777178772
@@ -502,7 +506,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13e99fe1237f4508ba6a6b743d44dd1c, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::PlayerStatusMarker
   anchor: {fileID: 0}
   heightAbovePlayer: 1.8
@@ -521,9 +525,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce829aa0916f430dbc05a403f72e38f0, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::PlayerDeathStatus
   deadStatus: {fileID: 11400000, guid: 0e1091ee608644546a48faef910f6c22, type: 2}
+--- !u!114 &5913907959130893562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1767d346037429a8fc0eedf4bc74e8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::PlayerDownedFire
+  fireVisualPrefab: {fileID: 2722837022463238924, guid: 07b9c96bb518d294f8e8f1ed9abe5a07, type: 3}
+  fireScale: {x: 1.3, y: 2, z: 1}
 --- !u!1 &1376534921308105634
 GameObject:
   m_ObjectHideFlags: 0

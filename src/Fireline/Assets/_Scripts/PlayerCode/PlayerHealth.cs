@@ -13,6 +13,31 @@ public class PlayerHealth : MonoBehaviour
     [Tooltip("Brief immunity shared across all touching enemies and fire zones, in seconds.")]
     [SerializeField, Min(0.05f)] private float contactDamageCooldown = 0.75f;
 
+    [Header("Revival")]
+    [SerializeField, Min(1f)] private float waterToRevive = 90f;
+    [SerializeField, Range(1f, 100f)] private float revivedHealthPercent = 50f;
+    [SerializeField, Min(0f)] private float reviveInvulnerabilitySeconds = 2f;
+    private float revivalWater;
+    private static readonly List<PlayerHealth> players = new List<PlayerHealth>();
+    public static IReadOnlyList<PlayerHealth> ActivePlayers => players;
+    public bool IsDowned => IsDead;
+    public float ReviveProgress => IsDowned ? Mathf.Clamp01(revivalWater / Mathf.Max(1f, waterToRevive)) : 0f;
+    public event Action Revived;
+    public bool CanResetScene
+    {
+        get
+        {
+            if (!IsDowned) return false;
+            foreach (var player in players)
+                if (player != null && player.gameObject.scene == gameObject.scene && !player.IsDowned) return false;
+            return true;
+        }
+    }
+
+    private void OnEnable() => players.Add(this);
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ClearPlayers() => players.Clear();
+
     [Header("Damage Feedback")]
     [Tooltip("Blinks per second while invulnerable after a hit.")]
     [SerializeField, Min(1f)] private float blinkRate = 10f;
@@ -76,11 +101,34 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(float amount)
     {
         if (!health.TakeDamage(amount)) return;
+        revivalWater = 0f;
+        if (blinkedOut) SetBlink(false);
         body.linearVelocity = Vector2.zero;
         body.angularVelocity = 0f;
         // A downed player must not be pushed around by other players.
         body.simulated = false;
+        foreach (var hose in GetComponents<HoseWeapon>()) hose.StopSpraying();
         Died?.Invoke();
+    }
+
+    public void ApplyRevivalWater(PlayerHealth teammate, float amount)
+    {
+        if (!isActiveAndEnabled || !IsDowned || teammate == null || teammate == this
+            || !teammate.isActiveAndEnabled || teammate.IsDowned || teammate.gameObject.scene != gameObject.scene
+            || amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount)) return;
+        revivalWater = Mathf.Min(Mathf.Max(1f, waterToRevive), revivalWater + amount);
+        if (ReviveProgress < 1f) return;
+        float maximum = health.Maximum;
+        health.Reset(maximum);
+        health.TakeDamage(maximum * (1f - Mathf.Clamp(revivedHealthPercent, 1f, 100f) / 100f));
+        revivalWater = 0f;
+        resetting = false;
+        contacts.Clear();
+        body.linearVelocity = Vector2.zero;
+        body.angularVelocity = 0f;
+        body.simulated = true;
+        nextContactTime = Time.time + Mathf.Max(0f, reviveInvulnerabilitySeconds);
+        Revived?.Invoke();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -106,6 +154,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void OnDisable()
     {
+        players.Remove(this);
         contacts.Clear();
         if (blinkedOut) SetBlink(false);
     }
@@ -127,7 +176,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void ResetScene()
     {
-        if (!IsDead || resetting) return;
+        if (!CanResetScene || resetting) return;
         Scene scene = gameObject.scene;
         resetting = true;
 #if UNITY_EDITOR
@@ -150,7 +199,13 @@ public class PlayerHealth : MonoBehaviour
         GUILayout.Label($"Player {index + 1} — Health {Mathf.CeilToInt(CurrentHealth)} / {MaxHealth:0}");
         if (IsDead)
         {
-            GUILayout.Label("You are down. Reset restarts the level for everyone.");
+            if (!CanResetScene)
+            {
+                GUILayout.Label($"Downed — teammates: spray to revive ({ReviveProgress:P0}).");
+                GUILayout.EndArea();
+                return;
+            }
+            GUILayout.Label("Everyone is down. Reset restarts the level.");
             string binding = input.currentControlScheme == "KeyboardMouse" ? "E" : "south face button";
             GUILayout.Label($"Press {binding} or click below.");
             if (GUILayout.Button("Reset level")) ResetScene();

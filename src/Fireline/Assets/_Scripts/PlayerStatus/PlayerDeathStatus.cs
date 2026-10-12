@@ -16,12 +16,19 @@ public class PlayerDeathStatus : MonoBehaviour
     private void OnEnable()
     {
         health.Died += ShowDeath;
+        health.Revived += ClearDeath;
         if (health.IsDead) ShowDeath();
     }
-    private void ShowDeath() => marker.SetStatus(this, deadStatus);
+    private void ShowDeath()
+    {
+        marker.SetStatus(this, deadStatus);
+        marker.SetProgress(this, health.ReviveProgress);
+    }
+    private void Update() { if (health.IsDowned) marker.SetProgress(this, health.ReviveProgress); }
+    private void ClearDeath() => marker.ClearStatus(this);
     private void OnDisable()
     {
-        if (health != null) health.Died -= ShowDeath;
+        if (health != null) { health.Died -= ShowDeath; health.Revived -= ClearDeath; }
         if (marker != null) marker.ClearStatus(this);
     }
 }

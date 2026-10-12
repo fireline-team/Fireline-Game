@@ -32,7 +32,7 @@ private void OnDisable() { if (marker != null) marker.ClearStatus(this); }
 
 Each producer owns one status slot. The highest priority wins; equal priorities use the most recently set status. Clearing the winner reveals the next status, or restores the player number if none remain. Destroyed owners are automatically removed. Producers should clear their own slot when disabled or when their condition ends. Keep ordinary statuses below death's priority if they should never obscure the skull.
 
-`PlayerDeathStatus` is the health adapter: it subscribes to the existing death event and initializes correctly when enabled on an already-dead player. The renderer and priority system do not depend on health or specific status types. Future revival logic should clear the death adapter's status when reviving.
+`PlayerDeathStatus` is the health adapter: it subscribes to the existing death event and initializes correctly when enabled on an already-dead player. The renderer and priority system do not depend on health or specific status types. The adapter listens to `PlayerHealth.Revived` and clears its status after a successful rescue. Its optional progress meter displays the accumulated revival water while downed.
 
 Markers use the player's assigned camera when present and otherwise the main camera. With no camera, or when the anchor is behind/outside that camera's viewport, the badge hides. Disabling or destroying a player also hides/removes its separate screen-space UI canvas.
 

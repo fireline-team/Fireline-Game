@@ -15,5 +15,6 @@ MonoBehaviour:
   priority: 1000
   label: Down
   icon: {fileID: 0}
+  progressLabel: REVIVE
   useSkull: 1
   tint: {r: 1, g: 1, b: 1, a: 1}

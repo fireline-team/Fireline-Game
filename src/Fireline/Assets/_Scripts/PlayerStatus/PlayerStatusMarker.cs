@@ -17,7 +17,7 @@ public class PlayerStatusMarker : MonoBehaviour
     [SerializeField] private bool useHosePlayerColors = true;
     [SerializeField] private Color identityColor = Color.white;
 
-    private struct Entry { public Object owner; public PlayerStatusDefinition status; public long order; }
+    private struct Entry { public Object owner; public PlayerStatusDefinition status; public long order; public float progress; }
     private readonly List<Entry> entries = new List<Entry>();
     private long nextOrder;
     private PlayerInput input;
@@ -26,6 +26,9 @@ public class PlayerStatusMarker : MonoBehaviour
     private Text text;
     private Image background, stripe, icon;
     private PlayerSkullGraphic skull;
+    private Image progressBack, progressFill;
+    private Text progressText;
+    public float CurrentProgress { get; private set; } = -1f;
     public PlayerStatusDefinition CurrentStatus { get; private set; }
     public string PlayerLabel => $"P{Mathf.Max(0, input != null ? input.playerIndex : 0) + 1}";
     public bool IsVisible => badge != null && badge.gameObject.activeInHierarchy;
@@ -34,7 +37,17 @@ public class PlayerStatusMarker : MonoBehaviour
     {
         if (owner == null) return;
         ClearStatus(owner);
-        if (status != null) entries.Add(new Entry { owner = owner, status = status, order = ++nextOrder });
+        if (status != null) entries.Add(new Entry { owner = owner, status = status, order = ++nextOrder, progress = -1f });
+        ResolveStatus();
+    }
+
+    public void SetProgress(Object owner, float progress)
+    {
+        for (int i = 0; i < entries.Count; i++)
+        {
+            if (entries[i].owner != owner) continue;
+            var entry = entries[i]; entry.progress = Mathf.Clamp01(progress); entries[i] = entry;
+        }
         ResolveStatus();
     }
 
@@ -48,12 +61,14 @@ public class PlayerStatusMarker : MonoBehaviour
     {
         entries.RemoveAll(entry => entry.owner == null || entry.status == null);
         CurrentStatus = null;
+        CurrentProgress = -1f;
         long order = -1;
         foreach (var entry in entries)
             if (CurrentStatus == null || entry.status.priority > CurrentStatus.priority
                 || (entry.status.priority == CurrentStatus.priority && entry.order > order))
             {
                 CurrentStatus = entry.status;
+                CurrentProgress = entry.progress;
                 order = entry.order;
             }
     }
@@ -82,6 +97,17 @@ public class PlayerStatusMarker : MonoBehaviour
         icon = Rect("Status icon", badge).gameObject.AddComponent<Image>();
         icon.preserveAspect = true;
         skull = Rect("Skull", badge).gameObject.AddComponent<PlayerSkullGraphic>();
+        progressBack = Rect("Revival progress", badge).gameObject.AddComponent<Image>();
+        progressBack.color = backgroundColor;
+        progressFill = Rect("Fill", progressBack.transform).gameObject.AddComponent<Image>();
+        progressFill.color = new Color(0.15f, 0.85f, 1f);
+        progressText = Rect("Progress label", progressBack.transform).gameObject.AddComponent<Text>();
+        progressText.font = text.font;
+        progressText.fontSize = 13;
+        progressText.fontStyle = FontStyle.Bold;
+        progressText.alignment = TextAnchor.MiddleCenter;
+        progressText.color = Color.white;
+        progressText.horizontalOverflow = HorizontalWrapMode.Overflow;
         foreach (var graphic in root.GetComponentsInChildren<Graphic>()) graphic.raycastTarget = false;
     }
 
@@ -125,6 +151,15 @@ public class PlayerStatusMarker : MonoBehaviour
         icon.sprite = CurrentStatus != null ? CurrentStatus.icon : null;
         float size = Mathf.Max(1f, Mathf.Min(badgeSize.x, badgeSize.y) - 8);
         icon.rectTransform.sizeDelta = skull.rectTransform.sizeDelta = new Vector2(size, size);
+        progressBack.gameObject.SetActive(CurrentProgress >= 0f);
+        float meterWidth = Mathf.Max(92f, badgeSize.x);
+        progressBack.rectTransform.sizeDelta = new Vector2(meterWidth, 24);
+        progressBack.rectTransform.anchoredPosition = new Vector2(0, -badgeSize.y / 2 - 14);
+        progressFill.rectTransform.sizeDelta = new Vector2(meterWidth * Mathf.Max(0f, CurrentProgress), 6);
+        progressFill.rectTransform.anchoredPosition = new Vector2(-meterWidth * (1f - Mathf.Max(0f, CurrentProgress)) / 2, -9);
+        progressText.rectTransform.sizeDelta = new Vector2(meterWidth, 18);
+        progressText.rectTransform.anchoredPosition = new Vector2(0, 3);
+        progressText.text = CurrentStatus != null ? $"{CurrentStatus.progressLabel} {Mathf.RoundToInt(CurrentProgress * 100f)}%" : "";
     }
 
     private void OnEnable() { if (canvas != null) canvas.gameObject.SetActive(true); }
