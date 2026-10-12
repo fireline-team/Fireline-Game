@@ -113,6 +113,8 @@ GameObject:
   - component: {fileID: 3818691781568856148}
   - component: {fileID: 5178020514801643433}
   - component: {fileID: 7459642988121664409}
+  - component: {fileID: 2627532492962399250}
+  - component: {fileID: 2109946662711708551}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -490,6 +492,38 @@ MonoBehaviour:
     m_Bits: 4294967295
   parryRefundsCooldown: 1
   alwaysShowGizmo: 1
+--- !u!114 &2627532492962399250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13e99fe1237f4508ba6a6b743d44dd1c, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Fireline.Gameplay::PlayerStatusMarker
+  anchor: {fileID: 0}
+  heightAbovePlayer: 1.8
+  badgeSize: {x: 72, y: 52}
+  fontSize: 32
+  backgroundColor: {r: 0.025, g: 0.035, b: 0.05, a: 0.94}
+  useHosePlayerColors: 1
+  identityColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &2109946662711708551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce829aa0916f430dbc05a403f72e38f0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Fireline.Gameplay::PlayerDeathStatus
+  deadStatus: {fileID: 11400000, guid: 0e1091ee608644546a48faef910f6c22, type: 2}
 --- !u!1 &1376534921308105634
 GameObject:
   m_ObjectHideFlags: 0
