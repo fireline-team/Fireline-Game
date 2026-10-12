@@ -10,6 +10,24 @@ public class HoseWaterRules : MonoBehaviour
     [SerializeField] private bool requireWaterSource = true;
     [Tooltip("Connect newly joining players to their nearest source once. Detaching never auto-reconnects.")]
     [SerializeField] private bool startConnected = true;
+    [Header("Player hose colors")]
+    [Tooltip("Base hose colors for players 1–4. Changes also apply to connected hoses during Play Mode.")]
+    [SerializeField] private Color player1HoseColor = Color.red;
+    [SerializeField] private Color player2HoseColor = Color.yellow;
+    [SerializeField] private Color player3HoseColor = Color.green;
+    [SerializeField] private Color player4HoseColor = Color.blue;
+
+    public Color GetHoseColor(int playerIndex)
+    {
+        switch (Mathf.Max(0, playerIndex) % 4)
+        {
+            case 0: return player1HoseColor;
+            case 1: return player2HoseColor;
+            case 2: return player3HoseColor;
+            default: return player4HoseColor;
+        }
+    }
+
     [Header("Hose tether")]
     [Tooltip("Turn off to restore unlimited payout and unrestricted movement.")]
     [SerializeField] private bool limitHoseLength = true;

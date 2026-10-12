@@ -42,8 +42,7 @@ public class PlayerHoseConnection : MonoBehaviour
         Detach();
         Source = source;
         Rope = source.CreateRope(this, nozzle.NozzleTransform);
-        var input = GetComponent<PlayerInput>();
-        playerColor = ColorForPlayer(input != null ? input.playerIndex : 0);
+        RefreshPlayerColor();
         Rope.SetColor(playerColor);
         brokenMessageUntil = 0f;
         ApplyLengthSettings();
@@ -127,9 +126,18 @@ public class PlayerHoseConnection : MonoBehaviour
         }
     }
 
+    private void RefreshPlayerColor()
+    {
+        var input = GetComponent<PlayerInput>();
+        int index = input != null ? input.playerIndex : 0;
+        var rules = HoseWaterRules.ForPlayer(gameObject);
+        playerColor = rules != null ? rules.GetHoseColor(index) : ColorForPlayer(index);
+    }
+
     private void UpdateWarning()
     {
         if (Rope == null) return;
+        RefreshPlayerColor(); // Inspector edits apply without detaching/rejoining.
         // White flashing is distinct even for the red player's hose; thickness also changes.
         float pulse = Strain01 > 0.05f ? (0.5f + 0.5f * Mathf.Sin(Time.time * (12f + 20f * Strain01))) : 0f;
         Rope.SetColor(Color.Lerp(playerColor, Color.white, pulse * Mathf.Clamp01(Strain01 * 2f)));

@@ -40,6 +40,8 @@ Select **Hose gameplay settings** in the scene Hierarchy, then use `HoseWaterRul
 
 The firing checkbox can change during Play Mode. Changes made during Play Mode are temporary, as usual in Unity; change it outside Play Mode to save the scene default. Scenes without `HoseWaterRules` keep always-available firing. Use one rules object per scene, regardless of the number of sources.
 
+Change all four colors in **Hose gameplay settings → Hose Water Rules → Player hose colors**, using the **Player 1/2/3/4 Hose Color** fields. Changes apply immediately to connected hoses in Play Mode, including their base color during strain warnings. Make edits outside Play Mode and save the scene to keep them permanently. Defaults remain red, yellow, green, and blue.
+
 Colors use each `PlayerInput.playerIndex` and a per-renderer property block, so transferring or changing one player's color does not mutate the shared material. Indices above four repeat the palette.
 
 ## Length, strain, and breaking
