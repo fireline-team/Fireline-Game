@@ -434,7 +434,7 @@ MonoBehaviour:
   flipWithSwingDirection: 1
   hideWhenIdle: 1
   trail: {fileID: 0}
-  trailColor: {r: 1, g: 0.7028302, b: 0.7028302, a: 0.8}
+  trailColor: {r: 1, g: 1, b: 1, a: 0.8}
   trailTime: 0.12
   trailWidth: 0.35
   useHitFreeze: 1
