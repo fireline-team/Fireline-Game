@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>An interactable outlet. Connection ownership lives on each player.</summary>
+/// <summary>A water source (hydrant, truck, extinguisher). Hit it with the axe to connect or
+/// disconnect your hose. Connection ownership lives on each player.</summary>
 public class HoseRopeSource : Interactable
 {
     [SerializeField] private Transform sourcePoint;
@@ -47,8 +48,8 @@ public class HoseRopeSource : Interactable
 
     public override void Interact(PlayerInteractor player)
     {
-        if (!CanInteract(player) || ((Vector2)(player.transform.position - transform.position)).sqrMagnitude
-            > InteractRadius * InteractRadius) return;
+        // Only from within the player's axe swing, so a distant source can't be used.
+        if (!CanInteract(player) || !player.CanReach(this)) return;
         var connection = player.GetComponent<PlayerHoseConnection>();
         if (connection == null) connection = player.gameObject.AddComponent<PlayerHoseConnection>();
         if (connection.Source == this) connection.Detach();

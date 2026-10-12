@@ -4,7 +4,7 @@ using UnityEngine.Pool;
 
 namespace Game.Runtime
 {
-    public class HordeEnemy : MonoBehaviour
+    public class HordeEnemy : MonoBehaviour, IAxeHittable
     {
         [SerializeField] private EnemyDefinition definition;
         [Tooltip("Optional. If set, the manager flips it to face left/right. Leave empty to auto-find one on this object or its children.")]
@@ -137,6 +137,15 @@ namespace Game.Runtime
             KnockbackVelocity += velocity * (1f - resistance);
         }
         
+        /// <summary>Axe hit: shoved away from the player, then damaged.</summary>
+        public AxeHitResult OnAxeHit(in AxeHit hit)
+        {
+            if (!isActiveAndEnabled || CurrentHealth <= 0f) return AxeHitResult.Ignored;
+            ApplyKnockback(hit.Direction * hit.Knockback);
+            TakeDamage(hit.Damage); // last, since it can despawn the enemy
+            return AxeHitResult.Hit;
+        }
+
         public void ApplySlow(float multiplier, float duration)
         {
             if (CurrentHealth <= 0f) return;

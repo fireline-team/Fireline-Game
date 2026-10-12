@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private PlayerHealth health;
     private HoseLoadout loadout;
-    private PlayerInteractor interactor;
+    private AxeSwing axe;
     private HoseWeapon fixedHose;
     private HoseWeapon hose => loadout != null && loadout.Current != null ? loadout.Current : fixedHose;
     private bool spraying;
@@ -43,7 +43,12 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<PlayerHealth>();
         loadout = GetComponent<HoseLoadout>();
-        interactor = GetComponent<PlayerInteractor>();
+        axe = GetComponent<AxeSwing>();
+        if (axe == null)
+        {
+            Debug.LogWarning($"{name} has no AxeSwing; adding one with default settings. Add it to the Player prefab to tune it.", this);
+            axe = gameObject.AddComponent<AxeSwing>();
+        }
         fixedHose = GetComponent<HoseWeapon>();
         if (hose == null)
             Debug.LogError($"{name} needs a hose component (StandardHose, MistHose, or JetHose).", this);
@@ -176,19 +181,8 @@ public class PlayerController : MonoBehaviour
         if (health != null) health.Died -= OnDied;
     }
     
-    private void Interact()
-    {
-        if (interactor != null && interactor.TryInteract())
-            return;
-
-        UseOffhand();
-    }
-
-    private void UseOffhand()
-    {
-        // TODO: off-hand axe/weapon
-        Debug.Log($"Player {playerInput.playerIndex + 1} swings axe (not implemented yet)");
-    }
+    // Interact = swing the off-hand axe. Whatever it hits (locker, water source) handles the rest.
+    private void Interact() => axe.TrySwing();
     
     
     // animation stuff
