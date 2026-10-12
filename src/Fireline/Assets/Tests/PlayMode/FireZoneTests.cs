@@ -74,7 +74,8 @@ public class FireZoneTests
     [UnityTest]
     public IEnumerator HoseExtinguishesOnlyOverlappingZonesOncePerTickAndCoopAddsWater()
     {
-        HoseWeapon hose = NewObject("Hose", new Vector2(100, 100)).AddComponent<HoseWeapon>();
+        // HoseWeapon is abstract now; StandardHose extinguishes at the default 30 per second.
+        HoseWeapon hose = NewObject("Hose", new Vector2(100, 100)).AddComponent<StandardHose>();
         FireZone hit = Fire(new Vector2(102, 100));
         hit.gameObject.AddComponent<CircleCollider2D>().isTrigger = true;
         var child = new GameObject("Extra hitbox");
@@ -86,7 +87,7 @@ public class FireZoneTests
         Assert.That(hit.RemainingStrength, Is.EqualTo(30), "Multiple colliders must not multiply water.");
         Assert.That(behind.RemainingStrength, Is.EqualTo(60));
         Assert.That(outside.RemainingStrength, Is.EqualTo(60));
-        HoseWeapon teammate = NewObject("Second hose", new Vector2(100, 100)).AddComponent<HoseWeapon>();
+        HoseWeapon teammate = NewObject("Second hose", new Vector2(100, 100)).AddComponent<StandardHose>();
         teammate.Spray(Vector2.right, 1f);
         Assert.That(hit.IsBurning, Is.False);
         yield return null;

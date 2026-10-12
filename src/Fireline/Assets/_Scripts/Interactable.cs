@@ -5,48 +5,65 @@ public abstract class Interactable : MonoBehaviour
 {
     private static readonly List<Interactable> Active = new List<Interactable>();
 
-    [Tooltip("How close a player has to be to use this.")]
-    [SerializeField, Min(0.1f)] private float interactRadius = 1.25f;
+    [Tooltip("Size of this object for axe hits when it has no Collider2D. With a collider, the collider's shape is used instead.")]
+    [SerializeField, Min(0f)] private float hitRadius = 0.3f;
 
-    public float InteractRadius => interactRadius;
+    private Collider2D _collider;
 
-    protected virtual void OnEnable() => Active.Add(this);
+    public float HitRadius => hitRadius;
+
+    protected virtual void OnEnable()
+    {
+        _collider = GetComponent<Collider2D>();
+        Active.Add(this);
+    }
+
     protected virtual void OnDisable() => Active.Remove(this);
-    
+
     public abstract string GetPrompt(PlayerInteractor player);
-    
+
     public virtual bool CanInteract(PlayerInteractor player) => true;
 
     public abstract void Interact(PlayerInteractor player);
+
+    private bool HasCollider => _collider != null && _collider.enabled;
+
+    /// <summary>Point on this object nearest to <paramref name="from"/>, on the ground.</summary>
+    public Vector2 ClosestPoint(Vector2 from) => HasCollider ? _collider.ClosestPoint(from) : (Vector2)transform.position;
     
-    public static Interactable FindNearest(Vector2 position, PlayerInteractor player)
+    public bool IsInArc(Vector2 origin, Vector2 facing, float range, float arcDegrees, out float distance)
+    {
+        float padding = HasCollider ? 0f : hitRadius;
+        return AxeSwing.IsInArc(origin, facing, range, arcDegrees, ClosestPoint(origin), padding, out distance);
+    }
+    
+    public static Interactable FindInArc(Vector2 origin, Vector2 facing, float range, float arcDegrees, PlayerInteractor player)
     {
         Interactable best = null;
-        float bestSqr = float.MaxValue;
+        float bestDistance = float.MaxValue;
 
         for (int i = 0; i < Active.Count; i++)
         {
             Interactable candidate = Active[i];
-            float sqr = ((Vector2)candidate.transform.position - position).sqrMagnitude;
-            float reach = candidate.interactRadius;
-
-            if (sqr <= reach * reach && sqr < bestSqr && candidate.CanInteract(player))
+            if (candidate.IsInArc(origin, facing, range, arcDegrees, out float distance)
+                && distance < bestDistance && candidate.CanInteract(player))
             {
                 best = candidate;
-                bestSqr = sqr;
+                bestDistance = distance;
             }
         }
         return best;
     }
-    
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ClearRegistry() => Active.Clear();
 
 #if UNITY_EDITOR
     protected virtual void OnDrawGizmosSelected()
     {
+        if (GetComponent<Collider2D>() != null) return; // the collider outline already shows the hit area
         Gizmos.color = new Color(1f, 0.85f, 0.2f, 0.8f);
-        Gizmos.DrawWireSphere(transform.position, interactRadius);
+        Gizmos.DrawWireSphere(transform.position, hitRadius);
     }
 #endif
 }

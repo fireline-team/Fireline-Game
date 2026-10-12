@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     private PlayerHealth health;
     private HoseLoadout loadout;
-    private PlayerInteractor interactor;
+    private AxeSwing axe;
     private HoseWeapon fixedHose;
     private HoseWeapon hose => loadout != null && loadout.Current != null ? loadout.Current : fixedHose;
     private bool spraying;
@@ -43,7 +43,12 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<PlayerHealth>();
         loadout = GetComponent<HoseLoadout>();
-        interactor = GetComponent<PlayerInteractor>();
+        axe = GetComponent<AxeSwing>();
+        if (axe == null)
+        {
+            Debug.LogWarning($"{name} has no AxeSwing; adding one with default settings. Add it to the Player prefab to tune it.", this);
+            axe = gameObject.AddComponent<AxeSwing>();
+        }
         fixedHose = GetComponent<HoseWeapon>();
         if (hose == null)
             Debug.LogError($"{name} needs a hose component (StandardHose, MistHose, or JetHose).", this);
@@ -65,13 +70,15 @@ public class PlayerController : MonoBehaviour
     {
         if (health.IsDead)
         {
-            if (Time.unscaledTime - diedAt > 0.3f && interactAction.WasPressedThisFrame())
+            UpdateAnimation();
+            if (health.CanResetScene && Time.unscaledTime - diedAt > 0.3f && interactAction.WasPressedThisFrame())
                 health.ResetScene();
             return;
         }
 
         ReadMovement();
         ReadAim();
+        UpdateAnimation();
         ReadActions();
     }
 
@@ -107,8 +114,7 @@ public class PlayerController : MonoBehaviour
         if (playerInput.currentControlScheme == "KeyboardMouse")
         {
             // Mouse gives us a SCREEN POSITION
-            Vector3 mouseWorldPosition =
-                aimCamera.ScreenToWorldPoint(aimInput);
+            Vector2 mouseWorldPosition = ScreenToGround(aimInput);
 
             Vector2 direction =
                 (Vector2)mouseWorldPosition - rb.position;
@@ -175,19 +181,8 @@ public class PlayerController : MonoBehaviour
         if (health != null) health.Died -= OnDied;
     }
     
-    private void Interact()
-    {
-        if (interactor != null && interactor.TryInteract())
-            return;
-
-        UseOffhand();
-    }
-
-    private void UseOffhand()
-    {
-        // TODO: off-hand axe/weapon
-        Debug.Log($"Player {playerInput.playerIndex + 1} swings axe (not implemented yet)");
-    }
+    // Interact = swing the off-hand axe. Whatever it hits (locker, water source) handles the rest.
+    private void Interact() => axe.TrySwing();
     
     
     // animation stuff
@@ -196,5 +191,12 @@ public class PlayerController : MonoBehaviour
     {
         if (_animator == null) return;
         _animator.SetBool(IsMovingParam, moveInput.sqrMagnitude > 0.01f);
+    }
+    
+    private Vector2 ScreenToGround(Vector2 screenPos)
+    {
+        Ray ray = aimCamera.ScreenPointToRay(screenPos);
+        Plane ground = new Plane(Vector3.forward, new Vector3(0f, 0f, transform.position.z));
+        return ground.Raycast(ray, out float distance) ? (Vector2)ray.GetPoint(distance) : rb.position;
     }
 }

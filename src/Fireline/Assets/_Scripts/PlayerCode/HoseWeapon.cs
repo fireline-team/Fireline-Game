@@ -3,17 +3,6 @@ using Game.Runtime;
 using UnityEngine;
 
 /// <summary>
-/// Base class for every nozzle. It handles everything nozzles have in common:
-/// aiming, the rectangular hitbox, finding the enemies inside it, and drawing the stream.
-/// Subclasses only decide WHEN the hose hits and WHAT HAPPENS to the enemies it catches.
-///
-/// The hitbox is a rectangle that starts at the muzzle: Range long (along the aim) and
-/// Width wide (across it). The water visual (HoseStreamVisual) is sized from the same
-/// numbers, so what you see roughly matches what hits, but particles never decide damage.
-///
-/// One physics query per step finds both enemies and fire zones in the hitbox;
-/// FindEnemiesInHitbox and FindFiresInHitbox just read its results.
-///
 /// To make a new nozzle: inherit from this, then override OnSpray.
 /// </summary>
 public abstract class HoseWeapon : MonoBehaviour
@@ -24,6 +13,8 @@ public abstract class HoseWeapon : MonoBehaviour
     [Tooltip("How wide the stream is, across the aim direction.")]
     [SerializeField, Min(0.01f)] private float width = 0.6f;
     [SerializeField] private LayerMask hitLayers = ~0;
+    [Tooltip("Layers that stop the water, like walls and buildings. If left empty, the \"Obstacles\" layer is used.")]
+    [SerializeField] private LayerMask blockingLayers;
     [SerializeField] private Transform muzzle;
 
     [Header("Firefighting")]
@@ -63,7 +54,12 @@ public abstract class HoseWeapon : MonoBehaviour
     private HoseStreamVisual _stream;
     private PlayerHealth _health;
 
+    /// <summary>The held nozzle transform, used by the supply hose attachment.</summary>
+    public Transform NozzleTransform => muzzle != null ? muzzle : transform;
+
     public float Range => range;
+    /// <summary>How far the water actually reaches this step: Range, or less if a wall is in the way.</summary>
+    public float CurrentRange { get; private set; }
     public float Width => width;
     /// <summary>True while the continuous water visual is running (pulses don't count).</summary>
     public bool IsStreamActive => _stream != null && _stream.IsEmitting;
@@ -71,14 +67,22 @@ public abstract class HoseWeapon : MonoBehaviour
 
     /// <summary>Normalized aim direction from the current Spray call.</summary>
     protected Vector2 AimDirection { get; private set; } = Vector2.right;
-    /// <summary>Where the stream starts this step (the muzzle, or this object if no muzzle is set).</summary>
+    /// <summary>
+    /// Where the stream starts this step, on the ground: the point directly below the muzzle.
+    /// The hitbox uses this, so holding the hose at waist height doesn't shift what it hits.
+    /// </summary>
     protected Vector2 Origin { get; private set; }
+
+    /// <summary>The muzzle's actual position, possibly raised off the ground. Visuals use this.</summary>
+    protected Vector3 MuzzlePosition { get; private set; }
     /// <summary>Where the stream ends this step.</summary>
     protected Vector2 End { get; private set; }
 
     protected virtual void Awake()
     {
         _health = GetComponent<PlayerHealth>();
+        if (blockingLayers == 0)
+            blockingLayers = LayerMask.GetMask(Structure.ObstacleLayer);
 
         _stream = new HoseStreamVisual(transform, streamPrefab, new HoseStreamVisual.Look
         {
@@ -100,20 +104,30 @@ public abstract class HoseWeapon : MonoBehaviour
     /// <summary>Call every physics step while the spray button is held.</summary>
     public void Spray(Vector2 direction, float deltaTime)
     {
-        if (!isActiveAndEnabled || (_health != null && _health.IsDead) || direction.sqrMagnitude < 0.001f)
+        if (!isActiveAndEnabled || (_health != null && _health.IsDead)
+            || !HoseWaterRules.CanSpray(gameObject) || direction.sqrMagnitude < 0.001f)
         {
             StopSpraying();
             return;
         }
 
         AimDirection = direction.normalized;
-        Origin = muzzle != null ? (Vector2)muzzle.position : (Vector2)transform.position;
-        End = Origin + AimDirection * range;
+        MuzzlePosition = muzzle != null ? muzzle.position : transform.position;
+        Origin = TiltedView.ToGround(MuzzlePosition, transform.position.z);
+
+        // Walls block water: cut the stream short at the first obstacle along its center line.
+        CurrentRange = range;
+        if (blockingLayers != 0)
+        {
+            RaycastHit2D wall = Physics2D.Raycast(Origin, AimDirection, range, blockingLayers);
+            if (wall.collider != null) CurrentRange = wall.distance;
+        }
+        End = Origin + AimDirection * CurrentRange;
         _scannedThisStep = false;
 
         OnSpray(deltaTime);
-        _stream.SetSpraying(ShowsContinuousStream(), Origin, AimDirection, transform.position.z,
-            range, width, particleLifetime, particlesPerSecond, particleSize);
+        _stream.SetSpraying(ShowsContinuousStream(), MuzzlePosition, AimDirection,
+            VisualRange, width, particleLifetime, particlesPerSecond, particleSize);
     }
 
     /// <summary>Call when the spray button is released.</summary>
@@ -140,11 +154,14 @@ public abstract class HoseWeapon : MonoBehaviour
     /// </summary>
     protected virtual bool ShowsContinuousStream() => true;
 
+    // Keep a little water visible even against a wall, so it splashes instead of vanishing.
+    private float VisualRange => Mathf.Max(CurrentRange, 0.25f);
+
     /// <summary>Fires one burst of water along the current aim. Call from OnSpray.</summary>
     protected void PulseStream(int particleCount)
     {
-        _stream.Pulse(Origin, AimDirection, transform.position.z,
-            range, width, particleLifetime, particleSize, particleCount);
+        _stream.Pulse(MuzzlePosition, AimDirection,
+            VisualRange, width, particleLifetime, particleSize, particleCount);
     }
 
     /// <summary>Lets a nozzle pick its own default hitbox size when it's added in the Inspector.</summary>
@@ -180,6 +197,21 @@ public abstract class HoseWeapon : MonoBehaviour
         List<FireZone> fires = FindFiresInHitbox();
         for (int i = 0; i < fires.Count; i++)
             fires[i].ApplyWater(amount);
+        // Downed bodies leave physics simulation; query their registered ground positions directly.
+        if (_health == null || CurrentRange <= 0.01f) return;
+        Vector2 across = new Vector2(-AimDirection.y, AimDirection.x);
+        foreach (var player in PlayerHealth.ActivePlayers)
+        {
+            if (player == null || !player.IsDowned || player == _health
+                || player.gameObject.scene != gameObject.scene
+                || (hitLayers.value & (1 << player.gameObject.layer)) == 0) continue;
+            Vector2 offset = (Vector2)player.transform.position - Origin;
+            float forward = Vector2.Dot(offset, AimDirection);
+            if (forward < 0f || forward > CurrentRange || Mathf.Abs(Vector2.Dot(offset, across)) > width * 0.5f + 0.3f) continue;
+            // A wide stream must not revive someone behind a wall beside its center line.
+            if (blockingLayers != 0 && Physics2D.Linecast(Origin, player.transform.position, blockingLayers).collider != null) continue;
+            player.ApplyRevivalWater(_health, amount);
+        }
     }
 
     // One physics query per Spray step, shared by the enemy and fire lists.
@@ -199,7 +231,8 @@ public abstract class HoseWeapon : MonoBehaviour
         filter.SetLayerMask(hitLayers);
 
         float angle = Mathf.Atan2(AimDirection.y, AimDirection.x) * Mathf.Rad2Deg;
-        Physics2D.OverlapBox((Origin + End) * 0.5f, new Vector2(range, width), angle, filter, _colliderHits);
+        if (CurrentRange <= 0.01f) return; // muzzle is right against a wall: nothing gets hit
+        Physics2D.OverlapBox((Origin + End) * 0.5f, new Vector2(CurrentRange, width), angle, filter, _colliderHits);
 
         for (int i = 0; i < _colliderHits.Count; i++)
         {
@@ -221,13 +254,15 @@ public abstract class HoseWeapon : MonoBehaviour
     protected virtual void OnDrawGizmosSelected()
     {
         Vector2 dir = Application.isPlaying ? AimDirection : (Vector2)transform.right;
-        Vector2 start = muzzle != null ? (Vector2)muzzle.position : (Vector2)transform.position;
-        Vector2 center = start + dir * (range * 0.5f);
+        Vector3 muzzlePosition = muzzle != null ? muzzle.position : transform.position;
+        Vector2 start = TiltedView.ToGround(muzzlePosition, transform.position.z);
+        float length = Application.isPlaying && CurrentRange > 0f ? CurrentRange : range;
+        Vector2 center = start + dir * (length * 0.5f);
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
         Gizmos.color = new Color(0.25f, 0.8f, 1f, 0.9f);
         Gizmos.matrix = Matrix4x4.TRS(center, Quaternion.Euler(0f, 0f, angle), Vector3.one);
-        Gizmos.DrawWireCube(Vector3.zero, new Vector3(range, width, 0f));
+        Gizmos.DrawWireCube(Vector3.zero, new Vector3(length, width, 0f));
         Gizmos.matrix = Matrix4x4.identity;
     }
 #endif

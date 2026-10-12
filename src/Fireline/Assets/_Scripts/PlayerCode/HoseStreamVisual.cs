@@ -55,12 +55,13 @@ public sealed class HoseStreamVisual
     }
 
     /// <summary>Points the stream and turns continuous spraying on or off.</summary>
-    public void SetSpraying(bool spraying, Vector2 origin, Vector2 direction, float z,
+    /// <param name="origin">Where the water leaves the nozzle, in world space (may be raised off the ground).</param>
+    public void SetSpraying(bool spraying, Vector3 origin, Vector2 direction,
         float range, float width, float lifetime, float particlesPerSecond, float particleSize)
     {
         if (spraying)
         {
-            Aim(origin, direction, z);
+            Aim(origin, direction);
             Shape(direction, range, width, lifetime, particleSize, 0.9f, 1.1f);
             if (!_isCustom)
             {
@@ -76,10 +77,10 @@ public sealed class HoseStreamVisual
     }
 
     /// <summary>One burst of water, for pulsing nozzles like the jet.</summary>
-    public void Pulse(Vector2 origin, Vector2 direction, float z,
+    public void Pulse(Vector3 origin, Vector2 direction,
         float range, float width, float lifetime, float particleSize, int count)
     {
-        Aim(origin, direction, z);
+        Aim(origin, direction);
         // A wide speed spread fills the whole line at once instead of one clump.
         Shape(direction, range, width, lifetime, particleSize, 0.35f, 1.15f);
         _particles.Emit(count);
@@ -95,10 +96,10 @@ public sealed class HoseStreamVisual
 
     // ---------------------------------------------------------------- per-frame setup
 
-    private void Aim(Vector2 origin, Vector2 direction, float z)
+    private void Aim(Vector3 origin, Vector2 direction)
     {
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        _holder.SetPositionAndRotation(new Vector3(origin.x, origin.y, z), Quaternion.Euler(0f, 0f, angle));
+        _holder.SetPositionAndRotation(origin, Quaternion.Euler(0f, 0f, angle));
     }
 
     private void Shape(Vector2 direction, float range, float width, float lifetime,
