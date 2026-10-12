@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 0
 --- !u!1 &62730614
 GameObject:
@@ -286,7 +286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4867a6af27504674a36b18c5adcd27e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::HoseRopeSource
-  interactRadius: 1.25
+  hitRadius: 0.3
   sourcePoint: {fileID: 728521319}
   groundPlane: {fileID: 361714891}
   groundNormal: {x: 0, y: 0, z: -1}
@@ -408,6 +408,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Camera Configuration
       objectReference: {fileID: 0}
+    - target: {fileID: 3871164830646965643, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: PositionMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3871164830646965643, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
+      propertyPath: RotationMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6157268166703812395, guid: 037c9015084b2ff298c6644ab6d515bf, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -484,6 +492,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::HoseWaterRules
   requireWaterSource: 1
   startConnected: 1
+  player1HoseColor: {r: 0.7294118, g: 0.078431375, b: 0.05490196, a: 1}
+  player2HoseColor: {r: 0.9882353, g: 0.8235294, b: 0.3019608, a: 1}
+  player3HoseColor: {r: 0.13725491, g: 0.5058824, b: 0.27450982, a: 1}
+  player4HoseColor: {r: 0.27058825, g: 0.30588236, b: 1, a: 1}
   limitHoseLength: 1
   hoseLength: 12
   secondsToBreak: 1
@@ -1005,7 +1017,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 1
 --- !u!212 &1030778144
 SpriteRenderer:
@@ -3306,7 +3318,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 2
 --- !u!212 &1831628986
 SpriteRenderer:
@@ -3412,7 +3424,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4867a6af27504674a36b18c5adcd27e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::HoseRopeSource
-  interactRadius: 1.25
+  hitRadius: 0.3
   sourcePoint: {fileID: 1088070715}
   groundPlane: {fileID: 361714891}
   groundNormal: {x: 0, y: 0, z: -1}

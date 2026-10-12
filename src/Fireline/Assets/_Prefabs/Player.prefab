@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 214903788933792270}
   - component: {fileID: 54014289339304533}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: fireline_playerhand_v1 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116,7 +116,7 @@ GameObject:
   - component: {fileID: 2627532492962399250}
   - component: {fileID: 2109946662711708551}
   - component: {fileID: 5913907959130893562}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -203,7 +203,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.008640707, y: 0.64044213}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -213,7 +213,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.5852455, y: 0.58730364}
   m_EdgeRadius: 0
 --- !u!114 &3919953474488637353
 MonoBehaviour:
@@ -554,7 +554,7 @@ GameObject:
   - component: {fileID: 1087674415940790308}
   - component: {fileID: 1017592944127437050}
   - component: {fileID: 4316567627025758878}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: PlayerSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -683,7 +683,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6246584468556133135}
   - component: {fileID: 8958800423581826540}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: fireline_playerhand_v1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -775,7 +775,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3136190981266959438}
   - component: {fileID: 7636147255678379848}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Axe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -866,7 +866,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5370900210424625486}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: InteractionPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -898,7 +898,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4377830768944491630}
   - component: {fileID: 5221166294906486497}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -990,7 +990,7 @@ GameObject:
   m_Component:
   - component: {fileID: 374009599070947445}
   - component: {fileID: 1133547690721760708}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AimPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
