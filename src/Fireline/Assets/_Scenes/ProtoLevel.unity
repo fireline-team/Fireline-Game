@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 0
 --- !u!1 &62730614
 GameObject:
@@ -919,7 +919,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 1
 --- !u!212 &1030778144
 SpriteRenderer:
@@ -3005,7 +3005,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 2
 --- !u!212 &1831628986
 SpriteRenderer:
