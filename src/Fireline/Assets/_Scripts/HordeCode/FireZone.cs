@@ -40,7 +40,7 @@ namespace Game.Runtime
             if (fireVisual != null)
             {
                 fireMaterial = fireVisual.GetComponent<MeshRenderer>().materials[0];
-                InitalFlameHeight = fireMaterial.GetFloat("FlameHeight");
+                InitalFlameHeight = fireMaterial.GetFloat("_FlameLength");
                 fullVisualScale = fireVisual.localScale;
                 //flames = fireVisual.GetComponentsInChildren<ParticleSystem>(true);
                 
@@ -96,7 +96,7 @@ namespace Game.Runtime
         private void SetProceduralFlameHeight()
         {
             //map the flame height to the strength of the fire
-            fireMaterial.SetFloat("FlameHeight", Mathf.Lerp(InitalFlameHeight, 0f, strength.Current / strength.Maximum ));
+            fireMaterial.SetFloat("_FlameLength", Mathf.Lerp(0f, InitalFlameHeight, strength.Current / strength.Maximum ));
         }
     }
 }
