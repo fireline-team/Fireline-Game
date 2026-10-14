@@ -52,31 +52,32 @@ Material:
     m_Ints: []
     m_Floats:
     - _AnimationFPS: 12
-    - _BaseInset: 0.01
-    - _BaseRoughness: -0.02
+    - _BaseInset: -0.04
+    - _BaseRoughness: 0.15
     - _BaseWidth: 0.38
     - _Base_Width: 0.65
     - _Brightness: 3
     - _EdgeRand: 0.58
-    - _EdgeTaperOne: -0.18
-    - _EdgeTaperTwo: 0.37
+    - _EdgeTaperOne: -0.33
+    - _EdgeTaperTwo: 0.56
     - _FlameHeight: 0.65
+    - _FlameLength: 0.65
     - _Flame_Height: 0.44
     - _Flame_Variation: 0.56
-    - _NoiseScale: 5.53
+    - _NoiseScale: 6.1
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Sway: -2.8
-    - _TileWidth: 2
+    - _Sway: 16.59
+    - _TileWidth: 6
     - _TopWidth: -0.1
     - _Top_Width: -0.1
-    - _tilesX: 1.49
+    - _tilesX: 8
     m_Colors:
     - _CoreColor: {r: 0.9542121, g: 0.9473093, b: 0.44367498, a: 1}
     - _InnerColor: {r: 1, g: 0.8313726, b: 0.27843136, a: 1}
     - _MidColor: {r: 1, g: 0.47058815, b: 0.12156857, a: 1}
     - _OuterColor: {r: 0.8509804, g: 0.21176466, b: 0.08627448, a: 1}
     - _Pixel_Resolution: {r: 24, g: 32, b: 0, a: 0}
-    - _Seed: {r: 44, g: 32, b: 0, a: 0}
+    - _Seed: {r: 27, g: 88, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

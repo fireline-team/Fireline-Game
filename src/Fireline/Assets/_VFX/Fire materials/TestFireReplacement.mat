@@ -116,17 +116,18 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EdgeRand: -0.05
-    - _EdgeTaperOne: -0.12
-    - _EdgeTaperTwo: 0.18
+    - _EdgeTaperOne: -0.08
+    - _EdgeTaperTwo: 0.23
     - _EnvironmentReflections: 1
     - _FlameHeight: 0.65
+    - _FlameLength: 0.79
     - _Flame_Height: 0.65
-    - _Flame_Variation: 0.3
+    - _Flame_Variation: 0.4
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
-    - _NoiseScale: 5
+    - _NoiseScale: 9
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
