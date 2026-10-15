@@ -386,7 +386,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 1
+  orthographic: 0
   orthographic size: 10.912499
   m_Depth: -1
   m_CullingMask:
@@ -483,7 +483,7 @@ MonoBehaviour:
   BlendUpdateMethod: 1
   LensModeOverride:
     Enabled: 1
-    DefaultMode: 1
+    DefaultMode: 2
   DefaultBlend:
     Style: 1
     Time: 2
@@ -5555,10 +5555,10 @@ MonoBehaviour:
   FramingSize: 0.75
   CenterOffset: {x: 0, y: 0}
   Damping: 0.9
-  SizeAdjustment: 2
+  SizeAdjustment: 0
   LateralAdjustment: 0
-  FovRange: {x: 1, y: 100}
-  DollyRange: {x: -100, y: 100}
+  FovRange: {x: 60, y: 78}
+  DollyRange: {x: 0, y: 0}
   OrthoSizeRange: {x: 6, y: 10}
 --- !u!114 &1507633282
 MonoBehaviour:
@@ -5608,7 +5608,7 @@ MonoBehaviour:
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
-    ModeOverride: 1
+    ModeOverride: 2
     PhysicalProperties:
       GateFit: 2
       SensorSize: {x: 21.946, y: 16.002}

@@ -60,6 +60,32 @@ public class SharedCameraTests
     }
 
     [UnityTest]
+    public IEnumerator HoseBillboardKeepsTiltAndAimWithoutMovingItsOrbitOrMuzzle()
+    {
+        yield return Load();
+        var player = Join(0);
+        Transform pivot = player.transform.Find("AimPivot");
+        Transform hose = pivot.Find("Hose");
+        Assert.That(hose.GetComponent<AimedBillboard>(), Is.Not.Null);
+        Vector3 normal = TiltedView.StandingRotation * Vector3.forward;
+        Vector3 localPosition = hose.localPosition;
+        foreach (float angle in new[] { 0f, 45f, 90f, 135f, 180f, 225f, 270f, 315f })
+        {
+            pivot.rotation = Quaternion.Euler(0, 0, angle);
+            Vector3 orbitPosition = hose.position;
+            Vector3 muzzlePosition = player.GetComponent<HoseLoadout>().Current.NozzleTransform.position;
+            yield return null;
+            Assert.That(Vector3.Dot(hose.forward, normal), Is.GreaterThan(0.9999f));
+            Vector3 projectedAim = Vector3.ProjectOnPlane(pivot.right, normal).normalized;
+            Assert.That(Vector3.Dot(hose.right, projectedAim), Is.GreaterThan(0.9999f));
+            Assert.That(Vector3.Distance(hose.position, orbitPosition), Is.LessThan(0.0001f));
+            Assert.That(hose.localPosition, Is.EqualTo(localPosition));
+            Assert.That(Vector3.Distance(player.GetComponent<HoseLoadout>().Current.NozzleTransform.position,
+                muzzlePosition), Is.LessThan(0.0001f));
+        }
+    }
+
+    [UnityTest]
     public IEnumerator MovingPlayersStayVisibleAtZoomCapAndCameraZoomsInWhenTheyRegroup()
     {
         yield return Load();
@@ -76,8 +102,9 @@ public class SharedCameraTests
         }
         yield return new WaitForSeconds(7);
         var camera = Camera.main;
-        float zoomCap = Object.FindAnyObjectByType<CinemachineGroupFraming>().OrthoSizeRange.y;
-        Assert.That(camera.orthographicSize, Is.InRange(zoomCap - 0.1f, zoomCap + 0.001f));
+        float zoomCap = Object.FindAnyObjectByType<CinemachineGroupFraming>().FovRange.y;
+        Assert.That(camera.orthographic, Is.False);
+        Assert.That(camera.fieldOfView, Is.InRange(zoomCap - 0.1f, zoomCap + 0.001f));
         foreach (var player in players)
         {
             Rect visible = BodyScreenBounds(player.GetComponentInChildren<Animator>().GetComponent<SpriteRenderer>(), camera, Vector2.zero);
@@ -91,7 +118,7 @@ public class SharedCameraTests
         yield return new WaitForSeconds(2);
         foreach (var device in devices) InputSystem.QueueStateEvent(device, new GamepadState());
         yield return new WaitForSeconds(2);
-        Assert.That(camera.orthographicSize, Is.LessThan(zoomCap - 0.5f));
+        Assert.That(camera.fieldOfView, Is.LessThan(zoomCap - 0.5f));
 #endif
     }
 
@@ -131,30 +158,40 @@ public class SharedCameraTests
         camera.transform.SetPositionAndRotation(new Vector3(0, -5, -8.660254f), Quaternion.Euler(-30, 0, 0));
         camera.orthographic = true;
         var body = target.GetComponentInChildren<Animator>().GetComponent<SpriteRenderer>();
-        foreach (float padding in new[] { 0f, 20f })
+        foreach (bool orthographic in new[] { true, false })
         {
-            typeof(PlayerController).GetField("screenEdgePaddingPixels", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                .SetValue(controller, padding);
-            foreach (float aspect in new[] { 16f/9f, 4f/3f, 0.75f })
+            camera.orthographic = orthographic;
+            camera.fieldOfView = 60;
+            foreach (float padding in new[] { 0f, 20f })
             {
-                camera.aspect = aspect;
-                foreach (Vector2 outside in new[] { new Vector2(-100, 0), new Vector2(100, 0), new Vector2(0, -100), new Vector2(0, 100), new Vector2(100, 100) })
+                typeof(PlayerController).GetField("screenEdgePaddingPixels", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    .SetValue(controller, padding);
+                foreach (float aspect in new[] { 16f/9f, 4f/3f, 0.75f })
                 {
-                    var clamped = controller.ConstrainToScreen(outside);
-                    Rect visible = BodyScreenBounds(body, camera, clamped - (Vector2)target.transform.position);
-                    Rect screen = camera.pixelRect;
-                    Assert.That(visible.xMin, Is.GreaterThanOrEqualTo(screen.xMin + padding - 0.01f));
-                    Assert.That(visible.xMax, Is.LessThanOrEqualTo(screen.xMax - padding + 0.01f));
-                    Assert.That(visible.yMin, Is.GreaterThanOrEqualTo(screen.yMin + padding - 0.01f));
-                    Assert.That(visible.yMax, Is.LessThanOrEqualTo(screen.yMax - padding + 0.01f));
-                    if (outside.x < 0) Assert.That(visible.xMin, Is.EqualTo(screen.xMin + padding).Within(0.01f));
-                    if (outside.x > 0) Assert.That(visible.xMax, Is.EqualTo(screen.xMax - padding).Within(0.01f));
-                    if (outside.y < 0) Assert.That(visible.yMin, Is.EqualTo(screen.yMin + padding).Within(0.01f));
-                    if (outside.y > 0) Assert.That(visible.yMax, Is.EqualTo(screen.yMax - padding).Within(0.01f));
+                    camera.aspect = aspect;
+                    foreach (Vector2 outside in new[] { new Vector2(-100, 0), new Vector2(100, 0), new Vector2(0, -100), new Vector2(0, 100), new Vector2(100, 100) })
+                    {
+                        var clamped = controller.ConstrainToScreen(outside);
+                        Rect visible = BodyScreenBounds(body, camera, clamped - (Vector2)target.transform.position);
+                        Rect screen = camera.pixelRect;
+                        Assert.That(visible.xMin, Is.GreaterThanOrEqualTo(screen.xMin + padding - 0.01f));
+                        Assert.That(visible.xMax, Is.LessThanOrEqualTo(screen.xMax - padding + 0.01f));
+                        Assert.That(visible.yMin, Is.GreaterThanOrEqualTo(screen.yMin + padding - 0.01f));
+                        Assert.That(visible.yMax, Is.LessThanOrEqualTo(screen.yMax - padding + 0.01f));
+                        float closestGap = Mathf.Min(visible.xMin - screen.xMin, screen.xMax - visible.xMax,
+                            visible.yMin - screen.yMin, screen.yMax - visible.yMax);
+                        Assert.That(closestGap, Is.EqualTo(padding).Within(0.02f), "Body should touch an edge without extra buffer.");
+                        if (orthographic && outside.x < 0) Assert.That(visible.xMin, Is.EqualTo(screen.xMin + padding).Within(0.01f));
+                        if (orthographic && outside.x > 0) Assert.That(visible.xMax, Is.EqualTo(screen.xMax - padding).Within(0.01f));
+                        if (orthographic && outside.y < 0) Assert.That(visible.yMin, Is.EqualTo(screen.yMin + padding).Within(0.01f));
+                        if (orthographic && outside.y > 0) Assert.That(visible.yMax, Is.EqualTo(screen.yMax - padding).Within(0.01f));
+                    }
+                    Vector2 first = controller.ConstrainToScreen(new Vector2(100, 0));
+                    Vector2 second = controller.ConstrainToScreen(new Vector2(100, 1));
+                    if (orthographic) Assert.That(second.y - first.y, Is.EqualTo(1).Within(0.001f));
+                    Vector2 slide = controller.ConstrainToScreen(first + Vector2.down * 0.2f);
+                    Assert.That((slide - first).magnitude, Is.GreaterThan(0.01f));
                 }
-                Vector2 first = controller.ConstrainToScreen(new Vector2(100, 0));
-                Vector2 second = controller.ConstrainToScreen(new Vector2(100, 1));
-                Assert.That(second.y - first.y, Is.EqualTo(1).Within(0.001f));
             }
         }
         target.transform.position = new Vector3(100, 0, 0);

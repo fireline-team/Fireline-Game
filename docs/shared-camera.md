@@ -1,14 +1,18 @@
 # Shared firefighter camera
 
-The shared Cinemachine setup frames standing firefighters only. Its zoom limits
-are configured by Cinemachine Group Framing's **Ortho Size Range** (X = minimum,
-Y = maximum). **Framing Size** controls how much of the frame the group normally
-occupies before zooming; it is separate from the physical screen boundary.
+The shared Cinemachine setup uses **perspective projection** with the existing
+30-degree camera/billboard tilt. The physics ground remains the XY plane.
+Standing firefighters are framed dynamically using **Zoom Only**, with **FOV
+Range = 60–78 degrees** and no dolly adjustment. At the existing 10-unit follow
+distance, 78 degrees gives approximately 8 units of vertical half-height at the
+target depth. Perspective makes the visible ground area vary with depth; it is
+not an orthographic-size limit.
 
 PlayerController constrains the **PlayerSprite body bounds**, including its head
 and feet, to the screen. Extra padding defaults to **0 pixels** on all four sides.
-Projection uses the sprite's local bounds and transform, so the tilted camera and
-feet pivot do not create asymmetric margins. Weapons, overhead badges, and effects
+The complete billboard is tested against the camera's view volume, including its
+depth. Movement is constrained on the XY floor, so players slide along the
+sloping perspective edges without moving their physics bodies off the floor. Weapons, overhead badges, and effects
 are not part of the body boundary. Movement along an edge remains possible.
 The Cinemachine extension uses the same body bounds to keep camera panning and
 zoom-in from clipping standing players, without teleporting physics bodies.
@@ -27,7 +31,11 @@ Open `Assets/_Prefabs/Player.prefab`, select its root **Player**, then expand
 
 Edit the prefab outside Play Mode to persist changes for all spawned players.
 Scene-instance overrides take precedence. Maximum camera zoom remains on
-**Camera Configuration → Target Group → Cinemachine Group Framing → Ortho Size Range → Y**.
+**Camera Configuration → Target Group → Cinemachine Group Framing → FOV Range → Y**
+(maximum vertical field of view). X is the closest zoom. Keep **Size Adjustment =
+Zoom Only** to use this cap without additional dolly zoom-out. **Cinemachine Follow
+→ Follow Offset** sets the camera distance. Orthographic Size Range has no effect
+in perspective. The camera Lens Mode Override and Brain Default Mode are Perspective.
 
 CameraTargetSetter discovers scene players and updates membership on join,
 downing, revival, disable, and destruction. Downed bodies remain where they

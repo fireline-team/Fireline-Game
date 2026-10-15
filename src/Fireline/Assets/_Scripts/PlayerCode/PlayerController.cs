@@ -118,27 +118,77 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = (constrained - rb.position) / Time.fixedDeltaTime;
     }
 
+    private readonly Vector3[] boundaryCorners = new Vector3[8];
+    private readonly Plane[] screenPlanes = new Plane[6];
+    private readonly float[] planeOffsets = new float[6];
+
     public Vector2 ConstrainToScreen(Vector2 position)
     {
         if (aimCamera == null) aimCamera = Camera.main;
-        if (aimCamera == null || !aimCamera.orthographic) return position;
-        Vector3 world = new Vector3(position.x, position.y, transform.position.z);
-        Vector3 viewport = aimCamera.WorldToViewportPoint(world);
-        Rect bounds = GetCameraPlaneBounds(aimCamera.transform.position, aimCamera.transform.rotation);
-        Vector3 delta = Quaternion.Inverse(aimCamera.transform.rotation) * (world - transform.position);
-        bounds.position += new Vector2(delta.x, delta.y);
-        float halfHeight = aimCamera.orthographicSize;
-        float halfWidth = halfHeight * aimCamera.aspect;
-        float padding = Mathf.Min(screenEdgePaddingPixels, Mathf.Min(aimCamera.pixelWidth, aimCamera.pixelHeight) * 0.49f);
-        float horizontalPadding = padding * (2f * halfWidth / Mathf.Max(1, aimCamera.pixelWidth));
-        float verticalPadding = padding * (2f * halfHeight / Mathf.Max(1, aimCamera.pixelHeight));
-        float x = viewport.x - ContainmentShift(bounds.xMin, bounds.xMax, halfWidth - horizontalPadding) / (2f * halfWidth);
-        float y = viewport.y - ContainmentShift(bounds.yMin, bounds.yMax, halfHeight - verticalPadding) / (2f * halfHeight);
-        if (x == viewport.x && y == viewport.y) return position;
-        // Ray/ground intersection preserves the XY physics plane with a tilted camera.
-        Ray ray = aimCamera.ViewportPointToRay(new Vector3(x, y, 0));
-        Plane ground = new Plane(Vector3.forward, world);
-        return ground.Raycast(ray, out float distance) ? (Vector2)ray.GetPoint(distance) : position;
+        if (aimCamera == null) return position;
+        // Cropping the projection keeps padding equal in pixels for either projection.
+        float padding = Mathf.Clamp(screenEdgePaddingPixels, 0f, Mathf.Min(aimCamera.pixelWidth, aimCamera.pixelHeight) * 0.49f);
+        Matrix4x4 projection = aimCamera.projectionMatrix;
+        projection.SetRow(0, projection.GetRow(0) / (1f - 2f * padding / Mathf.Max(1, aimCamera.pixelWidth)));
+        projection.SetRow(1, projection.GetRow(1) / (1f - 2f * padding / Mathf.Max(1, aimCamera.pixelHeight)));
+        GeometryUtility.CalculateFrustumPlanes(projection * aimCamera.worldToCameraMatrix, screenPlanes);
+        GetBoundaryCorners(boundaryCorners);
+        for (int i = 0; i < screenPlanes.Length; i++)
+        {
+            planeOffsets[i] = float.PositiveInfinity;
+            foreach (var corner in boundaryCorners)
+                planeOffsets[i] = Mathf.Min(planeOffsets[i], screenPlanes[i].GetDistanceToPoint(corner));
+        }
+        Vector2 desired = position - (Vector2)transform.position;
+        if (FitsScreen(desired)) return position;
+        Vector2 best = Vector2.zero;
+        float bestDistance = float.PositiveInfinity;
+        // Intersect the view volume with the XY movement plane. The nearest point
+        // on this convex polygon preserves sliding along its sloping perspective edges.
+        for (int i = 0; i < screenPlanes.Length; i++)
+        {
+            Vector2 n = screenPlanes[i].normal;
+            if (n.sqrMagnitude < 0.000001f) continue;
+            Consider(desired - n * ((Vector2.Dot(n, desired) + planeOffsets[i]) / n.sqrMagnitude));
+            for (int j = i + 1; j < screenPlanes.Length; j++)
+            {
+                Vector2 m = screenPlanes[j].normal;
+                float det = n.x * m.y - n.y * m.x;
+                if (Mathf.Abs(det) < 0.000001f) continue;
+                Consider(new Vector2((-planeOffsets[i] * m.y + n.y * planeOffsets[j]) / det,
+                    (-n.x * planeOffsets[j] + planeOffsets[i] * m.x) / det));
+            }
+        }
+        return (Vector2)transform.position + best;
+
+        void Consider(Vector2 candidate)
+        {
+            float distance = (candidate - desired).sqrMagnitude;
+            if (distance < bestDistance && FitsScreen(candidate)) { best = candidate; bestDistance = distance; }
+        }
+    }
+
+    private bool FitsScreen(Vector2 translation)
+    {
+        for (int i = 0; i < screenPlanes.Length; i++)
+            if (Vector2.Dot((Vector2)screenPlanes[i].normal, translation) + planeOffsets[i] < -0.00001f) return false;
+        return true;
+    }
+
+    public void GetBoundaryCorners(Vector3[] corners)
+    {
+        if (boundarySprite == null || boundarySprite.sprite == null)
+        {
+            for (int i = 0; i < 8; i++) corners[i] = transform.position;
+            return;
+        }
+        Bounds local = boundarySprite.localBounds;
+        // Sprite bounds include artificial thickness; the billboard itself is a flat surface.
+        for (int i = 0; i < 8; i++)
+            corners[i] = boundarySprite.transform.TransformPoint(new Vector3(
+                (i & 1) == 0 ? local.min.x : local.max.x,
+                (i & 2) == 0 ? local.min.y : local.max.y,
+                local.center.z));
     }
 
     /// <summary>Project the actual body rectangle, not a world-axis bounding box or the feet pivot.</summary>
@@ -154,7 +204,7 @@ public class PlayerController : MonoBehaviour
         for (int i = 0; i < 8; i++)
         {
             Vector3 corner = new Vector3((i & 1) == 0 ? local.min.x : local.max.x,
-                (i & 2) == 0 ? local.min.y : local.max.y, (i & 4) == 0 ? local.min.z : local.max.z);
+                (i & 2) == 0 ? local.min.y : local.max.y, local.center.z);
             Vector2 point = inverse * (boundarySprite.transform.TransformPoint(corner) - cameraPosition);
             min = Vector2.Min(min, point);
             max = Vector2.Max(max, point);
