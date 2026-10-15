@@ -258,6 +258,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   moveSpeed: 5
+  boundarySprite: {fileID: 1087674415940790308}
+  screenEdgePaddingPixels: 0
   aimPivot: {fileID: 374009599070947445}
   aimCamera: {fileID: 0}
   stickDeadzone: 0.2
