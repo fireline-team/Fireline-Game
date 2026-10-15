@@ -3,7 +3,9 @@
   "references": [
     "Fireline.Gameplay",
     "Fireline.Shared",
-    "Unity.InputSystem"
+    "Unity.InputSystem",
+    "Unity.Cinemachine",
+    "Unity.ugui"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"
