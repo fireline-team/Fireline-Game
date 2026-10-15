@@ -147,7 +147,7 @@ MonoBehaviour:
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
-    ModeOverride: 1
+    ModeOverride: 2
     PhysicalProperties:
       GateFit: 2
       SensorSize: {x: 21.946, y: 16.002}
@@ -196,10 +196,10 @@ MonoBehaviour:
   FramingSize: 0.75
   CenterOffset: {x: 0, y: 0}
   Damping: 0.9
-  SizeAdjustment: 2
+  SizeAdjustment: 0
   LateralAdjustment: 0
-  FovRange: {x: 1, y: 100}
-  DollyRange: {x: -100, y: 100}
+  FovRange: {x: 60, y: 78}
+  DollyRange: {x: 0, y: 0}
   OrthoSizeRange: {x: 6, y: 10}
 --- !u!114 &593135103658467004
 MonoBehaviour:

@@ -900,6 +900,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4377830768944491630}
   - component: {fileID: 5221166294906486497}
+  - component: {fileID: 810000009}
   m_Layer: 3
   m_Name: Hose
   m_TagString: Untagged
@@ -1030,3 +1031,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::HeightAboveGround
   height: 0.6
   groundOffset: {x: 0, y: 0}
+--- !u!114 &810000009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4640601042794098842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21886c607fe843e599c69381c28de722, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Fireline.Gameplay::AimedBillboard
+  aimPivot: {fileID: 374009599070947445}
