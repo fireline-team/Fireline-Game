@@ -1036,7 +1036,7 @@ PrefabInstance:
     - target: {fileID: 1070638113013307975, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 1956673368466636648, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Name
       value: Building (1)
@@ -1064,7 +1064,7 @@ PrefabInstance:
     - target: {fileID: 3623796942473255593, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Size.x
       value: 2.36
@@ -1076,7 +1076,7 @@ PrefabInstance:
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 4400138067852630974, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.y
       value: 4.981851
@@ -1091,7 +1091,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4629066642255133548, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: useDepth
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4629066642255133548, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: footprint.x
@@ -1136,7 +1136,7 @@ PrefabInstance:
     - target: {fileID: 7506096706342490312, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 8598371421348140119, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.3399997
@@ -3325,7 +3325,7 @@ PrefabInstance:
     - target: {fileID: 1070638113013307975, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 1956673368466636648, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Name
       value: Building
@@ -3333,14 +3333,14 @@ PrefabInstance:
     - target: {fileID: 3623796942473255593, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 4629066642255133548, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: useDepth
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4629066642255133548, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: depthMaterial
@@ -3353,7 +3353,7 @@ PrefabInstance:
     - target: {fileID: 7506096706342490312, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 8984695239606287088, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.38
