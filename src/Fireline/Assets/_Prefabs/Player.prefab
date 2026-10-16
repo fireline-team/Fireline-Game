@@ -26,8 +26,8 @@ Transform:
   m_GameObject: {fileID: 500129299363126778}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00000004470348, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.41, y: 0.55, z: 0.010000001}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalPosition: {x: -0.41, y: 0.49, z: 0.010000001}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3370365459608866585}
@@ -165,7 +165,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
@@ -258,6 +258,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   moveSpeed: 5
+  boundarySprite: {fileID: 1087674415940790308}
+  screenEdgePaddingPixels: 0
   aimPivot: {fileID: 374009599070947445}
   aimCamera: {fileID: 0}
   stickDeadzone: 0.2
@@ -554,6 +556,7 @@ GameObject:
   - component: {fileID: 1087674415940790308}
   - component: {fileID: 1017592944127437050}
   - component: {fileID: 4316567627025758878}
+  - component: {fileID: 5353719856927833428}
   m_Layer: 3
   m_Name: PlayerSprite
   m_TagString: Untagged
@@ -571,7 +574,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.25881907, y: -0, z: -0, w: 0.9659259}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 214903788933792270}
@@ -626,7 +629,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2353094741450111946, guid: 402e81363babf4b989fabcf1a18989d5, type: 3}
+  m_Sprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -647,7 +650,7 @@ Animator:
   m_GameObject: {fileID: 1376534921308105634}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 0e669740be2044bb89d29c4fab2e05bd, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -673,6 +676,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::StandUpright
   feetOnGround: 1
   groundOffset: {x: 0, y: 0}
+--- !u!114 &5353719856927833428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376534921308105634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6deb52a4e1e1c4623aa88a3d0abc7f30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::DirectionalSprite
+  poses:
+  - {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: 400683508, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: 1843409636, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: 1116449520, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: -47004420, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  artFacesWest: 1
+  minMoveDistance: 0.001
+  startFacing: 6
 --- !u!1 &1500676528642636846
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,8 +815,8 @@ Transform:
   m_GameObject: {fileID: 1627681725173256821}
   serializedVersion: 2
   m_LocalRotation: {x: -0.25881904, y: -0, z: -0, w: 0.9659259}
-  m_LocalPosition: {x: 1.651, y: 0.7683, z: -0.26633978}
-  m_LocalScale: {x: 1.953, y: 1.4589999, z: 1}
+  m_LocalPosition: {x: 1.17, y: 1.19, z: -0.26633978}
+  m_LocalScale: {x: -4.233909, y: 3.162966, z: 2.1679}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5933821776725555064}
@@ -846,7 +870,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: ea7e577935ec9499f8806f49334b4dc6, type: 3}
+  m_Sprite: {fileID: -736623611338251631, guid: 9db82bf192cb1415388b2f04fda7ae70, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -898,6 +922,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4377830768944491630}
   - component: {fileID: 5221166294906486497}
+  - component: {fileID: 810000009}
   m_Layer: 3
   m_Name: Hose
   m_TagString: Untagged
@@ -913,9 +938,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4640601042794098842}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.723, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.25881907, y: -0, z: -0, w: 0.9659259}
+  m_LocalPosition: {x: 0.719, y: 0.102, z: 0}
+  m_LocalScale: {x: -1.3425691, y: 1.0898, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 374009599070947445}
@@ -969,7 +994,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -6637883357958872357, guid: ed01ec398e0a341b9b2e1109caa5ecc2, type: 3}
+  m_Sprite: {fileID: 3465408108381529275, guid: 85b10a46724b44fc7ab5ada75b2cc628, type: 3}
   m_Color: {r: 1, g: 0.9320068, b: 0.06132078, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -980,6 +1005,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 1
   m_BlendShapeWeights: []
+--- !u!114 &810000009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4640601042794098842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21886c607fe843e599c69381c28de722, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::AimedBillboard
+  aimPivot: {fileID: 374009599070947445}
 --- !u!1 &6388043016819899405
 GameObject:
   m_ObjectHideFlags: 0

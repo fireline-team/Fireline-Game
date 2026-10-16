@@ -2945,8 +2945,8 @@ MonoBehaviour:
   UpdateMethod: 2
   BlendUpdateMethod: 1
   LensModeOverride:
-    Enabled: 0
-    DefaultMode: 1
+    Enabled: 1
+    DefaultMode: 2
   DefaultBlend:
     Style: 1
     Time: 2
