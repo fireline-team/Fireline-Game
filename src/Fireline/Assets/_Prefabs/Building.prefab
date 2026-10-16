@@ -242,6 +242,9 @@ MonoBehaviour:
   leftSide: {fileID: 7506096706342490312}
   rightSide: {fileID: 4161445541628738031}
   hideSideFacingAway: 1
+  useDepth: 1
+  depthMaterial: {fileID: 0}
+  spriteMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
 --- !u!114 &8626253112806125783
 MonoBehaviour:
   m_ObjectHideFlags: 0

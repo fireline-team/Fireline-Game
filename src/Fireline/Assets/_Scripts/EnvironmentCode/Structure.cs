@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -25,6 +26,11 @@ using UnityEngine.Rendering;
 /// sprite on both sides; the left side shows it mirrored automatically.
 ///
 /// Keep the root's scale at (1, 1, 1); size things with Footprint and Height instead.
+///
+/// Depth: the faces use the StructureDepth material, which writes depth, so buildings that touch
+/// or overlap hide each other per pixel instead of one painting over the other, and characters
+/// are hidden behind corners correctly. While FadeWhenBehind fades the building, the faces switch
+/// back to their normal sprite material (a depth material can't be see-through).
 ///
 /// Walls: use one-cell segments (footprint 1 x 1) so draw order stays correct along long walls.
 /// Buildings: one Structure with a footprint matching the building's base.
@@ -68,14 +74,42 @@ public class Structure : MonoBehaviour
              "show it through the building. (With an orthographic camera, both sides are edge-on and hidden.)")]
     [SerializeField] private bool hideSideFacingAway = true;
 
+    [Header("Depth")]
+    [Tooltip("Draw the faces with depth so overlapping/touching buildings and characters behind corners sort correctly per pixel. " +
+             "Turn off to go back to plain draw-order sorting.")]
+    [SerializeField] private bool useDepth = true;
+    [Tooltip("Material using the Fireline/StructureDepth shader. Filled in automatically with _VFX/StructureDepth.mat.")]
+    [SerializeField] private Material depthMaterial;
+    // The faces' normal sprite material, remembered so it can be put back while see-through or with Use Depth off.
+    [SerializeField, HideInInspector] private Material spriteMaterial;
+
+    private const string DepthMaterialGuid = "f369f7410847432584f91de60a5066e0"; // _VFX/StructureDepth.mat
+
     private float _frontHeight;
+    private bool _seeThrough;
 
     public Vector2 Footprint => footprint;
 
     private void OnEnable() => Apply();
 
 #if UNITY_EDITOR
-    private void OnValidate() => UnityEditor.EditorApplication.delayCall += () => { if (this != null) Apply(); };
+    private void OnValidate() => UnityEditor.EditorApplication.delayCall += () =>
+    {
+        if (this == null) return;
+        FindDepthMaterial();
+        Apply();
+    };
+
+    private void Reset() => FindDepthMaterial();
+
+    private void FindDepthMaterial()
+    {
+        if (!useDepth || depthMaterial != null) return;
+        string path = UnityEditor.AssetDatabase.GUIDToAssetPath(DepthMaterialGuid);
+        if (string.IsNullOrEmpty(path)) return;
+        depthMaterial = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (depthMaterial != null) UnityEditor.EditorUtility.SetDirty(this);
+    }
 #endif
 
     public void Apply()
@@ -120,8 +154,76 @@ public class Structure : MonoBehaviour
 
         ApplySide(leftSide, -1f);
         ApplySide(rightSide, +1f);
+        ApplyMaterials();
         UpdateSideVisibility();
     }
+
+    // ---- Depth materials ------------------------------------------------------------------
+
+    /// <summary>
+    /// Switches the faces to their normal (transparent, no-depth) sprite material, or back to the
+    /// depth material. FadeWhenBehind calls this while fading, since depth faces can't be see-through.
+    /// </summary>
+    public void SetSeeThrough(bool seeThrough)
+    {
+        if (_seeThrough == seeThrough) return;
+        _seeThrough = seeThrough;
+        ApplyMaterials();
+    }
+
+    private void ApplyMaterials()
+    {
+        SpriteRenderer topSprite = top != null ? top.GetComponent<SpriteRenderer>() : null;
+        SpriteRenderer[] faces = { front, topSprite, leftSide, rightSide };
+
+        // Remember the normal sprite material the first time, so it can be restored later.
+        if (spriteMaterial == null)
+        {
+            foreach (SpriteRenderer face in faces)
+            {
+                if (face == null || face.sharedMaterial == null || IsDepthMaterial(face.sharedMaterial)) continue;
+                spriteMaterial = face.sharedMaterial;
+                break;
+            }
+        }
+
+        bool depth = useDepth && depthMaterial != null && !_seeThrough;
+        foreach (SpriteRenderer face in faces)
+        {
+            if (face == null) continue;
+            Material material = depth ? DepthMaterialFor(face) : spriteMaterial;
+            if (material != null && face.sharedMaterial != material) face.sharedMaterial = material;
+        }
+    }
+
+    // One copy of the depth material per texture, with that texture set on the material itself.
+    // Sharing one material across faces with different textures let the roof draw with the
+    // facade's texture, because faces sharing a material can get drawn together. Copies with
+    // their own texture can never be merged across textures. A handful of buildings' worth of
+    // textures means only a handful of copies, shared by every structure that uses them.
+    private static readonly Dictionary<(Material, Texture), Material> DepthCopies = new Dictionary<(Material, Texture), Material>();
+
+    private Material DepthMaterialFor(SpriteRenderer face)
+    {
+        Texture texture = face.sprite != null ? face.sprite.texture : null;
+        if (texture == null) return depthMaterial;
+
+        var key = (depthMaterial, texture);
+        if (!DepthCopies.TryGetValue(key, out Material copy) || copy == null)
+        {
+            copy = new Material(depthMaterial)
+            {
+                name = $"{depthMaterial.name} ({texture.name})",
+                mainTexture = texture,
+                hideFlags = HideFlags.DontSave // rebuilt on load, never written into scenes
+            };
+            DepthCopies[key] = copy;
+        }
+        return copy;
+    }
+
+    private bool IsDepthMaterial(Material material) =>
+        material == depthMaterial || (depthMaterial != null && material.shader == depthMaterial.shader);
 
     private void LateUpdate() => UpdateSideVisibility();
 
