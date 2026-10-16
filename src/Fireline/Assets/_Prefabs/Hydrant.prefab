@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5449008156591678164}
   - component: {fileID: 2927516857758515646}
+  - component: {fileID: 7851170126433908796}
   m_Layer: 0
   m_Name: Hydrant
   m_TagString: Untagged
@@ -25,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7431508901296952179}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.25881907, y: 0, z: 0, w: 0.9659259}
   m_LocalPosition: {x: -4, y: 1.17, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -46,11 +47,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4867a6af27504674a36b18c5adcd27e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::HoseRopeSource
-  interactRadius: 1.25
+  hitRadius: 0.3
   sourcePoint: {fileID: 5795169815817078908}
-  groundPlane: {fileID: 0}
+  groundPlane: {fileID: 5449008156591678164}
   groundNormal: {x: 0, y: 0, z: -1}
   ropePrefab: {fileID: 1737988618363229577, guid: 26f48a1432d5e410a9b0f7ec48d1422c, type: 3}
+--- !u!114 &7851170126433908796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7431508901296952179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60df815fc63464d618fc887fec714527, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::StandUpright
+  feetOnGround: 1
+  groundOffset: {x: 0, y: 0}
 --- !u!1 &8190097753312395936
 GameObject:
   m_ObjectHideFlags: 0
@@ -76,7 +91,7 @@ Transform:
   m_GameObject: {fileID: 8190097753312395936}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.35, y: 0, z: -0.2}
+  m_LocalPosition: {x: -0.032, y: 0.648, z: -0.505}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -163,7 +178,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: b3dba03cab02b4cc6995be4f08ed6789, type: 3}
+  m_Sprite: {fileID: 3625706338715913334, guid: cc5b2dcdf7ec047ccbbe5f648a5bfef4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
