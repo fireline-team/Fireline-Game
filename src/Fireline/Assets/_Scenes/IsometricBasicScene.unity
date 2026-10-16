@@ -567,6 +567,7 @@ MonoBehaviour:
   playerTag: Player
   playerRefreshInterval: 0.5
   stopDistance: 0.6
+  navGrid: {fileID: 0}
   separationRadius: 0.6
   separationStrength: 3
   maxNeighbors: 8
@@ -2837,7 +2838,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 6
+  orthographic size: 7.17
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
