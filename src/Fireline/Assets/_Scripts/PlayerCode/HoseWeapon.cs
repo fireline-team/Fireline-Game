@@ -197,6 +197,21 @@ public abstract class HoseWeapon : MonoBehaviour
         List<FireZone> fires = FindFiresInHitbox();
         for (int i = 0; i < fires.Count; i++)
             fires[i].ApplyWater(amount);
+        // Downed bodies leave physics simulation; query their registered ground positions directly.
+        if (_health == null || CurrentRange <= 0.01f) return;
+        Vector2 across = new Vector2(-AimDirection.y, AimDirection.x);
+        foreach (var player in PlayerHealth.ActivePlayers)
+        {
+            if (player == null || !player.IsDowned || player == _health
+                || player.gameObject.scene != gameObject.scene
+                || (hitLayers.value & (1 << player.gameObject.layer)) == 0) continue;
+            Vector2 offset = (Vector2)player.transform.position - Origin;
+            float forward = Vector2.Dot(offset, AimDirection);
+            if (forward < 0f || forward > CurrentRange || Mathf.Abs(Vector2.Dot(offset, across)) > width * 0.5f + 0.3f) continue;
+            // A wide stream must not revive someone behind a wall beside its center line.
+            if (blockingLayers != 0 && Physics2D.Linecast(Origin, player.transform.position, blockingLayers).collider != null) continue;
+            player.ApplyRevivalWater(_health, amount);
+        }
     }
 
     // One physics query per Spray step, shared by the enemy and fire lists.
