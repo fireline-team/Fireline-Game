@@ -1,0 +1,814 @@
+fileFormatVersion: 2
+guid: abbbb312e57597c40858a0017adeff9a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -188356085181978337
+    second: Pixel art street and sidewalk atlas-1_0
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 218
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_0
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 668
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f19e1737323d26df0800000000000000
+      internalID: -188356085181978337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_1
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 668
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44a3f05679366384fa03e7e696919b95
+      internalID: 881554913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_2
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 668
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00ca5384162942448874ee1f8a53ce6c
+      internalID: 1153607561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_3
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 668
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66351271ff2f8b74b81fffb6354e62b9
+      internalID: 1709161165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_4
+      rect:
+        serializedVersion: 2
+        x: 894
+        y: 668
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5d4a55028f817d44baf97b15b3761a52
+      internalID: -1203760483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_5
+      rect:
+        serializedVersion: 2
+        x: 1117
+        y: 668
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e524d50876d574d4eb2ca19a285b0f1b
+      internalID: 511818741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_6
+      rect:
+        serializedVersion: 2
+        x: 1340
+        y: 668
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f96e205391f4b9e4ebcacfb48d63665d
+      internalID: -1952100780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_7
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 446
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42f58913667c95f4081ba503c9ccb688
+      internalID: 1115618974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_8
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 446
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ca9dffdc359b8d4a99e7a9d82a1d623
+      internalID: 1699860770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_9
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 446
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec4bf3d14fce05049b500aa77c6db21c
+      internalID: 1466334592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_10
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 446
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d875848ab21b3ce4d9f4495516cd40af
+      internalID: -1539942214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_11
+      rect:
+        serializedVersion: 2
+        x: 894
+        y: 446
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eafb163ce4ff1b84588a5b02c7886500
+      internalID: 975246565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_12
+      rect:
+        serializedVersion: 2
+        x: 1117
+        y: 446
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22dc4cd3c309c9341b3a68ef4eebbd79
+      internalID: -1203446505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_13
+      rect:
+        serializedVersion: 2
+        x: 1340
+        y: 446
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c0d6a96d9bb27a54e964516131378bcf
+      internalID: -1253876384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_14
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 224
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff675a287dd5126458e667036ed2aec4
+      internalID: -862114309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_15
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 224
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 056a873f1763aef4697ef13d2d90a8ba
+      internalID: 81522669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_16
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 224
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a92b3fe1445940f42a0d110293744ba0
+      internalID: 2111360309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_17
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 224
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91b5cd81938d2db4ea2506a90fa22108
+      internalID: -1574843894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_18
+      rect:
+        serializedVersion: 2
+        x: 894
+        y: 224
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c03bbb12808715c4b942daafa856fdc9
+      internalID: -1166705767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_19
+      rect:
+        serializedVersion: 2
+        x: 1117
+        y: 224
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7eb63a59462e7964797f1908a4c5761c
+      internalID: -1276110658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_20
+      rect:
+        serializedVersion: 2
+        x: 1340
+        y: 224
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6cb0230072b7ee0469189c7d9b619c95
+      internalID: -866028770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_21
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 2
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7262eb491f206f41b9ea7929c989040
+      internalID: 136916047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_22
+      rect:
+        serializedVersion: 2
+        x: 225
+        y: 2
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c7f686f6dc914ad4ab6e69ab4fd3ff95
+      internalID: -168674753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_23
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 2
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d76383c24443ce9438b50eca5b44a3a2
+      internalID: -1337783289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_24
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 2
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65292ace35ca2cc4bad8a0be3fd13d6c
+      internalID: -396240279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_25
+      rect:
+        serializedVersion: 2
+        x: 891
+        y: 3
+        width: 213
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae85b9d6c9733544d801957f1713faa6
+      internalID: -2033086178
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_26
+      rect:
+        serializedVersion: 2
+        x: 1117
+        y: 2
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 633f89f4e9326ca4dafa5496e81bd5e8
+      internalID: 1239234727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_27
+      rect:
+        serializedVersion: 2
+        x: 1340
+        y: 2
+        width: 218
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 80d95fb148f18144dbd6120062f32cde
+      internalID: 674935275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_28
+      rect:
+        serializedVersion: 2
+        x: 1556
+        y: 446
+        width: 216
+        height: 216
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd4cb6ddbf5d10441be22bf9979693b4
+      internalID: 1186436203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pixel art street and sidewalk atlas-1_29
+      rect:
+        serializedVersion: 2
+        x: 1557
+        y: 224
+        width: 213
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d37f948eed21c5f44b9832ab9c612719
+      internalID: 388068778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 6f3cc6ed75a1a704397c8b451edc6420
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":218.0,"y":218.0},"gridSpriteOffset":{"x":2.0,"y":1.0},"gridSpritePadding":{"x":5.0,"y":4.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Pixel art street and sidewalk atlas-1_0: -188356085181978337
+      Pixel art street and sidewalk atlas-1_1: 881554913
+      Pixel art street and sidewalk atlas-1_10: -1539942214
+      Pixel art street and sidewalk atlas-1_11: 975246565
+      Pixel art street and sidewalk atlas-1_12: -1203446505
+      Pixel art street and sidewalk atlas-1_13: -1253876384
+      Pixel art street and sidewalk atlas-1_14: -862114309
+      Pixel art street and sidewalk atlas-1_15: 81522669
+      Pixel art street and sidewalk atlas-1_16: 2111360309
+      Pixel art street and sidewalk atlas-1_17: -1574843894
+      Pixel art street and sidewalk atlas-1_18: -1166705767
+      Pixel art street and sidewalk atlas-1_19: -1276110658
+      Pixel art street and sidewalk atlas-1_2: 1153607561
+      Pixel art street and sidewalk atlas-1_20: -866028770
+      Pixel art street and sidewalk atlas-1_21: 136916047
+      Pixel art street and sidewalk atlas-1_22: -168674753
+      Pixel art street and sidewalk atlas-1_23: -1337783289
+      Pixel art street and sidewalk atlas-1_24: -396240279
+      Pixel art street and sidewalk atlas-1_25: -2033086178
+      Pixel art street and sidewalk atlas-1_26: 1239234727
+      Pixel art street and sidewalk atlas-1_27: 674935275
+      Pixel art street and sidewalk atlas-1_28: 1186436203
+      Pixel art street and sidewalk atlas-1_29: 388068778
+      Pixel art street and sidewalk atlas-1_3: 1709161165
+      Pixel art street and sidewalk atlas-1_4: -1203760483
+      Pixel art street and sidewalk atlas-1_5: 511818741
+      Pixel art street and sidewalk atlas-1_6: -1952100780
+      Pixel art street and sidewalk atlas-1_7: 1115618974
+      Pixel art street and sidewalk atlas-1_8: 1699860770
+      Pixel art street and sidewalk atlas-1_9: 1466334592
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
