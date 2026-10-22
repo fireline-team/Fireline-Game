@@ -21,6 +21,8 @@ public class JakeMissionSceneTests
         var mission = Object.FindAnyObjectByType<FireRescueMission>();
         Assert.That(mission, Is.Not.Null);
         Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Objective));
+        Assert.That(mission.Objectives.Count, Is.EqualTo(2));
+        Assert.That(mission.ShowEvacuationGuidance, Is.False);
         var so = new SerializedObject(mission);
         var spawns = so.FindProperty("spawnPoints");
         var sites = so.FindProperty("objectivePoints");
@@ -47,7 +49,7 @@ public class JakeMissionSceneTests
                 Assert.That(Physics2D.OverlapCircle(approach, 0.5f, blockers), Is.Null, site.name + " approach blocked");
                 Assert.That(Physics2D.Linecast(approach, fire.transform.position, blockers).collider, Is.Null,
                     site.name + " fire is behind a hose blocker");
-                if (site != mission.Objective) Assert.That(fire.gameObject.activeSelf, Is.False);
+                if (!mission.Objectives.Contains(site)) Assert.That(fire.gameObject.activeSelf, Is.False);
                 else
                 {
                     var upright = fire.GetComponentInChildren<StandUpright>();
@@ -74,12 +76,15 @@ public class JakeMissionSceneTests
         var rules = Object.FindAnyObjectByType<HoseWaterRules>();
         bool required = rules != null && rules.RequireWaterSource;
         if (rules != null) rules.RequireWaterSource = false;
-        foreach (var fire in ((FireObjectiveStep)mission.CurrentStep).Fires.ToArray())
+        foreach (var site in mission.Objectives)
         {
-            hoseObject.transform.position = fire.transform.position + Vector3.down * 2;
-            Physics2D.SyncTransforms();
-            hose.Spray(Vector2.up, 10);
-            Assert.That(fire.IsBurning, Is.False, fire.name);
+            foreach (var fire in ((FireObjectiveStep)mission.GetCurrentStep(site)).Fires.ToArray())
+            {
+                hoseObject.transform.position = fire.transform.position + Vector3.down * 2;
+                Physics2D.SyncTransforms();
+                hose.Spray(Vector2.up, 10);
+                Assert.That(fire.IsBurning, Is.False, fire.name);
+            }
         }
         Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Evacuate));
         if (rules != null) rules.RequireWaterSource = required;

@@ -134,6 +134,50 @@ public class FireMissionTests
         Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Evacuate));
     }
     [UnityTest]
+    public IEnumerator TwoDistinctObjectivesCanFinishInEitherOrderAndOnlyThenRevealEvacuation()
+    {
+        var first = Make("First step").AddComponent<TestObjectiveStep>();
+        var second = Make("Second step").AddComponent<TestObjectiveStep>();
+        var mission = Mission(new MissionObjectiveStep[] { first });
+        var other = Make("Other building", new Vector2(160, 100)).AddComponent<MissionObjectiveSite>();
+        Set(other, "steps", new MissionObjectiveStep[] { second });
+        var sites = (MissionObjectiveSite[])typeof(FireRescueMission).GetField("objectivePoints", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(mission);
+        Set(mission, "objectivePoints", new[] { sites[1], other, other });
+        Set(mission, "objectiveCount", 2);
+        var camera = Make("Camera").AddComponent<Camera>();
+        camera.tag = "MainCamera";
+        camera.transform.position = new Vector3(0, 0, -10);
+        var guidance = mission.gameObject.AddComponent<MissionGuidance>();
+        yield return null;
+        yield return null;
+        Assert.That(mission.Objectives.Count, Is.EqualTo(2));
+        Assert.That(mission.Objectives[0], Is.Not.SameAs(mission.Objectives[1]));
+        Assert.That(first.IsRunning && second.IsRunning, Is.True);
+        var arrow = mission.transform.Find("Mission direction arrows/Evacuation direction");
+        Assert.That(arrow.gameObject.activeSelf, Is.False);
+        second.Finish();
+        yield return null;
+        Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Objective));
+        Assert.That(mission.CompletedObjectives, Is.EqualTo(1));
+        Assert.That(mission.ShowEvacuationGuidance, Is.False);
+        Assert.That(arrow.gameObject.activeSelf, Is.False);
+        first.Finish();
+        yield return null;
+        Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Evacuate));
+        Assert.That(mission.ShowEvacuationGuidance, Is.True);
+        Assert.That(arrow.gameObject.activeSelf, Is.True);
+        mission.BeginMission();
+        yield return null;
+        Assert.That(mission.CompletedObjectives, Is.Zero);
+        Assert.That(mission.ShowEvacuationGuidance, Is.False);
+        Assert.That(arrow.gameObject.activeSelf, Is.False);
+        first.Finish();
+        Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Objective));
+        second.Finish();
+        Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Evacuate));
+    }
+
+    [UnityTest]
     public IEnumerator InvalidSetupFailsClearlyRatherThanChoosingNearbyObjective()
     {
         var step = Fires(out _, out _);

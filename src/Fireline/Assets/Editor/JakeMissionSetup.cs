@@ -22,6 +22,9 @@ public static class JakeMissionSetup
         var root = new GameObject("Fire rescue mission");
         var mission = root.AddComponent<FireRescueMission>();
         root.AddComponent<MissionGuidance>();
+        var missionSettings = new SerializedObject(mission);
+        missionSettings.FindProperty("objectiveCount").intValue = 2;
+        missionSettings.ApplyModifiedPropertiesWithoutUndo();
         var spawnsRoot = Child(root.transform, "Spawn and evacuation candidates", Vector3.zero);
         var sitesRoot = Child(root.transform, "Building objective candidates", Vector3.zero);
         var hydrant = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Prefabs/Hydrant.prefab");
