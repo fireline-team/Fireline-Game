@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9194649a9f4c8614d8be6642db716eed, type: 3}
+  m_Name: HoseVfxLibrary
+  m_EditorClassIdentifier: Fireline.Gameplay::HoseVfxLibrary
+  stream: {fileID: 8926484042661614526, guid: 0dfdbdb7890f7cc48a4d5503cf5099a8, type: 3}
+  mist: {fileID: 8926484042661614526, guid: 8b576948d87b166418d4f35d85fdfc08, type: 3}
+  burst: {fileID: 8926484042661614526, guid: afeb3ee85a8625d4891f0d20b1ac7be5, type: 3}
+  splash: {fileID: 8926484042661614526, guid: 91b5e37a87bfb8b44b1d84242557e66b, type: 3}
+  steam: {fileID: 8926484042661614526, guid: e27ef1bc992555446a9d13d359de5ff0, type: 3}
