@@ -1,12 +1,12 @@
 # JakeProtoLevel fire mission
 
-This is the first mission feature: randomized starting/return point, randomized building objective, required fires, then team evacuation. It is a scene-local component, not a Game Manager. It does not implement civilians, debris, a final stand, enemy waves, or generated streets.
+This is the first mission feature: randomized starting/return point, two randomized building objectives, required fires, then team evacuation. It is a scene-local component, not a Game Manager. It does not implement civilians, debris, a final stand, enemy waves, or generated streets.
 
 ## Play
 
-Open `Assets/_Scenes/JakeProtoLevel.unity`, enter Play Mode, and join normally. Players spawn around the selected EVAC point. Follow the yellow OBJECTIVE marker to the chosen building. Orange FIRE markers identify the three required fires; ambient fires do not count. A nearby hydrant supports the existing source/tether rules: detach to travel and reconnect at the objective as needed.
+Open `Assets/_Scenes/JakeProtoLevel.unity`, enter Play Mode, and join normally. Players spawn around the selected return point. Follow the numbered yellow OBJECTIVE markers to the two chosen buildings, in either order. Orange FIRE markers identify the three required fires; ambient fires do not count. A nearby hydrant supports the existing source/tether rules: detach to travel and reconnect at the objective as needed.
 
-Extinguishing every required fire changes the instruction to return. Follow the cyan EVAC marker back to the original spawn. All active players in the scene must be standing and inside the cyan three-unit radius for two continuous seconds. Leaving the circle or having a downed teammate resets the countdown. No players cannot complete a mission. Disconnected/disabled players do not block evacuation. Completion displays a success message and raises an Inspector event.
+Extinguishing every required fire at both buildings changes the instruction to return. Extraction arrows and labels stay hidden until both objectives are complete. Follow the cyan EVAC marker back to the original spawn. All active players in the scene must be standing and inside the cyan three-unit radius for two continuous seconds. Leaving the circle or having a downed teammate resets the countdown. No players cannot complete a mission. Disconnected/disabled players do not block evacuation. Completion displays a success message and raises an Inspector event.
 
 Re-enter Play Mode for a fresh mission. This feature does not add a retry/menu flow or reset player health; that belongs to later session management. Existing team-wipe/reset behavior is unchanged. Late joiners appear at the selected spawn.
 
@@ -19,15 +19,17 @@ The **Fire rescue mission** root contains:
 - **Spawn and evacuation candidates**: three editable spawn transforms with MissionPoint components.
 - **Building objective candidates**: eleven authored building-front sites, each with three dedicated FireZone prefab instances and a nearby water supply. Buildings without a clear front approach were excluded during authoring.
 
-Only the selected site's required fires activate. Existing scenery and ambient hazards remain. The point lists are explicit; adding a GameObject alone does not register it. Assign new points/sites in the mission Inspector.
+Only the two selected sites' required fires activate. Existing scenery and ambient hazards remain. The point lists are explicit; adding a GameObject alone does not register it. Assign new points/sites in the mission Inspector.
 
-Select a **MissionPoint** to see its exclusion circle in the XY gameplay plane. A pair is valid when the distance between centers is at least the sum of both exclusion radii (currently 9 + 9 = 18 units). Visual elevation/Z is ignored. Selection samples uniformly from all valid pairs; there is no retry loop and no too-close fallback. If no valid pair exists, the mission shows an unavailable message and logs an actionable error. Random selection can repeat a previous pair. Set a nonzero seed to reproduce a selection.
+Select a **MissionPoint** to see its exclusion circle in the XY gameplay plane. A pair is valid when the distance between centers is at least the sum of both exclusion radii (currently 9 + 9 = 18 units). Visual elevation/Z is ignored. Selection chooses a spawn with enough eligible sites, then chooses distinct sites without replacement; there is no retry loop and no too-close fallback. If no valid pair exists, the mission shows an unavailable message and logs an actionable error. Random selection can repeat a previous pair. Set a nonzero seed to reproduce a selection.
 
 The city block is handcrafted. Only mission locations change. Distance does not prove a walkable route, so route playtesting remains necessary when moving points or editing streets.
 
 ## Modular objectives
 
-A **MissionObjectiveSite** has an ordered **Steps** array. The mission starts step zero, waits for its completion event, then starts the next step. Evacuation becomes available only after the last step completes.
+The **Objective Count** setting on FireRescueMission is set to **2** in JakeProtoLevel. Both sites run concurrently; the HUD shows completed objectives. If a spawn has fewer than the requested number of eligible sites, it cannot be selected.
+
+A **MissionObjectiveSite** has an ordered **Steps** array. The mission starts step zero, waits for its completion event, then starts the next step. Evacuation becomes available only after the last step at every selected site completes.
 
 **FireObjectiveStep** owns an explicit list of required FireZones. It activates/reignites those zones when begun and waits for all unique assigned fires to be extinguished. Unassigned fires cannot advance it. Missing fire references or empty step lists invalidate a site.
 

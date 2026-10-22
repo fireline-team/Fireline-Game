@@ -62659,6 +62659,7 @@ MonoBehaviour:
   - {fileID: 901500002}
   - {fileID: 809686175}
   - {fileID: 376665638}
+  objectiveCount: 2
   evacuationRadius: 3
   evacuationHoldSeconds: 2
   seed: 0

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Fireline.Missions
@@ -11,14 +12,21 @@ namespace Fireline.Missions
         private LineRenderer evacuationRing;
         private Material ringMaterial;
         private Canvas arrowCanvas;
-        private PlayerRescueArrow objectiveArrow, evacuationArrow;
+        private readonly List<PlayerRescueArrow> objectiveArrows = new List<PlayerRescueArrow>();
+        private PlayerRescueArrow evacuationArrow;
         private void LateUpdate()
         {
             var camera = Camera.main;
-            objectiveArrow.PointTo(camera, mission.Objective != null ? mission.Objective.transform.position : Vector3.zero,
-                mission.State == FireRescueMission.Phase.Objective && mission.Objective != null);
+            while (objectiveArrows.Count < mission.Objectives.Count)
+                objectiveArrows.Add(CreateArrow($"Objective {objectiveArrows.Count + 1} direction", Color.yellow));
+            for (int i = 0; i < objectiveArrows.Count; i++)
+            {
+                var site = i < mission.Objectives.Count ? mission.Objectives[i] : null;
+                objectiveArrows[i].PointTo(camera, site != null ? site.transform.position : Vector3.zero,
+                    mission.State == FireRescueMission.Phase.Objective && site != null && mission.GetCurrentStep(site) != null);
+            }
             evacuationArrow.PointTo(camera, mission.Spawn != null ? mission.Spawn.transform.position : Vector3.zero,
-                mission.Spawn != null && mission.State != FireRescueMission.Phase.InvalidSetup);
+                mission.Spawn != null && mission.ShowEvacuationGuidance);
             if (mission == null || mission.Spawn == null) return;
             if (evacuationRing == null)
             {
@@ -53,7 +61,6 @@ namespace Fireline.Missions
             arrowCanvas.sortingOrder = 99; // Teammate rescue indicators remain above mission guidance.
             var group = root.GetComponent<CanvasGroup>();
             group.interactable = group.blocksRaycasts = false;
-            objectiveArrow = CreateArrow("Objective direction", Color.yellow);
             evacuationArrow = CreateArrow("Evacuation direction", Color.cyan);
         }
         private PlayerRescueArrow CreateArrow(string name, Color color)
@@ -78,10 +85,14 @@ namespace Fireline.Missions
             GUI.Box(new Rect((Screen.width - width) / 2, 12, width, 64), mission.Instruction, panel);
             var camera = Camera.main;
             if (camera == null) return;
-            if (mission.State == FireRescueMission.Phase.Objective && mission.Objective != null)
+            for (int i = 0; i < mission.Objectives.Count && mission.State == FireRescueMission.Phase.Objective; i++)
             {
-                DrawMarker(camera, mission.Objective.transform.position, "OBJECTIVE", Color.yellow, objectiveArrow);
-                if (mission.CurrentStep is FireObjectiveStep fireStep)
+                var site = mission.Objectives[i];
+                var step = mission.GetCurrentStep(site);
+                if (step == null) continue;
+                DrawMarker(camera, site.transform.position, $"OBJECTIVE {i + 1}", Color.yellow,
+                    i < objectiveArrows.Count ? objectiveArrows[i] : null);
+                if (step is FireObjectiveStep fireStep)
                 {
                     int number = 0;
                     foreach (var fire in fireStep.Fires)
@@ -92,7 +103,7 @@ namespace Fireline.Missions
                     }
                 }
             }
-            if (mission.Spawn != null && mission.State != FireRescueMission.Phase.InvalidSetup)
+            if (mission.Spawn != null && mission.ShowEvacuationGuidance)
                 DrawMarker(camera, mission.Spawn.transform.position,
                     mission.State == FireRescueMission.Phase.Evacuate ? $"EVAC {mission.EvacuationProgress:P0}" : "EVAC",
                     Color.cyan, evacuationArrow);
