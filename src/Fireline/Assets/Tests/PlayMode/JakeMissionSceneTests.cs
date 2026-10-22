@@ -48,6 +48,18 @@ public class JakeMissionSceneTests
                 Assert.That(Physics2D.Linecast(approach, fire.transform.position, blockers).collider, Is.Null,
                     site.name + " fire is behind a hose blocker");
                 if (site != mission.Objective) Assert.That(fire.gameObject.activeSelf, Is.False);
+                else
+                {
+                    var upright = fire.GetComponentInChildren<StandUpright>();
+                    var mesh = upright.GetComponent<MeshFilter>();
+                    Assert.That(mesh, Is.Not.Null);
+                    Bounds bounds = mesh.sharedMesh.bounds;
+                    Vector3 bottom = upright.transform.TransformPoint(new Vector3(bounds.center.x, bounds.min.y, bounds.center.z));
+                    Assert.That(Vector3.Distance(bottom, fire.transform.position), Is.LessThan(0.001f),
+                        "Objective flame base must touch its ground-space collider origin.");
+                    Vector3 top = upright.transform.TransformPoint(new Vector3(bounds.center.x, bounds.max.y, bounds.center.z));
+                    Assert.That(top.z, Is.LessThan(bottom.z), "Flame must rise above the XY ground, toward negative Z.");
+                }
             }
         }
         // Join through the real prefab and verify camera/tether initialization preserves the selected spawn.

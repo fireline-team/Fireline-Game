@@ -202,7 +202,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &31603661
 GameObject:
@@ -549,7 +549,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &120125582
 GameObject:
@@ -720,11 +720,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8376335334240305372, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.6415899
       objectReference: {fileID: 0}
     - target: {fileID: 8376335334240305372, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.3704221
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -814,7 +814,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &138200900
 GameObject:
@@ -1006,7 +1006,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &163470023
 PrefabInstance:
@@ -1086,7 +1086,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!4 &163470025 stripped
 Transform:
@@ -1176,7 +1176,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &187864296
 GameObject:
@@ -1508,7 +1508,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.500001
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1524,11 +1524,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1662,7 +1662,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1678,11 +1678,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2176,7 +2176,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &310858258
 PrefabInstance:
@@ -2261,7 +2261,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &376665637
 GameObject:
@@ -2292,7 +2292,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 376665639}
@@ -2306,7 +2306,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 310858260}
@@ -2341,7 +2341,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!1001 &378054915
@@ -2694,7 +2694,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 1024424887}
@@ -2710,7 +2710,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &464347320
@@ -2723,7 +2723,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 464347318}
@@ -59545,7 +59545,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &530624052
 GameObject:
@@ -59595,7 +59595,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 1934808649}
@@ -59611,7 +59611,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &530624056
@@ -59624,7 +59624,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 530624054}
@@ -60017,7 +60017,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &557269800
 GameObject:
@@ -60238,7 +60238,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &569102917
 GameObject:
@@ -60361,7 +60361,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -60377,11 +60377,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -60714,7 +60714,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!1 &642471237
@@ -61353,7 +61353,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -61369,11 +61369,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -61411,11 +61411,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalScale.x
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalScale.y
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.x
@@ -61459,7 +61459,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7431508901296952179, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_Name
-      value: BigHydrant
+      value: Hydrant
       objectReference: {fileID: 0}
     - target: {fileID: 7822589651020308751, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_FlipX
@@ -61492,7 +61492,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -61508,11 +61508,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -61655,7 +61655,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &809686171
 GameObject:
@@ -61705,7 +61705,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 10688190}
@@ -61721,7 +61721,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &809686175
@@ -61734,7 +61734,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 809686173}
@@ -61821,7 +61821,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &839781882
 GameObject:
@@ -61871,7 +61871,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 1350451619}
@@ -61887,7 +61887,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &839781886
@@ -61900,7 +61900,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 839781884}
@@ -62007,7 +62007,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -62023,11 +62023,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -62082,7 +62082,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!4 &870017193
@@ -62184,7 +62184,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &901499998
 GameObject:
@@ -62234,7 +62234,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 1644330100}
@@ -62250,7 +62250,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &901500002
@@ -62263,7 +62263,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 901500000}
@@ -62350,7 +62350,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &908211773
 GameObject:
@@ -62380,7 +62380,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12d791b6eb6b14797b34cbff66857175, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::HeightAboveGround
   height: 22.59
   groundOffset: {x: 0, y: 2}
@@ -62542,7 +62542,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &930058743
 PrefabInstance:
@@ -62641,7 +62641,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a07554bd2ec84ee1b9e5e14405d81ca2, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireRescueMission
   spawnPoints:
   - {fileID: 2003015817}
@@ -62768,7 +62768,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &1030778142
 GameObject:
@@ -63032,7 +63032,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 302473881}
@@ -63048,7 +63048,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &1044609505
@@ -63061,7 +63061,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1044609503}
@@ -63273,7 +63273,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &1087267858
 GameObject:
@@ -63687,7 +63687,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -63703,11 +63703,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -64142,7 +64142,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &1283924793
 GameObject:
@@ -64273,6 +64273,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: FireZone (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 8376335334240305372, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.60618067
+      objectReference: {fileID: 0}
+    - target: {fileID: 8376335334240305372, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.44912755
+      objectReference: {fileID: 0}
     - target: {fileID: 8626645244088611399, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -64330,7 +64338,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 556220591}
@@ -64346,7 +64354,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &1310398053
@@ -64359,7 +64367,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1310398051}
@@ -64446,7 +64454,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &1364483129
 GameObject:
@@ -64685,7 +64693,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &1406546551
 GameObject:
@@ -64913,7 +64921,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 106294197}
@@ -64929,7 +64937,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &1449094045
@@ -64942,7 +64950,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1449094043}
@@ -65029,7 +65037,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &1527212721
 PrefabInstance:
@@ -65171,7 +65179,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &1557172649
 PrefabInstance:
@@ -65567,7 +65575,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &1589328614
 GameObject:
@@ -65744,7 +65752,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &1644330098
 PrefabInstance:
@@ -65829,7 +65837,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &1655496870
 PrefabInstance:
@@ -65902,7 +65910,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -65918,11 +65926,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -66071,7 +66079,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -66087,11 +66095,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -66234,7 +66242,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &1710285510
 PrefabInstance:
@@ -66319,7 +66327,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &1718377633
 GameObject:
@@ -66369,7 +66377,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 789465212}
@@ -66385,7 +66393,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &1718377637
@@ -66398,7 +66406,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1718377635}
@@ -67273,7 +67281,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7062764c035045e290748b3a0d373394, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.FireObjectiveStep
   fires:
   - {fileID: 2054441601}
@@ -67289,7 +67297,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!114 &1889504201
@@ -67302,7 +67310,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0d1cea4db374c2dbde27e8baccefa3e, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1889504199}
@@ -67389,7 +67397,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!213 &1979547729
 Sprite:
@@ -67694,7 +67702,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1001 &1984687242
 PrefabInstance:
@@ -67710,7 +67718,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -67726,11 +67734,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -67801,7 +67809,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 044ab9c9f9064ed998c7a9d07756f4af, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionPoint
   exclusionRadius: 9
 --- !u!1001 &2005316104
@@ -67887,7 +67895,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &2019980010
 GameObject:
@@ -68295,7 +68303,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalPosition.z
@@ -68311,11 +68319,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5449008156591678164, guid: 42bc52edf4b7e42d7a3f3577d46ef591, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -68460,7 +68468,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &2056007215
 GameObject:
@@ -68590,7 +68598,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 012a27a089b54265acbd6498ef558f2d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireZone
 --- !u!1 &2068162897
 GameObject:

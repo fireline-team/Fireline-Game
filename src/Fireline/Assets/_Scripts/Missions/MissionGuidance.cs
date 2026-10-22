@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Fireline.Missions
 {
+    [DefaultExecutionOrder(11000)]
     [RequireComponent(typeof(FireRescueMission))]
     public sealed class MissionGuidance : MonoBehaviour
     {
@@ -9,8 +10,15 @@ namespace Fireline.Missions
         private GUIStyle panel, marker;
         private LineRenderer evacuationRing;
         private Material ringMaterial;
+        private Canvas arrowCanvas;
+        private PlayerRescueArrow objectiveArrow, evacuationArrow;
         private void LateUpdate()
         {
+            var camera = Camera.main;
+            objectiveArrow.PointTo(camera, mission.Objective != null ? mission.Objective.transform.position : Vector3.zero,
+                mission.State == FireRescueMission.Phase.Objective && mission.Objective != null);
+            evacuationArrow.PointTo(camera, mission.Spawn != null ? mission.Spawn.transform.position : Vector3.zero,
+                mission.Spawn != null && mission.State != FireRescueMission.Phase.InvalidSetup);
             if (mission == null || mission.Spawn == null) return;
             if (evacuationRing == null)
             {
@@ -35,7 +43,32 @@ namespace Fireline.Missions
             }
         }
         private void OnDestroy() { if (ringMaterial != null) Destroy(ringMaterial); }
-        private void Awake() => mission = GetComponent<FireRescueMission>();
+        private void Awake()
+        {
+            mission = GetComponent<FireRescueMission>();
+            var root = new GameObject("Mission direction arrows", typeof(RectTransform), typeof(Canvas), typeof(CanvasGroup));
+            root.transform.SetParent(transform, false);
+            arrowCanvas = root.GetComponent<Canvas>();
+            arrowCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            arrowCanvas.sortingOrder = 99; // Teammate rescue indicators remain above mission guidance.
+            var group = root.GetComponent<CanvasGroup>();
+            group.interactable = group.blocksRaycasts = false;
+            objectiveArrow = CreateArrow("Objective direction", Color.yellow);
+            evacuationArrow = CreateArrow("Evacuation direction", Color.cyan);
+        }
+        private PlayerRescueArrow CreateArrow(string name, Color color)
+        {
+            var arrow = new GameObject(name, typeof(RectTransform)).AddComponent<PlayerRescueArrow>();
+            arrow.transform.SetParent(arrowCanvas.transform, false);
+            arrow.rectTransform.anchorMin = arrow.rectTransform.anchorMax = Vector2.zero;
+            arrow.rectTransform.sizeDelta = new Vector2(68, 56);
+            arrow.raycastTarget = false;
+            arrow.color = color;
+            arrow.gameObject.SetActive(false);
+            return arrow;
+        }
+        private void OnEnable() { if (arrowCanvas != null) arrowCanvas.gameObject.SetActive(true); }
+        private void OnDisable() { if (arrowCanvas != null) arrowCanvas.gameObject.SetActive(false); }
         private void OnGUI()
         {
             if (mission == null) return;
@@ -47,7 +80,7 @@ namespace Fireline.Missions
             if (camera == null) return;
             if (mission.State == FireRescueMission.Phase.Objective && mission.Objective != null)
             {
-                DrawMarker(camera, mission.Objective.transform.position, "OBJECTIVE", Color.yellow, true);
+                DrawMarker(camera, mission.Objective.transform.position, "OBJECTIVE", Color.yellow, objectiveArrow);
                 if (mission.CurrentStep is FireObjectiveStep fireStep)
                 {
                     int number = 0;
@@ -55,26 +88,28 @@ namespace Fireline.Missions
                     {
                         number++;
                         if (fire != null && fire.IsBurning)
-                            DrawMarker(camera, fire.transform.position, $"FIRE {number}", new Color(1, 0.65f, 0.15f), false);
+                            DrawMarker(camera, fire.transform.position, $"FIRE {number}", new Color(1, 0.65f, 0.15f));
                     }
                 }
             }
             if (mission.Spawn != null && mission.State != FireRescueMission.Phase.InvalidSetup)
                 DrawMarker(camera, mission.Spawn.transform.position,
                     mission.State == FireRescueMission.Phase.Evacuate ? $"EVAC {mission.EvacuationProgress:P0}" : "EVAC",
-                    Color.cyan, true);
+                    Color.cyan, evacuationArrow);
         }
-        private void DrawMarker(Camera camera, Vector3 world, string text, Color color, bool offscreen)
+        private void DrawMarker(Camera camera, Vector3 world, string text, Color color, PlayerRescueArrow arrow = null)
         {
             Vector3 screen = camera.WorldToScreenPoint(world);
-            bool outside = screen.z <= 0 || screen.x < 70 || screen.x > Screen.width - 70 || screen.y < 30 || screen.y > Screen.height - 100;
-            if (outside && !offscreen) return;
+            bool outside = screen.z <= 0 || !camera.pixelRect.Contains(new Vector2(screen.x, screen.y));
+            if (outside && (arrow == null || !arrow.gameObject.activeSelf)) return;
             Vector2 position = new Vector2(screen.x, Screen.height - screen.y);
-            if (screen.z <= 0) position = new Vector2(Screen.width, Screen.height) - position;
             if (outside)
             {
-                Vector2 direction = position - new Vector2(Screen.width, Screen.height) * 0.5f;
-                text += Mathf.Abs(direction.x) > Mathf.Abs(direction.y) ? (direction.x > 0 ? " >" : " <") : (direction.y > 0 ? " v" : " ^");
+                // Keep the label inward from the shared arrow rather than covering its tip.
+                Vector2 arrowPosition = arrow.rectTransform.anchoredPosition;
+                Vector2 inward = (camera.pixelRect.center - arrowPosition).normalized;
+                Vector2 label = arrowPosition + inward * 100;
+                position = new Vector2(label.x, Screen.height - label.y);
             }
             position.x = Mathf.Clamp(position.x, 70, Mathf.Max(70, Screen.width - 70));
             position.y = Mathf.Clamp(position.y, 105, Mathf.Max(105, Screen.height - 25));
