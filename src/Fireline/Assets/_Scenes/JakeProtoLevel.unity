@@ -59640,6 +59640,7 @@ GameObject:
   - component: {fileID: 532505318}
   - component: {fileID: 532505317}
   - component: {fileID: 532505319}
+  - component: {fileID: 532505320}
   m_Layer: 0
   m_Name: Singletons
   m_TagString: Untagged
@@ -59686,7 +59687,7 @@ MonoBehaviour:
   rightClickToSpawn: 1
   enemiesPerClick: 1
   clickScatter: 0.4
-  showPanel: 0
+  showPanel: 1
 --- !u!114 &532505318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59732,6 +59733,29 @@ MonoBehaviour:
   sightRange: 12
   showBlocked: 1
   showFlow: 0
+--- !u!114 &532505320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 532505315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99f15224780d483db75aa36005966e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::HoseWaterRules
+  requireWaterSource: 1
+  startConnected: 1
+  player1HoseColor: {r: 1, g: 0, b: 0, a: 1}
+  player2HoseColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  player3HoseColor: {r: 0, g: 1, b: 0, a: 1}
+  player4HoseColor: {r: 0, g: 0, b: 1, a: 1}
+  limitHoseLength: 1
+  hoseLength: 12
+  secondsToBreak: 2
+  strainRecoveryTime: 1
+  fullPullSpeed: 5
 --- !u!1001 &555045256
 PrefabInstance:
   m_ObjectHideFlags: 0
