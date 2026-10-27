@@ -61399,6 +61399,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FireZone (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 8626645244088611399, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

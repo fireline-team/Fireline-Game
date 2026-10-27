@@ -4,6 +4,7 @@
     "Fireline.Shared",
     "Unity.InputSystem",
     "Unity.Cinemachine",
-    "Unity.ugui"
+    "Unity.ugui",
+    "Unity.TextMeshPro"
   ]
 }
