@@ -155,7 +155,8 @@ public abstract class HoseWeapon : MonoBehaviour
         if (_graph != null)
         {
             _graph.SetSpraying(ShowsContinuousStream(), MuzzlePosition, AimDirection,
-                CurrentRange, width, particleLifetime, particlesPerSecond, particleSize);
+                CurrentRange, width, particleLifetime, particlesPerSecond, particleSize,
+                Mathf.Max(0f, Vector3.Dot(MuzzlePosition - new Vector3(Origin.x, Origin.y, transform.position.z), TiltedView.Up)));
             if (ShowsContinuousStream() && !(this is MistHose))
             {
                 bool hit = TryGetVisualImpact(out Vector3 point, out Vector3 normal);

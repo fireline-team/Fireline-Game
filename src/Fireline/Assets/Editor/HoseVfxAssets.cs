@@ -11,19 +11,31 @@ using UnityEngine.VFX;
 using Object = UnityEngine.Object;
 
 /// <summary>Authors ordinary, editable VFX Graph assets through the installed 17.6 graph model.</summary>
-public static class HoseVfxAssets
+public static partial class HoseVfxAssets
 {
     private const string Root = "Assets/Resources/HoseVfx";
     private const string Request = "Temp/FirelineHoseVfx.request";
     private const string Report = "Temp/FirelineHoseVfx-report.txt";
     private const BindingFlags Flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+    private static bool requestQueued;
+    private static double nextRequestPoll;
 
     [InitializeOnLoadMethod]
     private static void OnLoad()
     {
         // A local, untracked request lets file-based authoring finish after Unity's next refresh.
         // Collaborators importing these scripts do not get unsolicited asset generation.
-        if (File.Exists(Request)) EditorApplication.delayCall += ProcessRequest;
+        EditorApplication.update -= PollRequest;
+        EditorApplication.update += PollRequest;
+    }
+
+    private static void PollRequest()
+    {
+        if (requestQueued || EditorApplication.timeSinceStartup < nextRequestPoll) return;
+        nextRequestPoll = EditorApplication.timeSinceStartup + 1.0;
+        if (!File.Exists(Request)) return;
+        requestQueued = true;
+        EditorApplication.delayCall += ProcessRequest;
     }
 
     private static void ProcessRequest()
@@ -33,18 +45,27 @@ public static class HoseVfxAssets
             EditorApplication.delayCall += ProcessRequest;
             return;
         }
-        if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+        if (EditorApplication.isPlayingOrWillChangePlaymode) { requestQueued = false; return; }
+        string operation = File.ReadAllText(Request);
         File.Delete(Request);
         try
         {
-            CreateMissingAssets();
-            File.WriteAllText(Report, "PASS: five hose graphs, shared library, and preview scene created and imported.\n");
+            if (operation.Trim().StartsWith("beam-v3")) UpgradeStreamMotion();
+            else if (operation.Trim().StartsWith("beam-v2")) UpgradeStreamAndJet();
+            else CreateMissingAssets();
+            File.WriteAllText(Report, operation.Trim().StartsWith("beam-v3")
+                ? "PASS: extending curved stream ribbon and fade bindings imported. Jet and mist preserved.\n"
+                : operation.Trim().StartsWith("beam-v2")
+                ? "PASS: continuous beam, falling droplets, single spear jet, and appearance bindings imported. Mist graph preserved.\n"
+                : "PASS: five hose graphs, shared library, and preview scene created and imported.\n");
+            if (operation.Trim() == "beam-v2-tests" || operation.Trim() == "beam-v3-tests") EditorApplication.delayCall += HoseVfxVerification.Run;
         }
         catch (Exception exception)
         {
             File.WriteAllText(Report, exception.ToString());
             Debug.LogException(exception);
         }
+        finally { requestQueued = false; }
     }
 
     [MenuItem("Fireline/VFX/Create Missing Hose Graphs")]
@@ -109,6 +130,11 @@ public static class HoseVfxAssets
 
     private static void BuildGraph(string path, int kind, Texture2D texture)
     {
+        if (kind == 0 || kind == 2)
+        {
+            BuildStreamOrSpear(path, kind == 0);
+            return;
+        }
         // The graph-model API is internal to the package. Keep this version-sensitive
         // reflection in an Editor authoring tool; runtime only uses the public VFX API.
         Call(TypeOf("UnityEditor.VisualEffectAssetEditorUtility"), "CreateNewAsset", path);
@@ -273,8 +299,8 @@ public static class HoseVfxAssets
             ? "UnityEditor.VFXModule" : "Unity.VisualEffectGraph.Editor").GetType(name)
         ?? throw new InvalidOperationException("VFX Graph 17.6 type unavailable: " + name);
     private static object New(string name) => ScriptableObject.CreateInstance(TypeOf(name));
-    private static object Get(object target, string name) => target.GetType().GetProperty(name, Flags).GetValue(target);
-    private static void Set(object target, string name, object value) => target.GetType().GetProperty(name, Flags).SetValue(target, value);
+    private static object Get(object target, string name) => target.GetType().GetProperties(Flags).First(p => p.Name == name).GetValue(target);
+    private static void Set(object target, string name, object value) => target.GetType().GetProperties(Flags).First(p => p.Name == name).SetValue(target, value);
     private static object[] Slots(object target, string name) => ((IEnumerable)Get(target, name)).Cast<object>().ToArray();
     private static void Setting(object target, string name, object value) => Call(target, "SetSettingValue", name, value);
     private static void SettingEnum(object target, string name, string value)

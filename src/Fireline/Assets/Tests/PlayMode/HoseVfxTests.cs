@@ -57,6 +57,14 @@ public sealed class HoseVfxTests
         var graph = go.GetComponentInChildren<HoseGraphVisual>();
         Assert.That(graph, Is.Not.Null);
         VisualEffect water = graph.transform.Find("Water").GetComponent<VisualEffect>();
+        Assert.That(hose.CurrentRange, Is.EqualTo(1.9f).Within(0.02f));
+        Assert.That(water.GetFloat("Range"), Is.LessThanOrEqualTo(hose.CurrentRange + 0.01f));
+        float readyAt = Time.time + 0.16f;
+        while (Time.time < readyAt)
+        {
+            hose.Spray(Vector2.right, 0.02f);
+            yield return null;
+        }
         Assert.That(water.GetFloat("Range"), Is.EqualTo(1.9f).Within(0.02f));
         hose.StopSpraying();
         Assert.That(hose.IsStreamActive, Is.False);
@@ -72,6 +80,14 @@ public sealed class HoseVfxTests
         var hose = NewObject("Standard", new Vector2(100, 100)).AddComponent<StandardHose>();
         var fire = NewObject("Fire", new Vector2(102, 100)).AddComponent<FireZone>();
         hose.Spray(Vector2.right, 0.02f);
+        Assert.That(hose.GetComponentsInChildren<VisualEffect>().Length, Is.EqualTo(2),
+            "Steam must wait for the visible stream to reach the fire.");
+        float readyAt = Time.time + 0.18f;
+        while (Time.time < readyAt)
+        {
+            hose.Spray(Vector2.right, 0.02f);
+            yield return null;
+        }
         int count = hose.GetComponentsInChildren<VisualEffect>().Length;
         Assert.That(count, Is.EqualTo(3), "Water, splash, and one fire-contact steam instance.");
         for (int i = 0; i < 10; i++) hose.Spray(Vector2.right, 0.02f);
