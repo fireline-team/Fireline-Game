@@ -335,15 +335,17 @@ MonoBehaviour:
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
   streamSheetFrames: 3
   streamColor: {r: 1, g: 1, b: 1, a: 1}
-  particlesPerSecond: 60
-  particleLifetime: 0.3
-  particleSize: 0.6
+  particlesPerSecond: 120
+  particleLifetime: 0.5
+  particleSize: 2
   splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
   splashSheetFrames: 6
   splashChance: 0.3
   sortingLayerName: Default
   sortingOrder: 10
   flipParticleRotation: 0
+  useVfxGraph: 1
+  hoseVfx: {fileID: 0}
   damagePerSecond: 20
   knockbackStrength: 24
 --- !u!114 &1000283584469985828
@@ -381,6 +383,8 @@ MonoBehaviour:
   sortingLayerName: Default
   sortingOrder: 10
   flipParticleRotation: 0
+  useVfxGraph: 1
+  hoseVfx: {fileID: 0}
   damagePerSecond: 8
   slowMultiplier: 0.4
   slowDuration: 1
@@ -419,10 +423,12 @@ MonoBehaviour:
   sortingLayerName: Default
   sortingOrder: 10
   flipParticleRotation: 0
+  useVfxGraph: 1
+  hoseVfx: {fileID: 11400000, guid: 64cf24982d4cf3d44ab19afdde1896c4, type: 2}
   damagePerShot: 15
   fireInterval: 0.5
   knockbackImpulse: 6
-  particlesPerShot: 18
+  particlesPerShot: 34
 --- !u!114 &5178020514801643433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -464,7 +470,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::AxeSwing
   range: 2.5
   arcDegrees: 180
-  cooldown: 2
+  cooldown: 1
   swingDuration: 0.3
   swingCurve:
     serializedVersion: 2
