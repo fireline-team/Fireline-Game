@@ -103,6 +103,9 @@ namespace Game.Runtime
         [Header("Players")]
         [Tooltip("Block player joining until Start is pressed.")]
         [SerializeField] private bool lockJoiningUntilStart = true;
+        [Tooltip("Start spawning as soon as the scene loads, without pressing START. Use this with the panel hidden.")]
+        [SerializeField] private bool startAutomatically;
+        
 
         [Header("Debug UI")]
         [SerializeField] private bool showPanel = true;
@@ -168,6 +171,8 @@ namespace Game.Runtime
                 PlayerInputManager.instance.DisableJoining();
             if (EnemySpawnPoint.All.Count == 0)
                 Debug.LogWarning("PlaytestSpawner: no EnemySpawnPoints in the scene, so nothing will spawn.", this);
+        
+            if (startAutomatically) Begin();
         }
 
         private void OnDestroy() => _pool?.Dispose();
