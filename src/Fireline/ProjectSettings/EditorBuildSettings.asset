@@ -14,8 +14,11 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_Scenes/Jake-Player.unity
     guid: 8f569655c4d954f27871f89eef873267
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/JakeProtoLevel.unity
     guid: 74d675a793cf747f8ab7edfcbf7e768b
+  - enabled: 1
+    path: Assets/_Scenes/PlayTestLevel.unity
+    guid: ec8049e5a1a804265ae8a9646187be52
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: d1838475a06704a6a9a78bc02db614c1, type: 3}
