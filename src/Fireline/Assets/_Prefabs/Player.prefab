@@ -700,6 +700,33 @@ MonoBehaviour:
   - {fileID: 1843409636, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
   - {fileID: 1116449520, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
   - {fileID: -47004420, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  walkCycles:
+  - frames:
+    - {fileID: 1170566810, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+    - {fileID: 250123582, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+    - {fileID: -79407862, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+    - {fileID: 1748392498, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+  - frames:
+    - {fileID: 4639661181165961347, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+    - {fileID: 1711307624, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+    - {fileID: -406627954, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+    - {fileID: 1807774691, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+  - frames:
+    - {fileID: 3222946465072736911, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+    - {fileID: 337899436, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+    - {fileID: -1490396729, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+    - {fileID: -97982183, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+  - frames:
+    - {fileID: -4446757073398820724, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+    - {fileID: 1674905503, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+    - {fileID: 1974879479, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+    - {fileID: 842366494, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+  - frames:
+    - {fileID: 5085815471958757980, guid: 967a227f9481343398abe412c1050acb, type: 3}
+    - {fileID: -1848140212, guid: 967a227f9481343398abe412c1050acb, type: 3}
+    - {fileID: -2131358835, guid: 967a227f9481343398abe412c1050acb, type: 3}
+    - {fileID: 1248964893, guid: 967a227f9481343398abe412c1050acb, type: 3}
+  walkFps: 10
   artFacesWest: 1
   minMoveDistance: 0.001
   startFacing: 6

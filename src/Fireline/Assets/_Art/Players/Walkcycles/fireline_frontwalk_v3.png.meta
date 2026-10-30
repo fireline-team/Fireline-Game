@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -77,7 +77,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -102,89 +102,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: fireline_playerfrontwalk_v3_0
+      name: fireline_frontwalk_v3_0
       rect:
         serializedVersion: 2
         x: 7
         y: 5
         width: 38
         height: 111
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 6fcc72af464837340800000000000000
-      internalID: 4860373992091405558
+      spriteID: f63f5fec0d1284b1c8b8315158c9cfd8
+      internalID: 1170566810
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: fireline_playerfrontwalk_v3_1
+      name: fireline_frontwalk_v3_1
       rect:
         serializedVersion: 2
         x: 52
         y: 5
         width: 36
         height: 109
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0edbe0d26ac2f495795940fbe57e80fa
-      internalID: 1495135259
+      spriteID: 84b368728028f4387ba321fc515758b2
+      internalID: 250123582
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: fireline_playerfrontwalk_v3_2
+      name: fireline_frontwalk_v3_2
       rect:
         serializedVersion: 2
         x: 95
         y: 5
         width: 38
         height: 111
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cdbc7dd10f12a42ae8c36372b7547113
-      internalID: -125740991
+      spriteID: c399feaddbc6c445dbd1fb78acf6b575
+      internalID: -79407862
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: fireline_playerfrontwalk_v3_3
+      name: fireline_frontwalk_v3_3
       rect:
         serializedVersion: 2
         x: 142
         y: 5
         width: 36
         height: 109
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8b5c255278ca741149d39b47a8685623
-      internalID: 247018129
+      spriteID: fb6a272354b1941079768aa27e02d4ee
+      internalID: 1748392498
       vertices: []
       indices: 
       edges: []
@@ -203,12 +203,12 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":4.0,"y":1.0},"gridSpriteSize":{"x":48.0,"y":121.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.0},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":7,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      fireline_playerfrontwalk_v3_0: 4860373992091405558
-      fireline_playerfrontwalk_v3_1: 1495135259
-      fireline_playerfrontwalk_v3_2: -125740991
-      fireline_playerfrontwalk_v3_3: 247018129
+      fireline_frontwalk_v3_0: 1170566810
+      fireline_frontwalk_v3_1: 250123582
+      fireline_frontwalk_v3_2: -79407862
+      fireline_frontwalk_v3_3: 1748392498
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
