@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
+    public float MoveSpeed => moveSpeed;
 
     [Header("Shared camera boundary")]
     [Tooltip("The character body used to keep head, feet and sides inside the screen.")]
