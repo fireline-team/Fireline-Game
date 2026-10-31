@@ -404,6 +404,77 @@ public class FireMissionTests
         Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Complete));
     }
 
+    private static void AssertCivilianSpacing(MissionObjectiveSite site)
+    {
+        for (int i = 0; i < site.Civilians.Count; i++)
+            for (int j = i + 1; j < site.Civilians.Count; j++)
+            {
+                var a = site.Civilians[i];
+                var b = site.Civilians[j];
+                if (a.IsResolved || b.IsResolved) continue;
+                Assert.That(Vector2.Distance(a.GetComponent<Rigidbody2D>().position, b.GetComponent<Rigidbody2D>().position),
+                    Is.GreaterThanOrEqualTo(CivilianEscort.MinimumSpacing - 0.015f), "Civilian bodies overlapped.");
+            }
+    }
+
+    [UnityTest]
+    public IEnumerator CiviliansEmergeApartAndRecoverFromExactOverlapWithoutAPlayer()
+    {
+        var step = Make("Rescue step").AddComponent<TestObjectiveStep>();
+        var mission = Mission(new MissionObjectiveStep[] { step });
+        yield return null;
+        var site = mission.Objective;
+        Set(site, "releaseIntervalSeconds", 0.1f);
+        step.Finish();
+        for (int i = 0; i < 30; i++)
+        {
+            yield return new WaitForFixedUpdate();
+            AssertCivilianSpacing(site);
+        }
+        Assert.That(site.Civilians.Count, Is.EqualTo(3));
+        foreach (var civilian in site.Civilians)
+            civilian.GetComponent<Rigidbody2D>().position = new Vector2(130, 97);
+        yield return new WaitForSeconds(1f);
+        AssertCivilianSpacing(site);
+    }
+
+    [UnityTest]
+    public IEnumerator CivilianCrowdStaysSeparatedWhileFollowingStoppingTurningAndExtracting()
+    {
+        var step = Make("Rescue step").AddComponent<TestObjectiveStep>();
+        var mission = Mission(new MissionObjectiveStep[] { step });
+        var player = Make("Player").AddComponent<PlayerHealth>();
+        var playerBody = player.GetComponent<Rigidbody2D>();
+        playerBody.gravityScale = 0;
+        yield return null;
+        var site = mission.Objective;
+        Set(site, "releaseIntervalSeconds", 0.1f);
+        player.transform.position = new Vector2(135, 98.5f);
+        playerBody.position = new Vector2(135, 98.5f);
+        Physics2D.SyncTransforms();
+        step.Finish();
+        float deadline = Time.time + 3f;
+        while (Time.time < deadline)
+        {
+            yield return new WaitForFixedUpdate();
+            AssertCivilianSpacing(site);
+        }
+        Assert.That(site.Civilians.Count, Is.EqualTo(3));
+        Assert.That(player.transform.position.x, Is.EqualTo(135).Within(0.1f));
+        foreach (var civilian in site.Civilians)
+            Assert.That(civilian.transform.position.x, Is.GreaterThan(132f), "Separation prevented following.");
+        // Reverse through the group, then wait at extraction. Survivors must not merge or deadlock.
+        playerBody.position = mission.Spawn.transform.position;
+        deadline = Time.time + 14f;
+        while (mission.State != FireRescueMission.Phase.Complete && Time.time < deadline)
+        {
+            yield return new WaitForFixedUpdate();
+            AssertCivilianSpacing(site);
+        }
+        Assert.That(mission.CiviliansSaved, Is.EqualTo(3));
+        Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Complete));
+    }
+
     [UnityTest]
     public IEnumerator InvalidSetupFailsClearlyRatherThanChoosingNearbyObjective()
     {

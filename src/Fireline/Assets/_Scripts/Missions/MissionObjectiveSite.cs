@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.Runtime;
 using UnityEngine;
 
 namespace Fireline.Missions
@@ -74,11 +75,26 @@ namespace Fireline.Missions
             if (CiviliansPendingRelease <= 0) { releasing = false; return; }
             releaseTimer -= Time.deltaTime;
             if (releaseTimer > 0) return;
+            Vector3 exit = transform.position + Vector3.down * 1.5f;
+            Vector3 position = exit;
+            bool space = CivilianEscort.CanSpawnAt(mission, position);
+            // Keep emerging civilians apart even when the group is waiting at the exit.
+            for (int ring = 1; !space && ring <= 3; ring++)
+                for (int slot = 0; !space && slot < 8; slot++)
+                {
+                    float angle = slot * Mathf.PI / 4;
+                    position = exit + new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0)
+                        * (ring * (CivilianEscort.MinimumSpacing + 0.1f));
+                    // Do not spawn on the other side of a wall beside the exit.
+                    space = !Physics2D.Linecast(exit, position, LayerMask.GetMask(Structure.ObstacleLayer))
+                        && CivilianEscort.CanSpawnAt(mission, position);
+                }
+            if (!space) { releaseTimer = 0.1f; return; }
             // At most one per frame: a hitch must not spawn the whole crowd at once.
             releaseTimer = Mathf.Max(0.1f, releaseIntervalSeconds);
             var go = new GameObject($"Civilian {civilians.Count + 1}");
             go.transform.SetParent(transform, false);
-            go.transform.position = transform.position + Vector3.down * 1.5f;
+            go.transform.position = position;
             var civilian = go.AddComponent<CivilianEscort>();
             civilian.Initialize(this, mission, civilianSprite);
             civilians.Add(civilian);

@@ -16,6 +16,33 @@ namespace Fireline.Missions
         [SerializeField, Min(0.1f)] private float followingDistance = 0.8f;
         [SerializeField, Min(0.05f)] private float contactDamageCooldown = 0.75f;
         private const float Radius = 0.22f;
+        public const float MinimumSpacing = 0.65f;
+        private const float SeparationRange = 0.9f;
+        private static int nextSeparationOrder;
+        private int separationOrder;
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetSeparationOrder() => nextSeparationOrder = 0;
+        private Vector2 plannedPosition;
+        private float plannedAt = -1;
+        private Vector2 SpacingPosition => plannedAt == Time.fixedTime ? plannedPosition : body.position;
+
+        private IEnumerable<CivilianEscort> Neighbors()
+        {
+            foreach (var objective in mission.Objectives)
+                foreach (var other in objective.Civilians)
+                    if (other != null && other != this && other.isActiveAndEnabled && !other.IsResolved)
+                        yield return other;
+        }
+
+        public static bool CanSpawnAt(FireRescueMission mission, Vector2 position)
+        {
+            if (Physics2D.OverlapCircle(position, Radius, LayerMask.GetMask(Structure.ObstacleLayer)) != null) return false;
+            foreach (var objective in mission.Objectives)
+                foreach (var other in objective.Civilians)
+                    if (other != null && other.isActiveAndEnabled && !other.IsResolved
+                        && Vector2.Distance(position, other.body.position) < MinimumSpacing + 0.05f) return false;
+            return true;
+        }
         private MissionObjectiveSite site;
         private FireRescueMission mission;
         private Rigidbody2D body;
@@ -38,6 +65,7 @@ namespace Fireline.Missions
 
         private void Awake()
         {
+            separationOrder = nextSeparationOrder++;
             body = GetComponent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Kinematic;
             body.gravityScale = 0;
@@ -100,18 +128,52 @@ namespace Fireline.Missions
             }
             if (closest != FollowTarget) nextPathTime = 0;
             FollowTarget = closest;
-            if (closest == null || distance <= followingDistance) return;
-            Vector2 target = closest.transform.position;
-            Vector2 direction = DirectionTo(target);
-            float travel = Mathf.Min(MoveSpeed * Time.fixedDeltaTime, distance - followingDistance);
-            if (direction.sqrMagnitude > 0 && travel > 0)
+            Vector2 velocity = Vector2.zero;
+            if (closest != null && distance > followingDistance)
+                velocity = DirectionTo(closest.transform.position)
+                    * Mathf.Min(MoveSpeed, (distance - followingDistance) / Time.fixedDeltaTime);
+            // Separation also runs while waiting or without a living player to follow.
+            foreach (var other in Neighbors())
             {
-                // Never walk through a wall, even without a nav grid or when its bake is stale.
+                Vector2 away = body.position - other.SpacingPosition;
+                float gap = away.magnitude;
+                if (gap >= SeparationRange) continue;
+                // An exact overlap needs opposite, deterministic directions to recover.
+                Vector2 direction = gap > 0.001f ? away / gap
+                    : separationOrder < other.separationOrder ? Vector2.left : Vector2.right;
+                velocity += direction * ((SeparationRange - gap) * 12f);
+            }
+            Vector2 movement = Vector2.ClampMagnitude(velocity, MoveSpeed) * Time.fixedDeltaTime;
+            float travel = movement.magnitude;
+            if (travel > 0.0001f)
+            {
+                Vector2 direction = movement / travel;
+                // Reserve against earlier movers this physics tick, not their stale transforms.
+                // Sweeping the entire move prevents two approaching civilians crossing through each other.
+                foreach (var other in Neighbors())
+                {
+                    Vector2 offset = body.position - other.SpacingPosition;
+                    float c = offset.sqrMagnitude - MinimumSpacing * MinimumSpacing;
+                    float projection = Vector2.Dot(offset, direction);
+                    if (c < -0.0001f)
+                    {
+                        if (projection < 0) travel = 0; // Existing overlap may only move apart.
+                    }
+                    else if (projection < 0)
+                    {
+                        float discriminant = projection * projection - Mathf.Max(0, c);
+                        if (discriminant >= 0)
+                            travel = Mathf.Min(travel, Mathf.Max(0, -projection - Mathf.Sqrt(discriminant) - 0.001f));
+                    }
+                }
                 float clearance = ObstacleDistance(body.position, direction, travel + 0.02f);
                 travel = Mathf.Min(travel, Mathf.Max(0, clearance - 0.02f));
-                body.MovePosition(body.position + direction * travel);
-                if (visual != null && Mathf.Abs(direction.x) > 0.05f) visual.flipX = direction.x < 0;
+                movement = direction * travel;
+                if (visual != null && travel > 0 && Mathf.Abs(direction.x) > 0.05f) visual.flipX = direction.x < 0;
             }
+            plannedPosition = body.position + movement;
+            plannedAt = Time.fixedTime;
+            body.MovePosition(plannedPosition);
         }
 
         private float ObstacleDistance(Vector2 from, Vector2 direction, float distance)
