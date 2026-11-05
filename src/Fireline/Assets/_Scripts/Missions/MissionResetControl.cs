@@ -35,7 +35,7 @@ namespace Fireline.Missions
 
         private void Update()
         {
-            if (resetting) return;
+            if (GameManager.Instance != null || resetting) return;
 
             if (MissionComplete)
             {
@@ -68,7 +68,7 @@ namespace Fireline.Missions
 
         public void ResetScene()
         {
-            if (resetting) return;
+            if (GameManager.Instance != null || resetting) return;
             resetting = true;
             Scene scene = gameObject.scene;
 #if UNITY_EDITOR
@@ -85,6 +85,7 @@ namespace Fireline.Missions
 
         private void OnGUI()
         {
+            if (GameManager.Instance != null) return;
             countdownStyle ??= new GUIStyle(GUI.skin.box) { fontSize = 28, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
             promptStyle ??= new GUIStyle(GUI.skin.box) { fontSize = 20, alignment = TextAnchor.MiddleCenter };
 

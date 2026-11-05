@@ -9,14 +9,26 @@ namespace Fireline.Missions
     {
         private FireRescueMission mission;
         private GUIStyle panel, marker;
+        private float markerTop = 140f;
         private LineRenderer evacuationRing;
         private Material ringMaterial;
         private Canvas arrowCanvas;
         private readonly List<PlayerRescueArrow> objectiveArrows = new List<PlayerRescueArrow>();
         private PlayerRescueArrow evacuationArrow;
+        private readonly List<CivilianEscort> civilians = new List<CivilianEscort>();
+        private readonly List<PlayerRescueArrow> civilianArrows = new List<PlayerRescueArrow>();
         private void LateUpdate()
         {
             var camera = Camera.main;
+            civilians.Clear();
+            foreach (var site in mission.Objectives)
+                foreach (var civilian in site.Civilians)
+                    if (civilian != null && civilian.isActiveAndEnabled && !civilian.IsResolved) civilians.Add(civilian);
+            while (civilianArrows.Count < civilians.Count)
+                civilianArrows.Add(CreateArrow("Civilian direction", new Color(0.7f, 0.9f, 1)));
+            for (int i = 0; i < civilianArrows.Count; i++)
+                civilianArrows[i].PointTo(camera, i < civilians.Count ? civilians[i].transform.position : Vector3.zero,
+                    i < civilians.Count);
             while (objectiveArrows.Count < mission.Objectives.Count)
                 objectiveArrows.Add(CreateArrow($"Objective {objectiveArrows.Count + 1} direction", Color.yellow));
             for (int i = 0; i < objectiveArrows.Count; i++)
@@ -82,7 +94,20 @@ namespace Fireline.Missions
             panel ??= new GUIStyle(GUI.skin.box) { fontSize = 18, alignment = TextAnchor.MiddleCenter, wordWrap = true };
             marker ??= new GUIStyle(GUI.skin.box) { fontSize = 15, alignment = TextAnchor.MiddleCenter };
             float width = Mathf.Min(600, Screen.width - 24);
-            GUI.Box(new Rect((Screen.width - width) / 2, 12, width, 64), mission.Instruction, panel);
+            string instruction = mission.Instruction + "\n" + mission.CivilianSummary;
+            float panelHeight = Mathf.Max(92, panel.CalcHeight(new GUIContent(instruction), width));
+            GUI.Box(new Rect((Screen.width - width) / 2, 12, width, panelHeight), instruction, panel);
+            markerTop = 12 + panelHeight + 32;
+            string alert = string.Join("\n", new[] { mission.RescueNotice, mission.RescueAlert }).Trim();
+            if (!string.IsNullOrEmpty(alert))
+            {
+                Color previous = GUI.color;
+                GUI.color = new Color(1, 0.45f, 0.25f);
+                float alertHeight = panel.CalcHeight(new GUIContent(alert), width) + 12;
+                GUI.Box(new Rect((Screen.width - width) / 2, 18 + panelHeight, width, alertHeight), alert, panel);
+                markerTop = 18 + panelHeight + alertHeight + 28;
+                GUI.color = previous;
+            }
             var camera = Camera.main;
             if (camera == null) return;
             for (int i = 0; i < mission.Objectives.Count && mission.State == FireRescueMission.Phase.Objective; i++)
@@ -90,7 +115,7 @@ namespace Fireline.Missions
                 var site = mission.Objectives[i];
                 var step = mission.GetCurrentStep(site);
                 if (step == null) continue;
-                DrawMarker(camera, site.transform.position, $"OBJECTIVE {i + 1}", Color.yellow,
+                DrawMarker(camera, site.transform.position, $"OBJECTIVE {i + 1}\n{site.CiviliansWaiting} trapped / {site.CiviliansLost} lost", site.CiviliansInDanger ? new Color(1, 0.45f, 0.25f) : Color.yellow,
                     i < objectiveArrows.Count ? objectiveArrows[i] : null);
                 if (step is FireObjectiveStep fireStep)
                 {
@@ -103,6 +128,11 @@ namespace Fireline.Missions
                     }
                 }
             }
+            for (int i = 0; i < civilians.Count; i++)
+                if (civilians[i] != null && !civilians[i].IsResolved)
+                    DrawMarker(camera, civilians[i].transform.position,
+                        $"CIVILIAN {Mathf.CeilToInt(civilians[i].CurrentHealth)}/{civilians[i].MaxHealth:0}",
+                        new Color(0.7f, 0.9f, 1), civilianArrows[i]);
             if (mission.Spawn != null && mission.ShowEvacuationGuidance)
                 DrawMarker(camera, mission.Spawn.transform.position,
                     mission.State == FireRescueMission.Phase.Evacuate ? $"EVAC {mission.EvacuationProgress:P0}" : "EVAC",
@@ -122,11 +152,11 @@ namespace Fireline.Missions
                 Vector2 label = arrowPosition + inward * 100;
                 position = new Vector2(label.x, Screen.height - label.y);
             }
-            position.x = Mathf.Clamp(position.x, 70, Mathf.Max(70, Screen.width - 70));
-            position.y = Mathf.Clamp(position.y, 105, Mathf.Max(105, Screen.height - 25));
+            position.x = Mathf.Clamp(position.x, 96, Mathf.Max(96, Screen.width - 96));
+            position.y = Mathf.Clamp(position.y, Mathf.Min(markerTop, Screen.height - 35), Mathf.Max(35, Screen.height - 35));
             Color previous = GUI.color;
             GUI.color = color;
-            GUI.Box(new Rect(position.x - 65, position.y - 15, 130, 30), text, marker);
+            GUI.Box(new Rect(position.x - 90, position.y - 23, 180, 46), text, marker);
             GUI.color = previous;
         }
     }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -31,9 +32,33 @@ namespace Fireline.Missions
         private readonly List<SiteProgress> progress = new List<SiteProgress>();
         private readonly List<MissionObjectiveSite> selectedObjectives = new List<MissionObjectiveSite>();
         public IReadOnlyList<MissionObjectiveSite> Objectives => selectedObjectives;
+        public int CiviliansSaved => selectedObjectives.Sum(s => s.CiviliansSaved);
+        public int CiviliansLost => selectedObjectives.Sum(s => s.CiviliansLost);
+        public int CiviliansWaiting => selectedObjectives.Sum(s => s.CiviliansWaiting);
+        public int CiviliansPendingRelease => selectedObjectives.Sum(s => s.CiviliansPendingRelease);
+        public int CiviliansEscorting => selectedObjectives.Sum(s => s.CiviliansEscorting);
+        public string CivilianSummary => $"Civilians: {CiviliansSaved} saved | {CiviliansWaiting} trapped | {CiviliansPendingRelease} emerging | {CiviliansEscorting} escorting | {CiviliansLost} lost";
+        public string RescueAlert
+        {
+            get
+            {
+                var warnings = new List<string>();
+                for (int i = 0; i < selectedObjectives.Count; i++)
+                {
+                    var site = selectedObjectives[i];
+                    if (site.CiviliansInDanger)
+                        warnings.Add($"HURRY! Objective {i + 1}: next civilian lost in {Mathf.CeilToInt(site.SecondsUntilLoss)}s");
+                }
+                return string.Join("\n", warnings);
+            }
+        }
         public int CompletedObjectives => progress.FindAll(p => p.Complete).Count;
         public MissionObjectiveStep GetCurrentStep(MissionObjectiveSite site) => progress.Find(p => p.Site == site)?.Step;
         private float evacuationTime;
+        private int reportedLosses;
+        private string rescueNotice;
+        private float rescueNoticeUntil;
+        public string RescueNotice => Time.time < rescueNoticeUntil ? rescueNotice : string.Empty;
         public Phase State { get; private set; }
         public MissionPoint Spawn { get; private set; }
         public MissionObjectiveSite Objective => progress.Find(p => !p.Complete)?.Site;
@@ -44,8 +69,8 @@ namespace Fireline.Missions
         public string Instruction => State switch
         {
             Phase.Objective => $"Objectives completed: {CompletedObjectives}/{selectedObjectives.Count}\n" + string.Join(" | ", progress.FindAll(p => !p.Complete).ConvertAll(p => p.Step != null ? p.Step.Instruction : "Reach the objective")),
-            Phase.Evacuate => "Return together to EVAC. Revive downed teammates before leaving.",
-            Phase.Complete => "Mission complete - team evacuated",
+            Phase.Evacuate => "Escort civilians to EVAC, then return together. Protect the slower survivors!",
+            Phase.Complete => CiviliansSaved > 0 ? "Mission complete - team evacuated" : "Team evacuated - no civilians saved",
             Phase.InvalidSetup => "Mission unavailable: no valid spawn/objective configuration",
             _ => "Preparing mission"
         };
@@ -57,6 +82,9 @@ namespace Fireline.Missions
             Unsubscribe();
             placedPlayers.Clear();
             evacuationTime = 0;
+            reportedLosses = 0;
+            rescueNotice = string.Empty;
+            rescueNoticeUntil = 0;
             Spawn = null;
             progress.Clear();
             selectedObjectives.Clear();
@@ -95,6 +123,7 @@ namespace Fireline.Missions
             }
             State = Phase.Objective;
             PlaceNewPlayers();
+            foreach (var entry in progress) entry.Site.BeginRescue(this);
             foreach (var entry in progress) BeginNextStep(entry);
             return true;
         }
@@ -105,6 +134,9 @@ namespace Fireline.Missions
             entry.Step = null;
             if (entry.Complete)
             {
+                entry.Site.ReleaseCivilians();
+                rescueNotice = $"Objective {selectedObjectives.IndexOf(entry.Site) + 1} complete: {entry.Site.CiviliansPendingRelease} civilians emerging. Escort them to EVAC!";
+                rescueNoticeUntil = Time.time + 6f;
                 if (progress.TrueForAll(p => p.Complete) && State == Phase.Objective)
                 {
                     State = Phase.Evacuate;
@@ -128,8 +160,16 @@ namespace Fireline.Missions
         {
             if (State != Phase.Objective && State != Phase.Evacuate) return;
             PlaceNewPlayers();
-            if (State != Phase.Evacuate) return;
-            bool any = false, together = true;
+            if (State == Phase.Objective)
+            {
+                if (!PlayerHealth.ActivePlayers.Any(p => p != null && p.gameObject.scene == gameObject.scene)) return;
+                foreach (var entry in progress)
+                    if (!entry.Complete) entry.Site.AdvanceRescue(Time.deltaTime);
+                ReportCivilianLosses();
+                return;
+            }
+            ReportCivilianLosses();
+            bool any = false, together = CiviliansPendingRelease == 0 && CiviliansEscorting == 0;
             foreach (var player in PlayerHealth.ActivePlayers)
             {
                 if (player == null || player.gameObject.scene != gameObject.scene) continue;
@@ -143,6 +183,14 @@ namespace Fireline.Missions
                 State = Phase.Complete;
                 onMissionCompleted.Invoke();
             }
+        }
+
+        private void ReportCivilianLosses()
+        {
+            if (CiviliansLost <= reportedLosses) return;
+            rescueNotice = $"{CiviliansLost - reportedLosses} civilian(s) died! Protect the remaining survivors.";
+            rescueNoticeUntil = Time.time + 6f;
+            reportedLosses = CiviliansLost;
         }
 
         private void PlaceNewPlayers()
