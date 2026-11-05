@@ -23,7 +23,7 @@ public static class JakeMissionSetup
         var mission = root.AddComponent<FireRescueMission>();
         root.AddComponent<MissionGuidance>();
         var missionSettings = new SerializedObject(mission);
-        missionSettings.FindProperty("objectiveCount").intValue = 2;
+        missionSettings.FindProperty("objectiveCount").intValue = 1;
         missionSettings.ApplyModifiedPropertiesWithoutUndo();
         var spawnsRoot = Child(root.transform, "Spawn and evacuation candidates", Vector3.zero);
         var sitesRoot = Child(root.transform, "Building objective candidates", Vector3.zero);
@@ -40,6 +40,8 @@ public static class JakeMissionSetup
         Physics2D.SyncTransforms();
         var buildings = Object.FindObjectsByType<Structure>(FindObjectsSortMode.None)
             .Where(HasClearApproach).OrderBy(x => x.transform.position.x).ToArray();
+        var playerBodySprite = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Prefabs/Player.prefab")
+            .transform.Find("PlayerSprite").GetComponent<SpriteRenderer>().sprite;
         var sites = buildings.Select((building, i) =>
         {
             var box = building.GetComponent<BoxCollider2D>();
@@ -48,6 +50,9 @@ public static class JakeMissionSetup
             front.z = 0;
             var site = Child(sitesRoot.transform, $"Objective {i + 1} - {building.name}", front + Vector3.down * 1.5f).AddComponent<MissionObjectiveSite>();
             SetFloat(site.Point, "exclusionRadius", 9);
+            var siteSettings = new SerializedObject(site);
+            siteSettings.FindProperty("civilianSprite").objectReferenceValue = playerBodySprite;
+            siteSettings.ApplyModifiedPropertiesWithoutUndo();
             var step = site.gameObject.AddComponent<FireObjectiveStep>();
             var fireList = new FireZone[3];
             float width = box != null ? box.size.x * Mathf.Abs(building.transform.lossyScale.x) : 8;

@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
+    public float MoveSpeed => moveSpeed;
 
     [Header("Shared camera boundary")]
     [Tooltip("The character body used to keep head, feet and sides inside the screen.")]
@@ -77,6 +78,15 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (Fireline.Missions.GameManager.BlocksGameplay)
+        {
+            moveInput = Vector2.zero;
+            spraying = false;
+            rb.linearVelocity = Vector2.zero;
+            if (hose != null) hose.StopSpraying();
+            UpdateAnimation();
+            return;
+        }
         if (health.IsDead)
         {
             UpdateAnimation();
@@ -93,7 +103,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (health.IsDead) return;
+        if (health.IsDead || Fireline.Missions.GameManager.BlocksGameplay) return;
         Move();
         if (hose == null) return;
         if (spraying) hose.Spray(aimDirection, Time.fixedDeltaTime);

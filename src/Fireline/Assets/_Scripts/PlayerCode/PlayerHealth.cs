@@ -27,7 +27,7 @@ public class PlayerHealth : MonoBehaviour
     {
         get
         {
-            if (!IsDowned) return false;
+            if (Fireline.Missions.GameManager.Instance != null || !IsDowned) return false;
             foreach (var player in players)
                 if (player != null && player.gameObject.scene == gameObject.scene && !player.IsDowned) return false;
             return true;

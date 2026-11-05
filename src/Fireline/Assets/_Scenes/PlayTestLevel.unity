@@ -2675,6 +2675,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 376665639}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!114 &376665639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3106,6 +3107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 464347318}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &484846396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51406,6 +51408,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 530624054}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1 &532505315
 GameObject:
   m_ObjectHideFlags: 0
@@ -53707,6 +53710,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 809686173}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &819351141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53873,6 +53877,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 839781884}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &847086037
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -54236,6 +54241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 901500000}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &905660855
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -54660,7 +54666,7 @@ MonoBehaviour:
   - {fileID: 901500002}
   - {fileID: 809686175}
   - {fileID: 376665638}
-  objectiveCount: 2
+  objectiveCount: 1
   evacuationRadius: 3
   evacuationHoldSeconds: 2
   seed: 0
@@ -55082,6 +55088,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1044609503}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1045244917
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -56448,6 +56455,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1310398051}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1350243981
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -57219,6 +57227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1449094043}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1464008565
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -58675,6 +58684,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1718377635}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1 &1721440122
 GameObject:
   m_ObjectHideFlags: 0
@@ -59579,6 +59589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1889504199}
+  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1934808647
 PrefabInstance:
   m_ObjectHideFlags: 0

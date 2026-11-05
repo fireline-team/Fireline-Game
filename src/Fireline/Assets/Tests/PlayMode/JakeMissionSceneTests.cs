@@ -21,8 +21,9 @@ public class JakeMissionSceneTests
         var mission = Object.FindAnyObjectByType<FireRescueMission>();
         Assert.That(mission, Is.Not.Null);
         Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Objective));
-        Assert.That(mission.Objectives.Count, Is.EqualTo(2));
+        Assert.That(mission.Objectives.Count, Is.EqualTo(1));
         Assert.That(mission.ShowEvacuationGuidance, Is.False);
+        Assert.That(mission.CiviliansWaiting, Is.EqualTo(mission.Objectives.Count * 3));
         var so = new SerializedObject(mission);
         var spawns = so.FindProperty("spawnPoints");
         var sites = so.FindProperty("objectivePoints");
@@ -39,6 +40,7 @@ public class JakeMissionSceneTests
         {
             var site = (MissionObjectiveSite)sites.GetArrayElementAtIndex(i).objectReferenceValue;
             Assert.That(site.IsConfigured, Is.True, site.name);
+            Assert.That(site.CiviliansWaiting, Is.EqualTo(mission.Objectives.Contains(site) ? 3 : 0));
             bool hasSpawn = false;
             for (int j = 0; j < spawns.arraySize; j++)
                 hasSpawn |= MissionPoint.CanPair((MissionPoint)spawns.GetArrayElementAtIndex(j).objectReferenceValue, site.Point);
@@ -87,6 +89,19 @@ public class JakeMissionSceneTests
             }
         }
         Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Evacuate));
+        Assert.That(mission.CiviliansSaved, Is.Zero);
+        Assert.That(mission.CiviliansPendingRelease, Is.EqualTo(3));
+        Assert.That(mission.CiviliansWaiting, Is.Zero);
+        yield return null;
+        yield return null;
+        var civilian = mission.Objectives[0].Civilians[0];
+        var civilianArt = civilian.GetComponentInChildren<SpriteRenderer>();
+        var playerArt = player.transform.Find("PlayerSprite").GetComponent<SpriteRenderer>();
+        Assert.That(civilianArt.sprite, Is.Not.Null);
+        Assert.That(civilianArt.sprite.texture, Is.SameAs(playerArt.sprite.texture));
+        Assert.That(civilianArt.transform.lossyScale.y, Is.LessThan(playerArt.transform.lossyScale.y));
+        Assert.That(civilian.MoveSpeed, Is.LessThan(player.GetComponent<PlayerController>().MoveSpeed));
+        Assert.That(civilian.GetComponent<PlayerHealth>(), Is.Null, "Civilians must not become player slots.");
         if (rules != null) rules.RequireWaterSource = required;
         Object.Destroy(hoseObject);
         yield return null;
