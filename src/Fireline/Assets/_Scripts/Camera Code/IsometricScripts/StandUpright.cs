@@ -1,12 +1,12 @@
 using UnityEngine;
 
 /// <summary>
-/// Makes a sprite stand up. Put on a child object that has a sprite, not on a collider.
+/// Makes a sprite or mesh stand up. Put on the visual child, not on a collider.
 /// </summary>
 [ExecuteAlways, DisallowMultipleComponent]
 public class StandUpright : MonoBehaviour
 {
-    [Tooltip("Lift the sprite so its bottom edge touches the ground, whatever its pivot is. Only works on a child object.")]
+    [Tooltip("Lift the visual so its bottom edge touches the ground, whatever its pivot is. Only works on a child object.")]
     [SerializeField] private bool feetOnGround = true;
     [Tooltip("Extra offset along the ground, relative to the parent (X = right, Y = up the screen).")]
     [SerializeField] private Vector2 groundOffset;
@@ -33,6 +33,15 @@ public class StandUpright : MonoBehaviour
             float pivot01 = sprite.sprite.pivot.y / sprite.sprite.rect.height;
             float drawnHeight = sprite.drawMode == SpriteDrawMode.Simple ? sprite.sprite.bounds.size.y : sprite.size.y;
             lift = pivot01 * drawnHeight * transform.lossyScale.y;
+        }
+
+        else
+        {
+            // Shader-based fire uses a mesh quad instead of a SpriteRenderer.
+            // Measure its local bottom, not world renderer bounds (which include the tilt).
+            var mesh = GetComponent<MeshFilter>();
+            if (mesh != null && mesh.sharedMesh != null)
+                lift = -mesh.sharedMesh.bounds.min.y * transform.lossyScale.y;
         }
 
         transform.localPosition = TiltedView.RaisedLocalPosition(transform.parent, groundOffset, lift);

@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 2285449017428956352}
   serializedVersion: 2
   m_LocalRotation: {x: -0.25881907, y: -0, z: -0, w: 0.9659259}
-  m_LocalPosition: {x: -0.0232, y: -0.1286, z: 1}
+  m_LocalPosition: {x: 0, y: 0.6415899, z: -0.3704221}
   m_LocalScale: {x: 2.1081367, y: 1.4816884, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60df815fc63464d618fc887fec714527, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::StandUpright
-  feetOnGround: 0
+  feetOnGround: 1
   groundOffset: {x: 0, y: 0}
 --- !u!23 &7100925179697189682
 MeshRenderer:

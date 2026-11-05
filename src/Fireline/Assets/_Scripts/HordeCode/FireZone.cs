@@ -18,10 +18,8 @@ namespace Game.Runtime
 
         private HealthPool strength;
         private Vector3 fullVisualScale;
-        //private ParticleSystem[] flames;
         private Material fireMaterial;
         private float InitalFlameHeight;
-        private float[] fullEmissionRates;
 
         public bool IsBurning => strength != null && !strength.IsDead;
         public float RemainingStrength => strength != null ? strength.Current : 0f;
@@ -39,24 +37,20 @@ namespace Game.Runtime
             if (!startsBurning) strength.TakeDamage(extinguishResistance);
             if (fireVisual != null)
             {
-                fireMaterial = fireVisual.GetComponent<MeshRenderer>().materials[0];
-                InitalFlameHeight = fireMaterial.GetFloat("_FlameLength");
                 fullVisualScale = fireVisual.localScale;
-                //flames = fireVisual.GetComponentsInChildren<ParticleSystem>(true);
-                
-
-
-                //dont need this with the shader
-                /*fullEmissionRates = new float[flames.Length];
-                for (int i = 0; i < flames.Length; i++)
-                    fullEmissionRates[i] = flames[i].emission.rateOverTimeMultiplier;
-            }*/
-
-                if (extinguishSteam != null)
-                    extinguishSteam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                UpdateVisuals();
-
+                var renderer = fireVisual.GetComponent<MeshRenderer>();
+                if (renderer != null && renderer.sharedMaterial != null
+                    && renderer.sharedMaterial.HasProperty("_FlameLength"))
+                {
+                    fireMaterial = renderer.material;
+                    InitalFlameHeight = fireMaterial.GetFloat("_FlameLength");
+                }
             }
+            if (extinguishSteam != null && fireVisual != null && extinguishSteam.transform.IsChildOf(fireVisual))
+                extinguishSteam.transform.SetParent(transform, true);
+            if (extinguishSteam != null)
+                extinguishSteam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            UpdateVisuals();
         }
 
         public void ApplyWater(float amount)
@@ -65,7 +59,7 @@ namespace Game.Runtime
             bool extinguished = strength.TakeDamage(amount);
             UpdateVisuals();
             if (!extinguished) return;
-                //if (extinguishSteam != null) extinguishSteam.Play(true);
+            if (extinguishSteam != null) extinguishSteam.Play(true);
             onExtinguished.Invoke();
         }
 
@@ -82,15 +76,14 @@ namespace Game.Runtime
         private void UpdateVisuals()
         {
             if (fireVisual == null) return;
-            //make visual init
             fireVisual.gameObject.SetActive(IsBurning);
-            SetProceduralFlameHeight();
-            /*fireVisual.localScale = fullVisualScale * Mathf.Lerp(0.2f, 1f, Intensity);
-            for (int i = 0; i < flames.Length; i++)
-            {
-                var emission = flames[i].emission;
-                emission.rateOverTimeMultiplier = fullEmissionRates[i] * Intensity;
-            }*/
+            if (fireMaterial != null) SetProceduralFlameHeight();
+            else fireVisual.localScale = fullVisualScale * Mathf.Lerp(0.2f, 1f, Intensity);
+        }
+
+        private void OnDestroy()
+        {
+            if (fireMaterial != null) Destroy(fireMaterial);
         }
 
         private void SetProceduralFlameHeight()

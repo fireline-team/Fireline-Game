@@ -174,18 +174,8 @@ public class PlayerStatusMarker : MonoBehaviour
 
     private void UpdateRescueArrow(Camera camera)
     {
-        Vector3 point = camera.WorldToScreenPoint(transform.position);
-        Rect bounds = camera.pixelRect;
-        bool offscreen = point.z <= 0f || !bounds.Contains(new Vector2(point.x, point.y));
-        rescueArrow.gameObject.SetActive(health != null && health.IsDowned && offscreen);
+        rescueArrow.PointTo(camera, transform.position, health != null && health.IsDowned);
         if (!rescueArrow.gameObject.activeSelf) return;
-        Vector2 direction = new Vector2(point.x, point.y) - bounds.center;
-        if (point.z <= 0f) direction = -direction;
-        if (direction.sqrMagnitude < 0.001f) direction = Vector2.down;
-        Vector2 halfSize = new Vector2(Mathf.Max(1, bounds.width / 2 - 36), Mathf.Max(1, bounds.height / 2 - 36));
-        float scale = 1f / Mathf.Max(Mathf.Abs(direction.x) / halfSize.x, Mathf.Abs(direction.y) / halfSize.y);
-        rescueArrow.rectTransform.anchoredPosition = bounds.center + direction * scale;
-        rescueArrow.rectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);
         var rules = HoseWaterRules.ForPlayer(gameObject);
         int index = input != null ? input.playerIndex : 0;
         rescueArrow.color = useHosePlayerColors
