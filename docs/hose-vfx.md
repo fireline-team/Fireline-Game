@@ -7,7 +7,7 @@ The three nozzle modes share `Assets/Resources/HoseVfx/HoseVfxLibrary.asset`:
 | HoseStream | Continuous while firing | An uninterrupted ribbon that extends from the muzzle, bends downward, and fades quickly on release; droplets shed from the visible stream |
 | HoseMist | Continuous while firing | Wide cone of fine, translucent droplets |
 | HoseBurst | One event per JetHose shot | One long, pointed water spear; default flight time 0.12 seconds |
-| HoseSplash | Stream contact pulses; one stronger sniper impact | Droplets fan outward from the surface normal |
+| HoseSplash | Continuous beam contact; one stronger sniper impact | Droplets fan outward from the surface normal |
 | HoseSteam | Water applied to an active FireZone | Pale rising, expanding steam/smoke puffs |
 
 ## First import and preview
@@ -20,6 +20,8 @@ Existing version-one hose assets can be upgraded with **Fireline > VFX > Upgrade
 
 Use **Fireline > VFX > Upgrade Stream Motion** for the version-three extending/curved stream. This upgrades only the stream graph and adds a ribbon mesh template; jet and mist graphs are preserved. Repeating the command validates the current version without replacing artist edits.
 
+**Fireline > VFX > Upgrade Water Pixelation and Contact Splash** upgrades to version four. It switches the stream, mist, jet, and splash outputs to the shared `PixelatedWater.shadergraph`, preserving their existing simulation blocks and textures. The splash gains a second, constant-rate spawner for beam contact; its original burst spawner still handles jet impacts. Existing graph GUIDs and the soft steam graph are preserved. Repeating this command validates without replacing edits.
+
 ## Integration and tuning
 
 `HoseWeapon` uses the shared library automatically when **Use Vfx Graph** is enabled, the library is complete, the platform supports compute shaders, and no custom `streamPrefab` is assigned. An explicit **Hose Vfx** library overrides the Resources default. An assigned legacy ParticleSystem prefab retains its original behavior. Turning **Use Vfx Graph** off restores the previous water visual. Existing serialized water materials and fields are preserved.
@@ -31,10 +33,13 @@ Select **Assets/Resources/HoseVfx/HoseVfxLibrary.asset** in the Project browser 
 | Stream Appearance | Beam width/color, extension speed, release fade, beam gravity, maximum drop; droplet rate, size, size variation, lifetime, forward speed, sideways spread, initial falling speed, gravity, and color |
 | Jet Appearance | Spear length, width, flight time, color, and the point in its lifetime when fading begins |
 | Mist Appearance | Density, size, lifetime, and visual spread multipliers; all default to one to preserve the existing look |
-| Splash Appearance | Stream and jet particle counts, stream splash interval, droplet size/lifetime/speed/spread/color |
+| Splash Appearance | Stream Rate for continuous contact, jet burst count, droplet size/lifetime/speed/spread/color; legacy stream count/interval support older custom graphs |
 | Steam Appearance | Cloud size/lifetime/rise speed/spread/color, puff interval, particles per water unit, and minimum/maximum puff counts |
+| Water Pixelation | Enabled toggle and Pixel Size (default 4 render-target pixels); applies to water and splashes, preserving soft steam |
 
 Colors include an alpha channel for transparency. Dimensions are in world units, durations are in seconds, and speeds are world units per second. Changes to the library are read during firing and are visible in both gameplay and the preview scene. The library is an asset: Inspector edits during Play Mode persist, so undo experiments or make a duplicate library for alternate art settings. Assign a duplicate in a hose component's **Hose Vfx** slot for a separate per-nozzle style; assign it to the preview component's **Library** slot to preview that same style.
+
+For a coarser pixel look, increase **Water Pixelation > Pixel Size**; disable **Enabled** or set the size to one for smooth sampling. The unlit VFX shader samples the original water texture at the center of each screen-aligned pixel block. This preserves the beam's extension/curvature, the jet's single spear, and mist's cone simulation. It is water-only shading, with no full-screen post-process, extra camera, layer change, or renderer-feature setup. Pixel size is measured before any camera upscaling/post-processing, so those can soften the final image. Very fine droplets can occupy only part of a pixel block; use larger droplet sizes or smaller Pixel Size to keep fine mist dense.
 
 For stream motion, start with these four controls:
 
@@ -57,12 +62,14 @@ Gameplay remains authoritative: the existing 2D wall raycast limits stream lengt
 
 The mist's **visual** shape is a cone. Its gameplay hitbox intentionally retains the existing rectangle; changing combat coverage is a separate balance decision. Water remains in the muzzle's raised plane while steam starts near the fire's ground footprint using `TiltedView.Up`. GPU particles do not trigger Physics2D callbacks. Splash motion is decorative; it does not add GPU scene collisions or secondary damage.
 
-Splash events are throttled and reused. Steam uses up to eight reusable contact effects per nozzle, with no per-puff Instantiate/Destroy. If all slots are still occupied, additional overlapping fire zones still receive gameplay water but omit steam until a slot expires.
+The beam's splash emits continuously at **Splash Appearance > Stream Rate** (default 155 droplets/second) after the visible water front reaches a reported wall/enemy contact. It follows the contact while aiming and stops adding droplets immediately on release, loss of contact, or a zero rate. Already emitted droplets finish their lifetimes. Missing physics updates expire the contact after a short grace period. No splash is added at maximum range in empty air. A single reusable effect handles the contact; it is not repeatedly restarted each physics tick. Older custom splash graphs retain the throttled burst fallback. Steam uses up to eight reusable contact effects per nozzle, with no per-puff Instantiate/Destroy. If all slots are still occupied, additional overlapping fire zones still receive gameplay water but omit steam until a slot expires.
 
 ## Verification
 
 **Fireline > VFX > Run Hose VFX Tests** runs the focused integration and rendering tests. `HoseVfxTests` covers wall-range binding, stopping on release/disable, delayed fire-contact effect reuse, distinct nozzle assets, and the sniper cooldown/continuous-stream distinction. `HoseVfxRenderingTests` checks continuity at zero droplet rate, gradual extension, downward curvature, ground-clearance limiting, release fading, restart behavior, and one spear per jet shot. It writes a comparison image to `Temp/HoseVfxVerification.png` (stream top, unchanged mist middle, spear bottom), plus `Temp/HoseStreamMotion-growing.png`, `Temp/HoseStreamMotion-full.png`, and `Temp/HoseStreamMotion-fading.png`. The comparison slows only a cloned test library's jet shot so its shape is easy to inspect. Results are written to `Temp/HoseVfxTests.xml` and `Temp/HoseVfxTests-result.txt`. These tests need a graphics-capable machine. Older `FireZoneTests` assume particle-era fire visuals; the current branch's shader fire implementation has a separate baseline mismatch with those tests.
 
+The additional render checks compare smooth and pixelated water, verify visibly flat color blocks and retained tint, and check the pixelation toggle. A sustained splash test checks front arrival, live particle emission, rendered droplets around the impact, moving contact, loss of contact, release, and expiration. These produce `Temp/HoseWater-smooth.png`, `Temp/HoseWater-pixelated.png`, `Temp/HoseBeam-contact-splash.png`, and a contact-state diagnostic text file. Test settings use cloned libraries and do not overwrite the shared appearance defaults.
+
 Generated asset import checks require every runtime property to be present. Check the Console for graph/shader errors, then visually inspect the preview and a playable level for transparency, density, muzzle alignment, wall contact, and fire placement. C# compilation alone does not prove GPU appearance or performance.
 
-Validated on 2026-10-27 in Unity 6000.6.1f1: all six focused PlayMode tests passed, including rendered continuity, gradual extension, downward curvature, ground-clearance limiting, release fading, restart behavior, one spear per shot, wall-range binding, and fire-contact effect reuse. The growth, full-stream, and comparison renders were inspected. Jet and mist graph hashes were unchanged by the stream-motion upgrade. Existing Burst compiler named-pipe errors remain a separate Editor baseline issue.
+Validated on 2026-11-05 in Unity 6000.6.1f1: all eight focused PlayMode tests passed, including pixelation/toggle/tint, continuous rendered splashes and their shutdown, plus the existing stream-motion, single-spear, wall-range, and fire-contact checks. Smooth/pixelated water, contact splash, and nozzle comparison renders were inspected. Conversion to Shader Graph outputs preserves particle tint/alpha and recreates transferred Custom HLSL input slots; otherwise the splash's fade block would receive a zero color and render invisibly. The steam graph remains unchanged. Existing Burst compiler named-pipe errors remain a separate Editor baseline issue.

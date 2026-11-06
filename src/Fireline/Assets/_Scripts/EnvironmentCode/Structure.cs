@@ -83,7 +83,7 @@ public class Structure : MonoBehaviour
     // The faces' normal sprite material, remembered so it can be put back while see-through or with Use Depth off.
     [SerializeField, HideInInspector] private Material spriteMaterial;
 
-    private const string DepthMaterialGuid = "f369f7410847432584f91de60a5066e0"; // _VFX/StructureDepth.mat
+    private const string DepthMaterialGuid = "42018bd762e4248cfa846f677810dbe3"; // _VFX/StructureDepth.mat
 
     private float _frontHeight;
     private bool _seeThrough;
@@ -104,6 +104,14 @@ public class Structure : MonoBehaviour
 
     private void FindDepthMaterial()
     {
+        // Use matching 3D lighting when the building is faded or depth is disabled.
+        if (spriteMaterial == null || spriteMaterial.shader.name == "Universal Render Pipeline/2D/Sprite-Unlit-Default"
+            || spriteMaterial.shader.name == "Sprites/Default")
+        {
+            string litPath = UnityEditor.AssetDatabase.GUIDToAssetPath("7cc6ebfb823d4b1eaca70dc99813e1fa");
+            Material lit = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(litPath);
+            if (lit != null) spriteMaterial = lit;
+        }
         if (!useDepth || depthMaterial != null) return;
         string path = UnityEditor.AssetDatabase.GUIDToAssetPath(DepthMaterialGuid);
         if (string.IsNullOrEmpty(path)) return;

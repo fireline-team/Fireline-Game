@@ -45,6 +45,7 @@ MonoBehaviour:
     lifetime: 1
     spread: 1
   splashAppearance:
+    streamRate: 155
     streamCount: 10
     jetCount: 28
     streamInterval: 0.065
@@ -63,4 +64,7 @@ MonoBehaviour:
     minimumCount: 3
     maximumCount: 24
     color: {r: 0.86, g: 0.91, b: 0.95, a: 0.32}
-  graphVersion: 3
+  waterPixelation:
+    enabled: 1
+    pixelSize: 4
+  graphVersion: 4

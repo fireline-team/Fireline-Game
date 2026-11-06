@@ -50,15 +50,19 @@ public static partial class HoseVfxAssets
         File.Delete(Request);
         try
         {
-            if (operation.Trim().StartsWith("beam-v3")) UpgradeStreamMotion();
+            if (operation.Trim().StartsWith("water-v4")) UpgradeWaterPixelation();
+            else if (operation.Trim().StartsWith("beam-v3")) UpgradeStreamMotion();
             else if (operation.Trim().StartsWith("beam-v2")) UpgradeStreamAndJet();
             else CreateMissingAssets();
-            File.WriteAllText(Report, operation.Trim().StartsWith("beam-v3")
+            File.WriteAllText(Report, operation.Trim().StartsWith("water-v4")
+                ? "PASS: water pixelation shader and continuous beam-contact splash imported.\n"
+                : operation.Trim().StartsWith("beam-v3")
                 ? "PASS: extending curved stream ribbon and fade bindings imported. Jet and mist preserved.\n"
                 : operation.Trim().StartsWith("beam-v2")
                 ? "PASS: continuous beam, falling droplets, single spear jet, and appearance bindings imported. Mist graph preserved.\n"
                 : "PASS: five hose graphs, shared library, and preview scene created and imported.\n");
-            if (operation.Trim() == "beam-v2-tests" || operation.Trim() == "beam-v3-tests") EditorApplication.delayCall += HoseVfxVerification.Run;
+            if (operation.Trim() == "beam-v2-tests" || operation.Trim() == "beam-v3-tests"
+                || operation.Trim() == "water-v4-tests") EditorApplication.delayCall += HoseVfxVerification.Run;
         }
         catch (Exception exception)
         {
