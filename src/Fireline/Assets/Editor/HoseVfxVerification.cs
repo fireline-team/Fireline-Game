@@ -27,7 +27,7 @@ public static class HoseVfxVerification
         runner.Execute(new ExecutionSettings(new Filter
         {
             testMode = TestMode.PlayMode,
-            testNames = new[] { "HoseVfxTests", "HoseVfxRenderingTests" }
+            testNames = new[] { "HoseVfxTests", "HoseVfxRenderingTests", "FireZoneTests" }
         }));
     }
 }

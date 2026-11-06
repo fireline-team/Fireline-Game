@@ -15,6 +15,10 @@ namespace Game.Runtime
         [SerializeField] private Transform fireVisual;
         [SerializeField] private ParticleSystem extinguishSteam;
         [SerializeField] private UnityEvent onExtinguished = new UnityEvent();
+        [Header("Ambient Smoke")]
+        [SerializeField] private bool emitAmbientSmoke = true;
+        [Tooltip("Optional override; otherwise uses Resources/FireVfx/FireSmokeProfile.")]
+        [SerializeField] private FireSmokeProfile smokeProfile;
 
         private HealthPool strength;
         private Vector3 fullVisualScale;
@@ -51,6 +55,18 @@ namespace Game.Runtime
             if (extinguishSteam != null)
                 extinguishSteam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             UpdateVisuals();
+            if (emitAmbientSmoke && SystemInfo.supportsComputeShaders
+                && GetComponentInChildren<FireSmokeVisual>(true) == null)
+            {
+                var appearance = smokeProfile != null ? smokeProfile : Resources.Load<FireSmokeProfile>(FireSmokeProfile.ResourcePath);
+                if (appearance != null && appearance.Graph != null)
+                {
+                    var smoke = new GameObject("Ambient fire smoke");
+                    smoke.transform.SetParent(transform, false);
+                    smoke.AddComponent<FireSmokeVisual>().Configure(this, appearance,
+                        fireVisual != null ? fireVisual.GetComponent<Renderer>() : null);
+                }
+            }
         }
 
         public void ApplyWater(float amount)
