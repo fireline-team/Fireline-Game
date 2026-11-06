@@ -30,6 +30,8 @@ public sealed class HoseGraphVisual : MonoBehaviour
     private static readonly int WaterSpeedId = Shader.PropertyToID("WaterSpeed");
     private static readonly int BeamGravityId = Shader.PropertyToID("BeamGravity");
     private static readonly int MaxDropId = Shader.PropertyToID("MaxDrop");
+    private static readonly int PixelSizeId = Shader.PropertyToID("PixelSize");
+    private static readonly int ContactRateId = Shader.PropertyToID("ContactRate");
 
     private struct Impact
     {
@@ -56,6 +58,10 @@ public sealed class HoseGraphVisual : MonoBehaviour
     private int _sortingOrder;
     private float _nextSplashTime;
     private HoseStreamRibbon _streamRibbon;
+    private bool _hasContact;
+    private bool _splashEmitting;
+    private Impact _contact;
+    private float _contactUpdatedAt;
 
     public bool IsEmitting { get; private set; }
 
@@ -69,6 +75,9 @@ public sealed class HoseGraphVisual : MonoBehaviour
             : mode == NozzleType.Jet ? library.Burst : library.Stream;
         _water = CreateEffect(asset, "Water");
         _splash = CreateEffect(library.Splash, "Impact splash");
+        ApplyPixelation(_water);
+        ApplyPixelation(_splash);
+        if (_splash.HasFloat(ContactRateId)) _splash.SetFloat(ContactRateId, 0f);
         if (mode == NozzleType.Standard && _water.HasMesh(BeamMeshId))
         {
             _streamRibbon = new HoseStreamRibbon();
@@ -127,7 +136,16 @@ public sealed class HoseGraphVisual : MonoBehaviour
 
     public void ShowContinuousImpact(bool hit, Vector3 point, Vector3 normal)
     {
-        if (_mode != NozzleType.Standard || !IsEmitting || !hit || Time.time < _nextSplashTime) return;
+        if (_mode != NozzleType.Standard) return;
+        if (_splash.HasFloat(ContactRateId))
+        {
+            _hasContact = hit;
+            _contact = new Impact { Position = point, Normal = normal };
+            _contactUpdatedAt = Time.time;
+            RefreshContinuousImpact();
+            return;
+        }
+        if (!IsEmitting || !hit || Time.time < _nextSplashTime) return;
         if (_streamRibbon != null)
         {
             float distance = Vector3.Dot(point - _streamRibbon.Origin, _streamRibbon.Direction);
@@ -178,6 +196,8 @@ public sealed class HoseGraphVisual : MonoBehaviour
 
     public void Stop()
     {
+        _hasContact = false;
+        StopContinuousImpact();
         if (_water == null || !IsEmitting) return;
         IsEmitting = false;
         if (_streamRibbon != null) _streamRibbon.Stop();
@@ -187,7 +207,11 @@ public sealed class HoseGraphVisual : MonoBehaviour
 
     private void Update()
     {
+        if (_water == null) return;
+        ApplyPixelation(_water);
+        ApplyPixelation(_splash);
         if (_streamRibbon != null && _streamRibbon.IsVisible) RefreshRibbon(Time.deltaTime);
+        if (_mode == NozzleType.Standard && _splash.HasFloat(ContactRateId)) RefreshContinuousImpact();
         while (_pendingImpacts.Count > 0 && _pendingImpacts.Peek().Time <= Time.time)
             EmitSplash(_pendingImpacts.Dequeue(), _library.SplashAppearance.jetCount);
     }
@@ -195,6 +219,8 @@ public sealed class HoseGraphVisual : MonoBehaviour
     private void OnDisable()
     {
         IsEmitting = false;
+        _hasContact = false;
+        StopContinuousImpact();
         _streamRibbon?.Clear();
         _pendingImpacts.Clear();
         if (_water != null)
@@ -208,6 +234,47 @@ public sealed class HoseGraphVisual : MonoBehaviour
     }
 
     private void OnDestroy() => _streamRibbon?.Dispose();
+
+    private void ApplyPixelation(VisualEffect effect)
+    {
+        if (!effect.HasFloat(PixelSizeId)) return; // Existing custom libraries remain usable.
+        var settings = _library.WaterPixelation;
+        effect.SetFloat(PixelSizeId, settings.enabled ? Mathf.Clamp(settings.pixelSize, 1, 16) : 1f);
+    }
+
+    private void RefreshContinuousImpact()
+    {
+        var settings = _library.SplashAppearance;
+        // A stale physics contact must not keep spraying after its caller stops updating.
+        if (!IsEmitting || !_hasContact || settings.streamRate <= 0f
+            || Time.time - _contactUpdatedAt > Mathf.Max(0.1f, Time.fixedDeltaTime * 3f))
+        {
+            StopContinuousImpact();
+            return;
+        }
+        Vector3 point = _contact.Position;
+        if (_streamRibbon != null)
+        {
+            float distance = Vector3.Dot(point - _streamRibbon.Origin, _streamRibbon.Direction);
+            if (_streamRibbon.Length + 0.01f < distance) { StopContinuousImpact(); return; }
+            point -= TiltedView.Up * _streamRibbon.Drop(distance, _library.StreamAppearance);
+        }
+        ConfigureContact(_splash, point + _contact.Normal * 0.025f, _contact.Normal);
+        ConfigureAppearance(_splash, settings.size, settings.lifetime, settings.color, settings.speed, settings.spread);
+        _splash.SetFloat(ContactRateId, Mathf.Clamp(settings.streamRate, 0f, 600f));
+        if (_splashEmitting) return;
+        _splash.SetFloat(CountId, 0f); // Beam uses the rate spawner; jet retains the burst spawner.
+        _splash.Play();
+        _splashEmitting = true;
+    }
+
+    private void StopContinuousImpact()
+    {
+        if (_splash == null || !_splash.HasFloat(ContactRateId)) return;
+        _splash.SetFloat(ContactRateId, 0f);
+        if (_splashEmitting) _splash.Stop();
+        _splashEmitting = false;
+    }
 
     private void RefreshRibbon(float deltaTime)
     {

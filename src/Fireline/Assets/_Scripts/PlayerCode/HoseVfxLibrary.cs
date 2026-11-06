@@ -70,8 +70,12 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [Serializable]
     public sealed class SplashSettings
     {
+        [Tooltip("Continuous droplets per second while the beam is touching a surface. Zero disables the beam splash.")]
+        [Range(0f, 600f)] public float streamRate = 155f;
+        [Tooltip("Legacy burst count, used only by older custom splash graphs without a continuous emitter.")]
         [Range(0, 100)] public int streamCount = 10;
         [Range(0, 200)] public int jetCount = 28;
+        [Tooltip("Legacy burst interval for older custom splash graphs. Use Stream Rate for the continuous beam splash.")]
         [Min(0.02f)] public float streamInterval = 0.065f;
         [Min(0.005f)] public float size = 0.14f;
         [Range(0.05f, 3f)] public float lifetime = 0.45f;
@@ -94,12 +98,22 @@ public sealed class HoseVfxLibrary : ScriptableObject
         public Color color = new Color(0.86f, 0.91f, 0.95f, 0.32f);
     }
 
+    [Serializable]
+    public sealed class PixelationSettings
+    {
+        [Tooltip("Pixelate the stream, mist, jet, and splash. Steam keeps its soft smoke appearance.")]
+        public bool enabled = true;
+        [Tooltip("Size of each water pixel in render-target pixels. Larger values make coarser blocks. One restores smooth sampling.")]
+        [Range(1, 16)] public int pixelSize = 4;
+    }
+
     [Header("Appearance — edit these settings while previewing")]
     [SerializeField] private StreamSettings streamAppearance = new StreamSettings();
     [SerializeField] private JetSettings jetAppearance = new JetSettings();
     [SerializeField] private MistSettings mistAppearance = new MistSettings();
     [SerializeField] private SplashSettings splashAppearance = new SplashSettings();
     [SerializeField] private SteamSettings steamAppearance = new SteamSettings();
+    [SerializeField] private PixelationSettings waterPixelation = new PixelationSettings();
     [SerializeField, HideInInspector] private int graphVersion;
 
     public VisualEffectAsset Stream => stream;
@@ -112,6 +126,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     public MistSettings MistAppearance => mistAppearance;
     public SplashSettings SplashAppearance => splashAppearance;
     public SteamSettings SteamAppearance => steamAppearance;
+    public PixelationSettings WaterPixelation => waterPixelation;
     public int GraphVersion => graphVersion;
     public bool IsComplete => stream != null && mist != null && burst != null && splash != null && steam != null;
 }
