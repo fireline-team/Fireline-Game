@@ -28,6 +28,9 @@ public sealed class HoseVfxLibrary : ScriptableObject
         [Min(0f)] public float beamGravity = 18f;
         [Tooltip("Maximum downward bend in world units. Gameplay also limits it to the muzzle's height above ground.")]
         [Min(0f)] public float maximumDrop = 0.75f;
+        [Tooltip("Seconds for the world-space endpoint to follow aim changes. Zero follows instantly.")]
+        [Range(0f, 1f)] public float aimResponseTime = 0.22f;
+        public PixelationSettings pixelation = new PixelationSettings();
         [Tooltip("Droplets shed along the length of the beam each second.")]
         [Range(0f, 600f)] public float dropletRate = 55f;
         [Min(0.005f)] public float dropletSize = 0.065f;
@@ -47,6 +50,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [Serializable]
     public sealed class JetSettings
     {
+        public PixelationSettings pixelation = new PixelationSettings();
         [Tooltip("Length of the single pointed shot in world units. Clamped to the available range.")]
         [Min(0.05f)] public float length = 1.8f;
         [Min(0.01f)] public float width = 0.45f;
@@ -59,6 +63,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [Serializable]
     public sealed class MistSettings
     {
+        public PixelationSettings pixelation = new PixelationSettings();
         [Tooltip("Multipliers for the existing mist look. One preserves its current appearance.")]
         [Range(0f, 4f)] public float density = 1f;
         [Range(0.1f, 4f)] public float size = 1f;
@@ -70,7 +75,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [Serializable]
     public sealed class SplashSettings
     {
-        [Tooltip("Continuous droplets per second while the beam is touching a surface. Zero disables the beam splash.")]
+        [Tooltip("Continuous droplets per second at the visible beam endpoint, including its ground landing. Zero disables the beam splash.")]
         [Range(0f, 600f)] public float streamRate = 155f;
         [Tooltip("Legacy burst count, used only by older custom splash graphs without a continuous emitter.")]
         [Range(0, 100)] public int streamCount = 10;
@@ -101,10 +106,20 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [Serializable]
     public sealed class PixelationSettings
     {
-        [Tooltip("Pixelate the stream, mist, jet, and splash. Steam keeps its soft smoke appearance.")]
+        [Tooltip("Enable this effect's pixelation and color filtering.")]
         public bool enabled = true;
         [Tooltip("Size of each water pixel in render-target pixels. Larger values make coarser blocks. One restores smooth sampling.")]
-        [Range(1, 16)] public int pixelSize = 4;
+        [Range(1, 32)] public int pixelSize = 4;
+        [Tooltip("Blend from smooth sampling (zero) to fully snapped blocks (one).")]
+        [Range(0f, 1f)] public float strength = 1f;
+        [Tooltip("Horizontal and vertical block proportions. One produces square blocks.")]
+        public Vector2 pixelAspect = Vector2.one;
+        [Tooltip("Offset of the pixel grid in render-target pixels.")]
+        public Vector2 gridOffset;
+        [Tooltip("Color levels per channel. Zero preserves the original color gradients.")]
+        [Range(0, 32)] public int colorSteps;
+        [Tooltip("Discard texture alpha below this value for harder pixel edges. Particle lifetime fades are preserved.")]
+        [Range(0f, 0.95f)] public float alphaCutoff;
     }
 
     [Header("Appearance — edit these settings while previewing")]
@@ -113,7 +128,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [SerializeField] private MistSettings mistAppearance = new MistSettings();
     [SerializeField] private SplashSettings splashAppearance = new SplashSettings();
     [SerializeField] private SteamSettings steamAppearance = new SteamSettings();
-    [SerializeField] private PixelationSettings waterPixelation = new PixelationSettings();
+    [SerializeField, HideInInspector] private PixelationSettings waterPixelation = new PixelationSettings();
     [SerializeField, HideInInspector] private int graphVersion;
 
     public VisualEffectAsset Stream => stream;
@@ -126,7 +141,10 @@ public sealed class HoseVfxLibrary : ScriptableObject
     public MistSettings MistAppearance => mistAppearance;
     public SplashSettings SplashAppearance => splashAppearance;
     public SteamSettings SteamAppearance => steamAppearance;
-    public PixelationSettings WaterPixelation => waterPixelation;
+    // Compatibility for callers that previously tuned the shared water filter.
+    public PixelationSettings WaterPixelation => streamAppearance.pixelation;
+    public PixelationSettings PixelationFor(NozzleType mode) => mode == NozzleType.Jet ? jetAppearance.pixelation
+        : mode == NozzleType.Mist ? mistAppearance.pixelation : streamAppearance.pixelation;
     public int GraphVersion => graphVersion;
     public bool IsComplete => stream != null && mist != null && burst != null && splash != null && steam != null;
 }

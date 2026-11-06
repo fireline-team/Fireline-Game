@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3159bd7e7726cc2499caa1ce18982eea, type: 3}
+  m_Name: FireSmokeProfile
+  m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireSmokeProfile
+  graph: {fileID: 8926484042661614526, guid: 7e55f80e371a41a49baccec7b2086c44, type: 3}
+  rate: 14
+  lifetime: 2.8
+  size: 0.8
+  sizeVariation: 0.35
+  riseSpeed: 0.75
+  drift: 0.25
+  radius: 0.65
+  spawnHeight: 0.55
+  growth: 2.4
+  color: {r: 0.27, g: 0.29, b: 0.32, a: 0.58}
+  pixelation:
+    enabled: 1
+    pixelSize: 6
+    strength: 1
+    pixelAspect: {x: 1, y: 1}
+    gridOffset: {x: 0, y: 0}
+    colorSteps: 5
+    alphaCutoff: 0.02

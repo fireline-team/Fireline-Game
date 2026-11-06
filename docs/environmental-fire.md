@@ -27,4 +27,6 @@ The current hose still uses its existing rectangular overlap: it can affect enem
 
 ## Checks
 
+Ambient pixelated smoke is now available on FireZone fires. See [Ambient fire smoke](fire-ambient-smoke.md) for automatic setup, profile controls, and the standalone prefab.
+
 Run Unity PlayMode tests: FireZoneTests plus the existing HealthCombatTests. These cover gradual extinguishing, invalid water values, one completion event per burn cycle, duplicate colliders, hose range/direction, cooperative spraying, hazard damage, safety after extinguishing, and reignition under a stationary player.
