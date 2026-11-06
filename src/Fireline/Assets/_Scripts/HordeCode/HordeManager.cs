@@ -17,6 +17,10 @@ namespace Game.Runtime
         [Tooltip("Enemies stop pushing forward once this close to their target.")]
         [SerializeField, Min(0f)] private float stopDistance = 0.6f;
 
+        [Header("Pathfinding")]
+        [Tooltip("Routes enemies around obstacles. Leave empty to use the HordeNavGrid in the scene, if any. With none, enemies walk straight at players.")]
+        [SerializeField] private HordeNavGrid navGrid;
+
         [Header("Separation (crowd spacing)")]
         [Tooltip("Enemies closer than this push each other apart. Roughly one enemy width.")]
         [SerializeField, Min(0.01f)] private float separationRadius = 0.8f;
@@ -62,6 +66,11 @@ namespace Game.Runtime
             Instance = this;
             // Cell size = separation radius, so a 3x3 query always covers the full radius.
             _hash = new SpatialHash(separationRadius);
+        }
+
+        private void Start()
+        {
+            if (navGrid == null) navGrid = HordeNavGrid.Instance;
         }
 
         private void OnDestroy()
@@ -131,6 +140,7 @@ namespace Game.Runtime
                 _refreshTimer = playerRefreshInterval;
             }
             SnapshotPlayerPositions();
+            FlowField field = navGrid != null ? navGrid.Tick(_playerPositions, Time.deltaTime) : null;
 
             int count = _enemies.Count;
             if (count == 0)
@@ -160,10 +170,7 @@ namespace Game.Runtime
                 PlaneVector pos = _positions[i];
                 if (enemy.IsFlashing) enemy.UpdateFlash(now);
 
-                PlaneVector seek = PlaneVector.Zero;
-                int target = HordeSteering.FindNearest(pos, _playerPositions);
-                if (target >= 0)
-                    seek = HordeSteering.Seek(pos, _playerPositions[target], stopDistance);
+                PlaneVector seek = ChooseDirection(pos, field);
 
                 _hash.QueryNeighbors(pos, _neighborBuffer);
                 PlaneVector push = HordeSteering.Separation(i, _positions, _neighborBuffer, separationRadius, maxNeighbors);
@@ -173,6 +180,7 @@ namespace Game.Runtime
                                        + push * separationStrength
                                        + new PlaneVector(knockback.x, knockback.y);
                 PlaneVector newPos = pos + velocity * dt;
+                if (field != null) newPos = field.Slide(pos, newPos); // slide along walls instead of walking through them
 
                 if (knockback != Vector2.zero)
                 {
@@ -191,6 +199,29 @@ namespace Game.Runtime
 
             _stopwatch.Stop();
             LastUpdateMs = (float)_stopwatch.Elapsed.TotalMilliseconds;
+        }
+
+        // Which way an enemy wants to walk (unit length, or zero when close enough to its target).
+        private PlaneVector ChooseDirection(PlaneVector pos, FlowField field)
+        {
+            if (_playerPositions.Count == 0) return PlaneVector.Zero;
+
+            if (field != null)
+            {
+                switch (field.Sample(pos, out PlaneVector direction, out int target))
+                {
+                    case FlowSample.Direct: // a player is in plain view: walk straight at their live position
+                        if (target >= 0 && target < _playerPositions.Count)
+                            return HordeSteering.Seek(pos, _playerPositions[target], stopDistance);
+                        break;
+                    case FlowSample.Follow: // walls in the way: follow the field around them
+                        return direction;
+                }
+            }
+
+            // No grid, outside it, or walled off from everyone: straight at the nearest player, as before.
+            int nearest = HordeSteering.FindNearest(pos, _playerPositions);
+            return nearest >= 0 ? HordeSteering.Seek(pos, _playerPositions[nearest], stopDistance) : PlaneVector.Zero;
         }
 
 #if UNITY_EDITOR

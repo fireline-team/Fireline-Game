@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 214903788933792270}
   - component: {fileID: 54014289339304533}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: fireline_playerhand_v1 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,8 +26,8 @@ Transform:
   m_GameObject: {fileID: 500129299363126778}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00000004470348, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.41, y: 0.55, z: 0.010000001}
-  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
+  m_LocalPosition: {x: -0.41, y: 0.49, z: 0.010000001}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3370365459608866585}
@@ -116,7 +116,7 @@ GameObject:
   - component: {fileID: 2627532492962399250}
   - component: {fileID: 2109946662711708551}
   - component: {fileID: 5913907959130893562}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -165,7 +165,7 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
@@ -203,7 +203,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.008640707, y: 0.64044213}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -213,7 +213,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.5852455, y: 0.58730364}
   m_EdgeRadius: 0
 --- !u!114 &3919953474488637353
 MonoBehaviour:
@@ -258,6 +258,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   moveSpeed: 5
+  boundarySprite: {fileID: 1087674415940790308}
+  screenEdgePaddingPixels: 0
   aimPivot: {fileID: 374009599070947445}
   aimCamera: {fileID: 0}
   stickDeadzone: 0.2
@@ -333,15 +335,17 @@ MonoBehaviour:
   streamMaterial: {fileID: 2100000, guid: 1871f34c679df4e47bfdabfc3bff6a00, type: 2}
   streamSheetFrames: 3
   streamColor: {r: 1, g: 1, b: 1, a: 1}
-  particlesPerSecond: 60
-  particleLifetime: 0.3
-  particleSize: 0.6
+  particlesPerSecond: 120
+  particleLifetime: 0.5
+  particleSize: 2
   splashMaterial: {fileID: 2100000, guid: 72b825c0d422b9e4faba10536e481a44, type: 2}
   splashSheetFrames: 6
   splashChance: 0.3
   sortingLayerName: Default
   sortingOrder: 10
   flipParticleRotation: 0
+  useVfxGraph: 1
+  hoseVfx: {fileID: 0}
   damagePerSecond: 20
   knockbackStrength: 24
 --- !u!114 &1000283584469985828
@@ -379,6 +383,8 @@ MonoBehaviour:
   sortingLayerName: Default
   sortingOrder: 10
   flipParticleRotation: 0
+  useVfxGraph: 1
+  hoseVfx: {fileID: 0}
   damagePerSecond: 8
   slowMultiplier: 0.4
   slowDuration: 1
@@ -417,10 +423,12 @@ MonoBehaviour:
   sortingLayerName: Default
   sortingOrder: 10
   flipParticleRotation: 0
+  useVfxGraph: 1
+  hoseVfx: {fileID: 11400000, guid: 64cf24982d4cf3d44ab19afdde1896c4, type: 2}
   damagePerShot: 15
   fireInterval: 0.5
   knockbackImpulse: 6
-  particlesPerShot: 18
+  particlesPerShot: 34
 --- !u!114 &5178020514801643433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -462,7 +470,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::AxeSwing
   range: 2.5
   arcDegrees: 180
-  cooldown: 2
+  cooldown: 1
   swingDuration: 0.3
   swingCurve:
     serializedVersion: 2
@@ -554,7 +562,8 @@ GameObject:
   - component: {fileID: 1087674415940790308}
   - component: {fileID: 1017592944127437050}
   - component: {fileID: 4316567627025758878}
-  m_Layer: 0
+  - component: {fileID: 5353719856927833428}
+  m_Layer: 3
   m_Name: PlayerSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -571,7 +580,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.25881907, y: -0, z: -0, w: 0.9659259}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 214903788933792270}
@@ -626,7 +635,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 2353094741450111946, guid: 402e81363babf4b989fabcf1a18989d5, type: 3}
+  m_Sprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -647,7 +656,7 @@ Animator:
   m_GameObject: {fileID: 1376534921308105634}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 0e669740be2044bb89d29c4fab2e05bd, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -673,6 +682,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::StandUpright
   feetOnGround: 1
   groundOffset: {x: 0, y: 0}
+--- !u!114 &5353719856927833428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1376534921308105634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6deb52a4e1e1c4623aa88a3d0abc7f30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::DirectionalSprite
+  poses:
+  - {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: 400683508, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: 1843409636, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: 1116449520, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  - {fileID: -47004420, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  walkCycles:
+  - frames:
+    - {fileID: 1170566810, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+    - {fileID: 250123582, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+    - {fileID: -79407862, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+    - {fileID: 1748392498, guid: 51115bbe0f7c1477b91d19302ad32e2a, type: 3}
+  - frames:
+    - {fileID: 4639661181165961347, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+    - {fileID: 1711307624, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+    - {fileID: -406627954, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+    - {fileID: 1807774691, guid: e96c6fe85dd7b452096ee2fb8fb143f9, type: 3}
+  - frames:
+    - {fileID: 3222946465072736911, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+    - {fileID: 337899436, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+    - {fileID: -1490396729, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+    - {fileID: -97982183, guid: a0062f4860b4e4b76851df52f964011e, type: 3}
+  - frames:
+    - {fileID: -4446757073398820724, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+    - {fileID: 1674905503, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+    - {fileID: 1974879479, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+    - {fileID: 842366494, guid: 53784b5ab24444bc38d90f85070e581d, type: 3}
+  - frames:
+    - {fileID: 5085815471958757980, guid: 967a227f9481343398abe412c1050acb, type: 3}
+    - {fileID: -1848140212, guid: 967a227f9481343398abe412c1050acb, type: 3}
+    - {fileID: -2131358835, guid: 967a227f9481343398abe412c1050acb, type: 3}
+    - {fileID: 1248964893, guid: 967a227f9481343398abe412c1050acb, type: 3}
+  walkFps: 10
+  artFacesWest: 1
+  minMoveDistance: 0.001
+  startFacing: 6
 --- !u!1 &1500676528642636846
 GameObject:
   m_ObjectHideFlags: 0
@@ -683,7 +740,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6246584468556133135}
   - component: {fileID: 8958800423581826540}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: fireline_playerhand_v1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -775,7 +832,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3136190981266959438}
   - component: {fileID: 7636147255678379848}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Axe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -791,8 +848,8 @@ Transform:
   m_GameObject: {fileID: 1627681725173256821}
   serializedVersion: 2
   m_LocalRotation: {x: -0.25881904, y: -0, z: -0, w: 0.9659259}
-  m_LocalPosition: {x: 1.651, y: 0.7683, z: -0.26633978}
-  m_LocalScale: {x: 1.953, y: 1.4589999, z: 1}
+  m_LocalPosition: {x: 1.17, y: 1.19, z: -0.26633978}
+  m_LocalScale: {x: -4.233909, y: 3.162966, z: 2.1679}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5933821776725555064}
@@ -846,7 +903,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: ea7e577935ec9499f8806f49334b4dc6, type: 3}
+  m_Sprite: {fileID: -736623611338251631, guid: 9db82bf192cb1415388b2f04fda7ae70, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -866,7 +923,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5370900210424625486}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: InteractionPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -898,7 +955,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4377830768944491630}
   - component: {fileID: 5221166294906486497}
-  m_Layer: 0
+  - component: {fileID: 810000009}
+  m_Layer: 3
   m_Name: Hose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -913,9 +971,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4640601042794098842}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.723, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.25881907, y: -0, z: -0, w: 0.9659259}
+  m_LocalPosition: {x: 0.719, y: 0.102, z: 0}
+  m_LocalScale: {x: -1.3425691, y: 1.0898, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 374009599070947445}
@@ -969,7 +1027,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -6637883357958872357, guid: ed01ec398e0a341b9b2e1109caa5ecc2, type: 3}
+  m_Sprite: {fileID: 3465408108381529275, guid: 85b10a46724b44fc7ab5ada75b2cc628, type: 3}
   m_Color: {r: 1, g: 0.9320068, b: 0.06132078, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -980,6 +1038,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 1
   m_BlendShapeWeights: []
+--- !u!114 &810000009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4640601042794098842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21886c607fe843e599c69381c28de722, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::AimedBillboard
+  aimPivot: {fileID: 374009599070947445}
 --- !u!1 &6388043016819899405
 GameObject:
   m_ObjectHideFlags: 0
@@ -990,7 +1061,7 @@ GameObject:
   m_Component:
   - component: {fileID: 374009599070947445}
   - component: {fileID: 1133547690721760708}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AimPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

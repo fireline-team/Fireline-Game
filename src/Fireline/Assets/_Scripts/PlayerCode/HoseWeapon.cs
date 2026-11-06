@@ -45,14 +45,25 @@ public abstract class HoseWeapon : MonoBehaviour
     [Tooltip("Tick this if the water blobs tilt the wrong way when aiming diagonally.")]
     [SerializeField] private bool flipParticleRotation;
 
+    [Header("VFX Graph")]
+    [Tooltip("Use the shared hose graphs when no custom Particle System prefab is assigned.")]
+    [SerializeField] private bool useVfxGraph = true;
+    [Tooltip("Optional override. Otherwise loads Resources/HoseVfx/HoseVfxLibrary.")]
+    [SerializeField] private HoseVfxLibrary hoseVfx;
+
     private readonly List<Collider2D> _colliderHits = new List<Collider2D>(64);
     private readonly HashSet<HordeEnemy> _seen = new HashSet<HordeEnemy>();
     private readonly List<HordeEnemy> _enemyHits = new List<HordeEnemy>(64);
     private readonly HashSet<FireZone> _seenFires = new HashSet<FireZone>();
     private readonly List<FireZone> _fireHits = new List<FireZone>(8);
+    private readonly List<Vector2> _fireContactPoints = new List<Vector2>(8);
     private bool _scannedThisStep;
     private HoseStreamVisual _stream;
+    private HoseGraphVisual _graph;
     private PlayerHealth _health;
+    private RaycastHit2D _wall;
+    private float _enemyImpactDistance;
+    private Vector2 _enemyImpactPoint;
 
     /// <summary>The held nozzle transform, used by the supply hose attachment.</summary>
     public Transform NozzleTransform => muzzle != null ? muzzle : transform;
@@ -62,7 +73,7 @@ public abstract class HoseWeapon : MonoBehaviour
     public float CurrentRange { get; private set; }
     public float Width => width;
     /// <summary>True while the continuous water visual is running (pulses don't count).</summary>
-    public bool IsStreamActive => _stream != null && _stream.IsEmitting;
+    public bool IsStreamActive => _graph != null ? _graph.IsEmitting : _stream != null && _stream.IsEmitting;
     protected float ExtinguishPerSecond => extinguishPerSecond;
 
     /// <summary>Normalized aim direction from the current Spray call.</summary>
@@ -83,6 +94,20 @@ public abstract class HoseWeapon : MonoBehaviour
         _health = GetComponent<PlayerHealth>();
         if (blockingLayers == 0)
             blockingLayers = LayerMask.GetMask(Structure.ObstacleLayer);
+
+        if (useVfxGraph && streamPrefab == null && SystemInfo.supportsComputeShaders)
+        {
+            HoseVfxLibrary library = hoseVfx != null ? hoseVfx : Resources.Load<HoseVfxLibrary>(HoseVfxLibrary.ResourcePath);
+            if (library != null && library.IsComplete)
+            {
+                var holder = new GameObject("Hose VFX Graph");
+                holder.transform.SetParent(transform, false);
+                _graph = holder.AddComponent<HoseGraphVisual>();
+                NozzleType mode = this is MistHose ? NozzleType.Mist : this is JetHose ? NozzleType.Jet : NozzleType.Standard;
+                _graph.Initialize(library, mode, sortingLayerName, sortingOrder);
+                return;
+            }
+        }
 
         _stream = new HoseStreamVisual(transform, streamPrefab, new HoseStreamVisual.Look
         {
@@ -117,23 +142,37 @@ public abstract class HoseWeapon : MonoBehaviour
 
         // Walls block water: cut the stream short at the first obstacle along its center line.
         CurrentRange = range;
+        _wall = default;
         if (blockingLayers != 0)
         {
-            RaycastHit2D wall = Physics2D.Raycast(Origin, AimDirection, range, blockingLayers);
-            if (wall.collider != null) CurrentRange = wall.distance;
+            _wall = Physics2D.Raycast(Origin, AimDirection, range, blockingLayers);
+            if (_wall.collider != null) CurrentRange = _wall.distance;
         }
         End = Origin + AimDirection * CurrentRange;
         _scannedThisStep = false;
 
         OnSpray(deltaTime);
-        _stream.SetSpraying(ShowsContinuousStream(), MuzzlePosition, AimDirection,
-            VisualRange, width, particleLifetime, particlesPerSecond, particleSize);
+        if (_graph != null)
+        {
+            _graph.SetSpraying(ShowsContinuousStream(), MuzzlePosition, AimDirection,
+                CurrentRange, width, particleLifetime, particlesPerSecond, particleSize,
+                Mathf.Max(0f, Vector3.Dot(MuzzlePosition - new Vector3(Origin.x, Origin.y, transform.position.z), TiltedView.Up)));
+            if (ShowsContinuousStream() && !(this is MistHose))
+            {
+                bool hit = TryGetVisualImpact(out Vector3 point, out Vector3 normal);
+                _graph.ShowContinuousImpact(hit, point, normal);
+            }
+        }
+        else
+            _stream.SetSpraying(ShowsContinuousStream(), MuzzlePosition, AimDirection,
+                VisualRange, width, particleLifetime, particlesPerSecond, particleSize);
     }
 
     /// <summary>Call when the spray button is released.</summary>
     public void StopSpraying()
     {
         if (_stream != null) _stream.Stop();
+        if (_graph != null) _graph.Stop();
         OnStopSpraying();
     }
 
@@ -160,8 +199,36 @@ public abstract class HoseWeapon : MonoBehaviour
     /// <summary>Fires one burst of water along the current aim. Call from OnSpray.</summary>
     protected void PulseStream(int particleCount)
     {
-        _stream.Pulse(MuzzlePosition, AimDirection,
-            VisualRange, width, particleLifetime, particleSize, particleCount);
+        if (_graph != null)
+        {
+            bool hit = TryGetVisualImpact(out Vector3 point, out Vector3 normal);
+            _graph.Pulse(MuzzlePosition, AimDirection, CurrentRange, width,
+                particleLifetime, particleSize, particleCount, hit, point, normal);
+        }
+        else
+            _stream.Pulse(MuzzlePosition, AimDirection,
+                VisualRange, width, particleLifetime, particleSize, particleCount);
+    }
+
+    // Reuse the gameplay query; GPU particles never decide damage or extinguishing.
+    private bool TryGetVisualImpact(out Vector3 point, out Vector3 normal)
+    {
+        ScanHitbox();
+        bool found = _wall.collider != null;
+        float nearest = CurrentRange;
+        Vector2 groundPoint = End;
+        normal = found ? (Vector3)_wall.normal : -(Vector3)AimDirection;
+        if (_enemyImpactDistance < nearest)
+        {
+            nearest = _enemyImpactDistance;
+            groundPoint = _enemyImpactPoint;
+            normal = -(Vector3)AimDirection;
+            found = true;
+        }
+        if (found && nearest == CurrentRange) groundPoint = _wall.point;
+        Vector3 visualLift = MuzzlePosition - new Vector3(Origin.x, Origin.y, transform.position.z);
+        point = new Vector3(groundPoint.x, groundPoint.y, transform.position.z) + visualLift;
+        return found;
     }
 
     /// <summary>Lets a nozzle pick its own default hitbox size when it's added in the Inspector.</summary>
@@ -196,7 +263,15 @@ public abstract class HoseWeapon : MonoBehaviour
     {
         List<FireZone> fires = FindFiresInHitbox();
         for (int i = 0; i < fires.Count; i++)
+        {
+            if (_graph != null && fires[i].IsBurning && amount > 0f)
+            {
+                Vector2 contact = _fireContactPoints[i];
+                _graph.WaterFire(fires[i],
+                    new Vector3(contact.x, contact.y, fires[i].transform.position.z) + TiltedView.Up * 0.15f, amount);
+            }
             fires[i].ApplyWater(amount);
+        }
         // Downed bodies leave physics simulation; query their registered ground positions directly.
         if (_health == null || CurrentRange <= 0.01f) return;
         Vector2 across = new Vector2(-AimDirection.y, AimDirection.x);
@@ -223,7 +298,10 @@ public abstract class HoseWeapon : MonoBehaviour
         _enemyHits.Clear();
         _seen.Clear();
         _fireHits.Clear();
+        _fireContactPoints.Clear();
+        _colliderHits.Clear();
         _seenFires.Clear();
+        _enemyImpactDistance = float.PositiveInfinity;
 
         // Horde movement writes Transforms directly, so queries need current physics poses.
         Physics2D.SyncTransforms();
@@ -240,12 +318,28 @@ public abstract class HoseWeapon : MonoBehaviour
             if (hit == null) continue;
 
             HordeEnemy enemy = hit.GetComponentInParent<HordeEnemy>();
-            if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHealth > 0f && _seen.Add(enemy))
-                _enemyHits.Add(enemy);
+            if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHealth > 0f)
+            {
+                if (_seen.Add(enemy)) _enemyHits.Add(enemy);
+                if (_graph != null)
+                {
+                    Vector2 point = hit.ClosestPoint(Origin);
+                    float distance = Vector2.Dot(point - Origin, AimDirection);
+                    if (distance >= 0f && distance < _enemyImpactDistance)
+                    {
+                        _enemyImpactDistance = distance;
+                        _enemyImpactPoint = point;
+                    }
+                }
+            }
 
             FireZone fire = hit.GetComponentInParent<FireZone>();
             if (fire != null && fire.isActiveAndEnabled && fire.IsBurning && _seenFires.Add(fire))
+            {
                 _fireHits.Add(fire);
+                float along = Mathf.Clamp(Vector2.Dot((Vector2)fire.transform.position - Origin, AimDirection), 0f, CurrentRange);
+                _fireContactPoints.Add(hit.ClosestPoint(Origin + AimDirection * along));
+            }
         }
     }
 

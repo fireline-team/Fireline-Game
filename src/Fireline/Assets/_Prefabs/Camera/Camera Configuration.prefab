@@ -77,8 +77,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5eb80d8e62d9d145bb50fb783c0f731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineTargetGroup
-  PositionMode: 0
-  RotationMode: 0
+  PositionMode: 1
+  RotationMode: 1
   UpdateMethod: 2
   Targets: []
   m_LegacyTargets: []
@@ -147,7 +147,7 @@ MonoBehaviour:
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
-    ModeOverride: 1
+    ModeOverride: 2
     PhysicalProperties:
       GateFit: 2
       SensorSize: {x: 21.946, y: 16.002}
@@ -193,14 +193,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineGroupFraming
   FramingMode: 2
-  FramingSize: 0.5
+  FramingSize: 0.75
   CenterOffset: {x: 0, y: 0}
   Damping: 0.9
-  SizeAdjustment: 2
+  SizeAdjustment: 0
   LateralAdjustment: 0
-  FovRange: {x: 1, y: 100}
-  DollyRange: {x: -100, y: 100}
-  OrthoSizeRange: {x: 6, y: 30}
+  FovRange: {x: 60, y: 78}
+  DollyRange: {x: 0, y: 0}
+  OrthoSizeRange: {x: 6, y: 10}
 --- !u!114 &593135103658467004
 MonoBehaviour:
   m_ObjectHideFlags: 0

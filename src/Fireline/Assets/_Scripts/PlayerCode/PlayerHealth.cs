@@ -1,4 +1,4 @@
-using System;
+ using System;
 using System.Collections.Generic;
 using Fireline.Shared.Infrastructure;
 using Game.Runtime;
@@ -27,7 +27,7 @@ public class PlayerHealth : MonoBehaviour
     {
         get
         {
-            if (!IsDowned) return false;
+            if (Fireline.Missions.GameManager.Instance != null || !IsDowned) return false;
             foreach (var player in players)
                 if (player != null && player.gameObject.scene == gameObject.scene && !player.IsDowned) return false;
             return true;
@@ -190,7 +190,7 @@ public class PlayerHealth : MonoBehaviour
 #endif
         SceneManager.LoadScene(scene.path);
     }
-
+    /* 
     private void OnGUI()
     {
         int index = Mathf.Max(0, input.playerIndex);
@@ -212,4 +212,5 @@ public class PlayerHealth : MonoBehaviour
         }
         GUILayout.EndArea();
     }
+    */
 }

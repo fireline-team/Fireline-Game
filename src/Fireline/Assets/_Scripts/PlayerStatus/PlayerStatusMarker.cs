@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>Screen-space presentation and priority arbitration, independent of status producers.</summary>
+[DefaultExecutionOrder(11000)]
 [DisallowMultipleComponent]
 public class PlayerStatusMarker : MonoBehaviour
 {
@@ -21,6 +22,9 @@ public class PlayerStatusMarker : MonoBehaviour
     private readonly List<Entry> entries = new List<Entry>();
     private long nextOrder;
     private PlayerInput input;
+    private PlayerHealth health;
+    private PlayerRescueArrow rescueArrow;
+    public bool IsRescueArrowVisible => rescueArrow != null && rescueArrow.gameObject.activeInHierarchy;
     private Canvas canvas;
     private RectTransform badge;
     private Text text;
@@ -76,6 +80,7 @@ public class PlayerStatusMarker : MonoBehaviour
     private void Awake()
     {
         input = GetComponent<PlayerInput>();
+        health = GetComponent<PlayerHealth>();
         var root = new GameObject("Player overhead UI", typeof(RectTransform), typeof(Canvas), typeof(CanvasGroup));
         SceneManager.MoveGameObjectToScene(root, gameObject.scene);
         canvas = root.GetComponent<Canvas>();
@@ -84,6 +89,10 @@ public class PlayerStatusMarker : MonoBehaviour
         var group = root.GetComponent<CanvasGroup>();
         group.interactable = false;
         group.blocksRaycasts = false;
+        rescueArrow = Rect("Downed teammate direction", root.transform).gameObject.AddComponent<PlayerRescueArrow>();
+        rescueArrow.rectTransform.anchorMin = rescueArrow.rectTransform.anchorMax = Vector2.zero;
+        rescueArrow.rectTransform.sizeDelta = new Vector2(68, 56);
+        rescueArrow.gameObject.SetActive(false);
         badge = Rect("Status badge", root.transform);
         badge.anchorMin = badge.anchorMax = Vector2.zero;
         background = badge.gameObject.AddComponent<Image>();
@@ -123,7 +132,8 @@ public class PlayerStatusMarker : MonoBehaviour
     {
         ResolveStatus();
         var camera = input != null && input.camera != null ? input.camera : Camera.main;
-        if (camera == null) { badge.gameObject.SetActive(false); return; }
+        if (camera == null) { badge.gameObject.SetActive(false); rescueArrow.gameObject.SetActive(false); return; }
+        UpdateRescueArrow(camera);
         var point = camera.WorldToScreenPoint((anchor != null ? anchor.position : transform.position)
             + camera.transform.up * heightAbovePlayer);
         bool visible = point.z > 0f && camera.pixelRect.Contains(new Vector2(point.x, point.y));
@@ -160,6 +170,16 @@ public class PlayerStatusMarker : MonoBehaviour
         progressText.rectTransform.sizeDelta = new Vector2(meterWidth, 18);
         progressText.rectTransform.anchoredPosition = new Vector2(0, 3);
         progressText.text = CurrentStatus != null ? $"{CurrentStatus.progressLabel} {Mathf.RoundToInt(CurrentProgress * 100f)}%" : "";
+    }
+
+    private void UpdateRescueArrow(Camera camera)
+    {
+        rescueArrow.PointTo(camera, transform.position, health != null && health.IsDowned);
+        if (!rescueArrow.gameObject.activeSelf) return;
+        var rules = HoseWaterRules.ForPlayer(gameObject);
+        int index = input != null ? input.playerIndex : 0;
+        rescueArrow.color = useHosePlayerColors
+            ? (rules != null ? rules.GetHoseColor(index) : PlayerHoseConnection.ColorForPlayer(index)) : identityColor;
     }
 
     private void OnEnable() { if (canvas != null) canvas.gameObject.SetActive(true); }

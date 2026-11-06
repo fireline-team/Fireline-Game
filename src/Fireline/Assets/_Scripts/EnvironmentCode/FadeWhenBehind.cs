@@ -8,6 +8,9 @@ using UnityEngine;
 ///
 /// "Behind" means further up the screen than this object's position (the structure's front
 /// edge). "Hidden" means the player's body is inside the structure's area on screen.
+///
+/// On a Structure using depth, the faces are switched to their normal sprite material while
+/// faded (a depth material can't be see-through) and back once fully solid again.
 /// </summary>
 [DisallowMultipleComponent]
 public class FadeWhenBehind : MonoBehaviour
@@ -25,12 +28,14 @@ public class FadeWhenBehind : MonoBehaviour
     private static float _nextPlayerRefresh;
 
     private SpriteRenderer[] _renderers;
+    private Structure _structure;
     private float[] _baseAlphas;
     private float _fade = 1f;
 
     private void Awake()
     {
         _renderers = GetComponentsInChildren<SpriteRenderer>(true);
+        _structure = GetComponent<Structure>();
         _baseAlphas = new float[_renderers.Length];
         for (int i = 0; i < _renderers.Length; i++)
             _baseAlphas[i] = _renderers[i].color.a;
@@ -99,6 +104,8 @@ public class FadeWhenBehind : MonoBehaviour
     private void SetFade(float fade)
     {
         _fade = fade;
+        // Swap materials before changing alpha, so the first faded frame is already see-through.
+        if (_structure != null) _structure.SetSeeThrough(fade < 0.999f);
         if (_renderers == null) return;
         for (int i = 0; i < _renderers.Length; i++)
         {

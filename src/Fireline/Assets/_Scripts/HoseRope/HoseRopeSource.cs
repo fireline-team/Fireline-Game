@@ -6,9 +6,8 @@ using UnityEngine;
 public class HoseRopeSource : Interactable
 {
     [SerializeField] private Transform sourcePoint;
-    [SerializeField] private Transform groundPlane;
     [Tooltip("Local up axis of the ground plane. XY ground uses (0,0,-1).")]
-    [SerializeField] private Vector3 groundNormal = Vector3.back;
+    public static readonly Vector3 GroundNormal = Vector3.back;
     [SerializeField] private HoseRope ropePrefab;
 
     private static readonly List<HoseRopeSource> Sources = new List<HoseRopeSource>();
@@ -73,8 +72,7 @@ public class HoseRopeSource : Interactable
     {
         var rope = Instantiate(ropePrefab, player.transform);
         rope.name = "Supply hose";
-        var plane = groundPlane != null ? groundPlane : transform;
-        rope.Bind(sourcePoint, nozzle, plane.position, plane.TransformDirection(groundNormal));
+        rope.Bind(sourcePoint, nozzle, sourcePoint.position, GroundNormal);
         connections.Add(player);
         return rope;
     }

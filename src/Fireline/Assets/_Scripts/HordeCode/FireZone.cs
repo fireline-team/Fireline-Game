@@ -18,8 +18,8 @@ namespace Game.Runtime
 
         private HealthPool strength;
         private Vector3 fullVisualScale;
-        private ParticleSystem[] flames;
-        private float[] fullEmissionRates;
+        private Material fireMaterial;
+        private float InitalFlameHeight;
 
         public bool IsBurning => strength != null && !strength.IsDead;
         public float RemainingStrength => strength != null ? strength.Current : 0f;
@@ -32,16 +32,22 @@ namespace Game.Runtime
         private void Awake()
         {
             GetComponent<BoxCollider2D>().isTrigger = true;
+            
             strength = new HealthPool(extinguishResistance);
             if (!startsBurning) strength.TakeDamage(extinguishResistance);
             if (fireVisual != null)
             {
                 fullVisualScale = fireVisual.localScale;
-                flames = fireVisual.GetComponentsInChildren<ParticleSystem>(true);
-                fullEmissionRates = new float[flames.Length];
-                for (int i = 0; i < flames.Length; i++)
-                    fullEmissionRates[i] = flames[i].emission.rateOverTimeMultiplier;
+                var renderer = fireVisual.GetComponent<MeshRenderer>();
+                if (renderer != null && renderer.sharedMaterial != null
+                    && renderer.sharedMaterial.HasProperty("_FlameLength"))
+                {
+                    fireMaterial = renderer.material;
+                    InitalFlameHeight = fireMaterial.GetFloat("_FlameLength");
+                }
             }
+            if (extinguishSteam != null && fireVisual != null && extinguishSteam.transform.IsChildOf(fireVisual))
+                extinguishSteam.transform.SetParent(transform, true);
             if (extinguishSteam != null)
                 extinguishSteam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             UpdateVisuals();
@@ -71,12 +77,19 @@ namespace Game.Runtime
         {
             if (fireVisual == null) return;
             fireVisual.gameObject.SetActive(IsBurning);
-            fireVisual.localScale = fullVisualScale * Mathf.Lerp(0.2f, 1f, Intensity);
-            for (int i = 0; i < flames.Length; i++)
-            {
-                var emission = flames[i].emission;
-                emission.rateOverTimeMultiplier = fullEmissionRates[i] * Intensity;
-            }
+            if (fireMaterial != null) SetProceduralFlameHeight();
+            else fireVisual.localScale = fullVisualScale * Mathf.Lerp(0.2f, 1f, Intensity);
+        }
+
+        private void OnDestroy()
+        {
+            if (fireMaterial != null) Destroy(fireMaterial);
+        }
+
+        private void SetProceduralFlameHeight()
+        {
+            //map the flame height to the strength of the fire
+            fireMaterial.SetFloat("_FlameLength", Mathf.Lerp(0f, InitalFlameHeight, strength.Current / strength.Maximum ));
         }
     }
 }

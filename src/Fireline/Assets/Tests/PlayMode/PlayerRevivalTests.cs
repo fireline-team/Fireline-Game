@@ -144,7 +144,10 @@ public class PlayerRevivalTests
         var health = target.GetComponent<PlayerHealth>();
         health.TakeDamage(10000);
         var position = target.transform.position;
-        InputSystem.QueueStateEvent(pad,new GamepadState { leftStick=Vector2.right, rightStick=Vector2.right, rightTrigger=1 }.WithButton(GamepadButton.South));
+        // Test restored movement toward the screen center: outward movement can
+        // legitimately be blocked by the shared camera boundary after revival.
+        Vector2 movement = Camera.main.WorldToViewportPoint(position).x > 0.5f ? Vector2.left : Vector2.right;
+        InputSystem.QueueStateEvent(pad,new GamepadState { leftStick=movement, rightStick=Vector2.right, rightTrigger=1 }.WithButton(GamepadButton.South));
         yield return null; yield return new WaitForFixedUpdate(); yield return null;
         Assert.That(target.transform.position, Is.EqualTo(position));
         Assert.That(target.GetComponent<HoseLoadout>().Current.IsStreamActive, Is.False);
@@ -153,7 +156,7 @@ public class PlayerRevivalTests
         Assert.That(health.ReviveProgress, Is.Zero);
         health.ApplyRevivalWater(helper.GetComponent<PlayerHealth>(),1000);
         yield return null; yield return new WaitForFixedUpdate(); yield return null;
-        Assert.That(target.GetComponent<Rigidbody2D>().linearVelocity.x, Is.GreaterThan(0));
+        Assert.That(Vector2.Dot(target.GetComponent<Rigidbody2D>().linearVelocity, movement), Is.GreaterThan(0));
         Assert.That(target.GetComponent<HoseLoadout>().Current.IsStreamActive, Is.True);
         Assert.That(target.GetComponent<AxeSwing>().TrySwing(), Is.True);
     }
