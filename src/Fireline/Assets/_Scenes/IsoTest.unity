@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 0
 --- !u!1001 &131258220
 PrefabInstance:
@@ -470,6 +470,7 @@ MonoBehaviour:
   playerTag: Player
   playerRefreshInterval: 0.5
   stopDistance: 0.6
+  navGrid: {fileID: 0}
   separationRadius: 0.6
   separationStrength: 3
   maxNeighbors: 8
@@ -871,7 +872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 1
 --- !u!212 &1030778144
 SpriteRenderer:
@@ -2850,7 +2851,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 0
-  orthographic size: 6
+  orthographic size: 7.17
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2987,7 +2988,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05750d138b6f344c997d62e6eff2b57b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::NozzleStation
-  interactRadius: 1.25
+  hitRadius: 0.3
   nozzle: 2
 --- !u!212 &1831628986
 SpriteRenderer:
@@ -3326,8 +3327,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::Structure
   footprint: {x: 1, y: 1}
+  height: 0
   front: {fileID: 1863134604}
   top: {fileID: 1984391604}
+  spriteFit: 1
+  leftSide: {fileID: 0}
+  rightSide: {fileID: 0}
+  hideSideFacingAway: 1
+  useDepth: 1
+  depthMaterial: {fileID: 2100000, guid: 42018bd762e4248cfa846f677810dbe3, type: 2}
+  spriteMaterial: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
 --- !u!210 &2068065816
 SortingGroup:
   m_ObjectHideFlags: 0

@@ -1881,7 +1881,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 2100000, guid: 42018bd762e4248cfa846f677810dbe3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2204,7 +2204,7 @@ PrefabInstance:
     - target: {fileID: 1070638113013307975, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 1956673368466636648, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Name
       value: Building (5)
@@ -2232,7 +2232,7 @@ PrefabInstance:
     - target: {fileID: 3623796942473255593, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Size.x
       value: 2.36
@@ -2244,7 +2244,7 @@ PrefabInstance:
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 4400138067852630974, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.y
       value: 4.981851
@@ -2304,7 +2304,7 @@ PrefabInstance:
     - target: {fileID: 7506096706342490312, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 8598371421348140119, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.3400002
@@ -2675,6 +2675,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 376665639}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!114 &376665639
 MonoBehaviour:
@@ -3107,6 +3112,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 464347318}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &484846396
 PrefabInstance:
@@ -51408,6 +51418,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 530624054}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1 &532505315
 GameObject:
@@ -51641,7 +51656,7 @@ PrefabInstance:
     - target: {fileID: 1070638113013307975, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 1956673368466636648, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Name
       value: Building (2)
@@ -51669,7 +51684,7 @@ PrefabInstance:
     - target: {fileID: 3623796942473255593, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Size.x
       value: 17.9
@@ -51681,7 +51696,7 @@ PrefabInstance:
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 4400138067852630974, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.y
       value: 12.751851
@@ -51741,7 +51756,7 @@ PrefabInstance:
     - target: {fileID: 7506096706342490312, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 8598371421348140119, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.789999
@@ -52378,7 +52393,7 @@ PrefabInstance:
     - target: {fileID: 1070638113013307975, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 1956673368466636648, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Name
       value: Building (3)
@@ -52406,7 +52421,7 @@ PrefabInstance:
     - target: {fileID: 3623796942473255593, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Size.x
       value: 27.3
@@ -52418,7 +52433,7 @@ PrefabInstance:
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 4400138067852630974, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.y
       value: 17.45185
@@ -52478,7 +52493,7 @@ PrefabInstance:
     - target: {fileID: 7506096706342490312, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+      objectReference: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
     - target: {fileID: 8598371421348140119, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.790001
@@ -52934,7 +52949,7 @@ MonoBehaviour:
   rightSide: {fileID: 1364483130}
   hideSideFacingAway: 1
   useDepth: 1
-  depthMaterial: {fileID: 0}
+  depthMaterial: {fileID: 2100000, guid: 42018bd762e4248cfa846f677810dbe3, type: 2}
   spriteMaterial: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
 --- !u!210 &678995158
 SortingGroup:
@@ -53710,6 +53725,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 809686173}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &819351141
 PrefabInstance:
@@ -53877,6 +53897,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 839781884}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &847086037
 PrefabInstance:
@@ -54241,6 +54266,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 901500000}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &905660855
 PrefabInstance:
@@ -54944,7 +54974,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -55088,6 +55118,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1044609503}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1045244917
 PrefabInstance:
@@ -55357,7 +55392,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -55531,6 +55566,10 @@ PrefabInstance:
     - target: {fileID: 3623796942473255593, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_DrawMode
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3623796942473255593, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4161445541628738031, guid: 98093970b78d1426bb0f90bf678464ad, type: 3}
       propertyPath: m_Size.x
@@ -56455,6 +56494,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1310398051}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1350243981
 PrefabInstance:
@@ -56678,7 +56722,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 2100000, guid: 42018bd762e4248cfa846f677810dbe3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -56930,7 +56974,7 @@ MonoBehaviour:
   rightSide: {fileID: 1774031253}
   hideSideFacingAway: 1
   useDepth: 1
-  depthMaterial: {fileID: 0}
+  depthMaterial: {fileID: 2100000, guid: 42018bd762e4248cfa846f677810dbe3, type: 2}
   spriteMaterial: {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
 --- !u!210 &1406546554
 SortingGroup:
@@ -57227,6 +57271,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1449094043}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1464008565
 PrefabInstance:
@@ -57894,7 +57943,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 2100000, guid: 42018bd762e4248cfa846f677810dbe3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -58684,6 +58733,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1718377635}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1 &1721440122
 GameObject:
@@ -58775,7 +58829,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -59099,7 +59153,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 2100000, guid: 42018bd762e4248cfa846f677810dbe3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -59589,6 +59643,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::Fireline.Missions.MissionObjectiveSite
   steps:
   - {fileID: 1889504199}
+  civilianCount: 3
+  firstLossSeconds: 120
+  lossIntervalSeconds: 30
+  warningSeconds: 20
+  releaseIntervalSeconds: 1
   civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
 --- !u!1001 &1934808647
 PrefabInstance:
@@ -60089,7 +60148,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7cc6ebfb823d4b1eaca70dc99813e1fa, type: 2}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
