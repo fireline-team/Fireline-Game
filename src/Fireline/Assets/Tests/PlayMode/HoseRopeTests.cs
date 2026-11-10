@@ -271,6 +271,35 @@ public class HoseRopeTests
         CheckClear(rope);
     }
 
+    [TestCase(0f)]
+    [TestCase(25f)]
+    public void EmbeddedNozzleFollowsPlayerSlidingCloseToLongWall(float rotation)
+    {
+        var wall = Building(new Vector2(104, 100), new Vector2(2, 80), rotation);
+        Vector3 At(float x, float y, float z)
+        {
+            Vector3 position = wall.transform.TransformPoint(new Vector3(x, y, 0));
+            position.z = z;
+            return position;
+        }
+        var source = Make("Source", At(-5, -20, -0.2f)).transform;
+        var player = Make("Player", At(-1.04f, -20, 0)).transform;
+        var tip = Make("Tip", At(-0.4f, -20, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, tip, Vector3.zero, Vector3.back, player);
+        for (int i = 0; i < 200; i++)
+        {
+            float y = -20 + i * 0.2f;
+            player.position = At(-1.04f, y, 0); // Body is clear, but closer than the hose radius.
+            tip.position = At(-0.4f, y, -0.6f);
+            rope.Simulate(0.02f);
+            Vector3 local = wall.transform.InverseTransformPoint(rope.NozzlePosition);
+            Assert.That(local.y, Is.EqualTo(y).Within(0.01f), "Visual endpoint stayed at an old wall contact");
+            Assert.That(local.x, Is.LessThan(-1f - rope.Radius));
+            CheckClear(rope);
+        }
+    }
+
     private static void CheckGrounded(HoseRope rope, Vector3 origin, Vector3 up)
     {
         for (int i = 1; i < rope.PointCount - 1; i++)

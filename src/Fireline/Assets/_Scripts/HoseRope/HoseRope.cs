@@ -219,7 +219,7 @@ public class HoseRope : MonoBehaviour
             (nozzleOwner != null && obstacleRoute.Blocker(anchor, resolvedNozzle) != null);
         if (needsClamp)
         {
-            if (obstacleRoute.Contains(anchor))
+            if (obstacleRoute.Contains(anchor) && !obstacleRoute.TryClearAnchor(anchor, out anchor))
                 anchor = hasClearNozzle && !obstacleRoute.Contains(lastClearNozzle) ? lastClearNozzle : source.position;
             if (!obstacleRoute.Contains(anchor))
                 resolvedNozzle = obstacleRoute.ClampEndpoint(anchor, resolvedNozzle);

@@ -95,7 +95,9 @@ public class PlayerHoseConnection : MonoBehaviour
         var nozzle = CurrentNozzle();
         if (nozzle == null) return;
         Rope.GetTether(out Vector3 pivot, out float usedLength);
-        Vector3 offset = Rope.NozzlePosition - pivot;
+        // A retracted visual tip must never grant extra movement. Enforce the hose
+        // budget against the real held nozzle, which always moves with the player.
+        Vector3 offset = nozzle.NozzleTransform.position - pivot;
         float remainingLength = Mathf.Max(0f, rules.HoseLength - usedLength);
         // Gameplay moves in XY. Nozzle height uses part of the total hose length.
         float reach = Mathf.Sqrt(Mathf.Max(0f, remainingLength * remainingLength - offset.z * offset.z));
