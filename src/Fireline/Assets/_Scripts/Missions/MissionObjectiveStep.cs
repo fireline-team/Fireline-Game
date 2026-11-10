@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Fireline.Missions
 {
-    /// <summary>One ordered objective step. Future debris steps implement this same contract.</summary>
     public abstract class MissionObjectiveStep : MonoBehaviour
     {
         public bool IsRunning { get; private set; }
@@ -25,6 +24,8 @@ namespace Fireline.Missions
             IsRunning = false;
             IsComplete = false;
         }
+        
+        public virtual void SetAvailable(bool available) => ResetStep();
 
         protected void CompleteStep()
         {

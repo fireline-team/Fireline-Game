@@ -141,9 +141,7 @@ namespace Fireline.Missions
             ClearCivilians();
             foreach (var step in steps)
             {
-                if (step == null) continue;
-                step.ResetStep();
-                if (step is FireObjectiveStep fire) fire.SetAvailable(false);
+                if (step != null) step.SetAvailable(false);
             }
         }
     }
