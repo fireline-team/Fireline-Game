@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// A chain of Verlet particles with maximum-distance constraints. The simulation is
-/// three-dimensional; GroundUp selects the ground plane independently of the camera.
+/// A chain of Verlet particles constrained to the ground plane, with attached endpoints.
+/// GroundUp selects the plane independently of the camera; only the end spans rise to the fittings.
 /// </summary>
 [RequireComponent(typeof(LineRenderer))]
 [DefaultExecutionOrder(200)]
@@ -12,7 +12,6 @@ public class HoseRope : MonoBehaviour
     [SerializeField, Min(0.1f)] private float minimumLength = 12f;
     [SerializeField, Min(0.1f)] private float payoutSlack = 2f;
     [SerializeField, Min(0.01f)] private float radius = 0.06f;
-    [SerializeField, Min(0f)] private float gravity = 9.81f;
     [SerializeField, Min(0f)] private float airDrag = 1.5f;
     [SerializeField, Min(0f)] private float groundFriction = 12f;
     [SerializeField, Range(1, 8)] private int substeps = 3;
@@ -145,7 +144,7 @@ public class HoseRope : MonoBehaviour
             for (int i = 1; i < segments; i++)
             {
                 Vector3 current = points[i];
-                points[i] += (points[i] - previous[i]) * drag - groundUp * (gravity * dt * dt);
+                points[i] += Vector3.ProjectOnPlane(points[i] - previous[i], groundUp) * drag;
                 previous[i] = current;
             }
             for (int iteration = 0; iteration < constraintIterations; iteration++)
@@ -171,11 +170,11 @@ public class HoseRope : MonoBehaviour
             }
             for (int i = 1; i < segments; i++)
             {
-                if (Vector3.Dot(points[i] - groundOrigin, groundUp) > radius + 0.001f) continue;
                 Vector3 velocity = points[i] - previous[i];
                 Vector3 tangent = Vector3.ProjectOnPlane(velocity, groundUp) * Mathf.Exp(-groundFriction * dt);
-                float outward = Mathf.Max(0f, Vector3.Dot(velocity, groundUp));
-                previous[i] = points[i] - tangent - groundUp * outward;
+                // Discard normal velocity as well as position: releasing a corner must not
+                // carry an old airborne Verlet impulse into the next step.
+                previous[i] = points[i] - tangent;
             }
             PinEnds();
         }
@@ -244,6 +243,7 @@ public class HoseRope : MonoBehaviour
             for (int j = 0; j < subdivisions[span]; j++)
             {
                 points[index] = Vector3.Lerp(route[span], route[span + 1], (float)j / subdivisions[span]);
+                if (index > 0) ProjectToGround(index);
                 previous[index] = points[index];
                 index++;
             }
@@ -253,7 +253,7 @@ public class HoseRope : MonoBehaviour
     private void ProjectToGround(int i)
     {
         float height = Vector3.Dot(points[i] - groundOrigin, groundUp);
-        if (height < radius) points[i] += groundUp * (radius - height);
+        points[i] += groundUp * (radius - height);
     }
 
     private void PinEnds()
