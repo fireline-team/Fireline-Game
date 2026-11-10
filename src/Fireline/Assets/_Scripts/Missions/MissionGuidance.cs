@@ -17,6 +17,7 @@ namespace Fireline.Missions
         private PlayerRescueArrow evacuationArrow;
         private readonly List<CivilianEscort> civilians = new List<CivilianEscort>();
         private readonly List<PlayerRescueArrow> civilianArrows = new List<PlayerRescueArrow>();
+        private readonly List<ObjectiveMarker> targetMarkers = new List<ObjectiveMarker>();
         private void LateUpdate()
         {
             var camera = Camera.main;
@@ -117,15 +118,12 @@ namespace Fireline.Missions
                 if (step == null) continue;
                 DrawMarker(camera, site.transform.position, $"OBJECTIVE {i + 1}\n{site.CiviliansWaiting} trapped / {site.CiviliansLost} lost", site.CiviliansInDanger ? new Color(1, 0.45f, 0.25f) : Color.yellow,
                     i < objectiveArrows.Count ? objectiveArrows[i] : null);
-                if (step is FireObjectiveStep fireStep)
+                if (step is IObjectiveMarkerSource source)
                 {
-                    int number = 0;
-                    foreach (var fire in fireStep.Fires)
-                    {
-                        number++;
-                        if (fire != null && fire.IsBurning)
-                            DrawMarker(camera, fire.transform.position, $"FIRE {number}", new Color(1, 0.65f, 0.15f));
-                    }
+                    targetMarkers.Clear();
+                    source.CollectMarkers(targetMarkers);
+                    foreach (var target in targetMarkers)
+                        DrawMarker(camera, target.Position, target.Label, target.Color);
                 }
             }
             for (int i = 0; i < civilians.Count; i++)
