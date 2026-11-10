@@ -7,6 +7,7 @@ internal sealed class HoseObstacleRoute
 {
     public readonly List<Vector3> Points = new List<Vector3>();
     private readonly List<RaycastHit2D> hits = new List<RaycastHit2D>();
+    private readonly List<Collider2D> overlaps = new List<Collider2D>();
     private readonly List<Vector3> nodes = new List<Vector3>();
     private readonly HashSet<Collider2D> expanded = new HashSet<Collider2D>();
     private readonly List<Vector3> detour = new List<Vector3>();
@@ -19,13 +20,20 @@ internal sealed class HoseObstacleRoute
 
     public void Clear() => Points.Clear();
 
-    public void Update(Vector3 start, Vector3 end, float clearance, float z, Scene ownerScene)
+    public void Configure(float clearance, float z, Scene ownerScene)
     {
         scene = ownerScene;
         radius = clearance;
         groundZ = z;
         filter = new ContactFilter2D { useTriggers = false };
         filter.SetLayerMask(LayerMask.GetMask(Structure.ObstacleLayer));
+    }
+
+    public void Update(Vector3 start, Vector3 end, float clearance, float z, Scene ownerScene)
+    {
+        Configure(clearance, z, ownerScene);
+        // There is no path into a solid footprint. Do not expand a graph looking for one.
+        if (Contains(start) || Contains(end)) { Valid = false; Length = 0; return; }
         if (Points.Count < 2) { Points.Clear(); Points.Add(start); Points.Add(end); }
         Points[0] = start;
         Points[Points.Count - 1] = end;
@@ -42,6 +50,99 @@ internal sealed class HoseObstacleRoute
         }
         Length = 0;
         for (int i = 1; i < Points.Count; i++) Length += Vector3.Distance(Points[i - 1], Points[i]);
+    }
+
+    public bool Contains(Vector3 point)
+    {
+        int count = Physics2D.OverlapCircle(point, radius, filter, overlaps);
+        for (int i = 0; i < count; i++)
+            if (overlaps[i].gameObject.scene == scene) return true;
+        return false;
+    }
+
+    /// <summary>Find a clear anchor near the current player, including when their body
+    /// is closer to a wall than the hose radius. Never anchor a sliding player to an old frame.</summary>
+    public bool TryClearAnchor(Vector3 position, out Vector3 result)
+    {
+        result = position;
+        for (int iteration = 0; iteration < 8; iteration++)
+        {
+            int count = Physics2D.OverlapCircle(result, radius, filter, overlaps);
+            Collider2D obstacle = null;
+            for (int i = 0; i < count; i++)
+                if (overlaps[i].gameObject.scene == scene) { obstacle = overlaps[i]; break; }
+            if (obstacle == null) return true;
+            float pad = radius + 0.025f;
+            Vector3 best = result;
+            float bestDistance = float.PositiveInfinity;
+            if (obstacle is BoxCollider2D box)
+            {
+                Vector3 scale = box.transform.lossyScale;
+                Vector2 half = box.size * 0.5f + Vector2.one * box.edgeRadius + new Vector2(
+                    pad / Mathf.Max(0.001f, Mathf.Abs(scale.x)), pad / Mathf.Max(0.001f, Mathf.Abs(scale.y)));
+                Vector2 local = (Vector2)box.transform.InverseTransformPoint(result) - box.offset;
+                for (int side = 0; side < 4; side++)
+                {
+                    Vector2 candidate = new Vector2(Mathf.Clamp(local.x, -half.x, half.x), Mathf.Clamp(local.y, -half.y, half.y));
+                    if (side < 2) candidate.x = side == 0 ? -half.x : half.x;
+                    else candidate.y = side == 2 ? -half.y : half.y;
+                    Consider(box.transform.TransformPoint(candidate + box.offset));
+                }
+            }
+            else
+            {
+                Bounds bounds = obstacle.bounds;
+                bounds.Expand(pad * 2);
+                Consider(new Vector3(bounds.min.x, result.y, result.z));
+                Consider(new Vector3(bounds.max.x, result.y, result.z));
+                Consider(new Vector3(result.x, bounds.min.y, result.z));
+                Consider(new Vector3(result.x, bounds.max.y, result.z));
+            }
+            result = best;
+
+            void Consider(Vector3 candidate)
+            {
+                candidate.z = position.z;
+                float distance = (candidate - position).sqrMagnitude;
+                if (distance < bestDistance) { bestDistance = distance; best = candidate; }
+            }
+        }
+        return !Contains(result);
+    }
+
+    /// <summary>Retract toward a clear player-side anchor instead of routing into a wall.</summary>
+    public Vector3 ClampEndpoint(Vector3 anchor, Vector3 desired)
+    {
+        Vector2 delta = desired - anchor;
+        float distance = delta.magnitude;
+        if (distance < 0.00001f) return anchor;
+        int count = Physics2D.CircleCast(anchor, radius, delta / distance, filter, hits, distance);
+        float allowed = distance;
+        bool blocked = false;
+        for (int i = 0; i < count; i++)
+        {
+            if (hits[i].collider.gameObject.scene != scene) continue;
+            allowed = Mathf.Min(allowed, Mathf.Max(0, hits[i].distance - 0.025f));
+            blocked = true;
+        }
+        if (!blocked && !Contains(desired)) return desired;
+        Vector3 result = Vector3.Lerp(anchor, desired, allowed / distance);
+        result.z = desired.z;
+        // Overlap/cast contact tolerances can differ at rotated corners. Stay on the
+        // same side of the wall as the anchor, with a bounded retreat if necessary.
+        if (Contains(result))
+        {
+            float low = 0, high = allowed / distance;
+            for (int i = 0; i < 12; i++)
+            {
+                float t = (low + high) * 0.5f;
+                if (Contains(Vector3.Lerp(anchor, desired, t))) high = t;
+                else low = t;
+            }
+            result = Vector3.Lerp(anchor, desired, low);
+            result.z = desired.z;
+        }
+        return result;
     }
 
     public Collider2D Blocker(Vector3 start, Vector3 end)

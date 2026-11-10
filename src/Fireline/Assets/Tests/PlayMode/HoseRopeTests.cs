@@ -26,7 +26,7 @@ public class HoseRopeTests
     }
 
     [UnityTest]
-    public IEnumerator ChainFallsToGroundWithPinnedEndsAndLimitedSegmentStretch()
+    public IEnumerator ChainStaysOnGroundWithPinnedEndsAndLimitedSegmentStretch()
     {
         var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
         var end = Make("Nozzle", new Vector3(105, 100, -0.6f)).transform;
@@ -35,13 +35,7 @@ public class HoseRopeTests
         for (int step = 0; step < 180; step++) rope.Simulate(0.02f);
         Assert.That(rope.GetPoint(0), Is.EqualTo(source.position));
         Assert.That(rope.GetPoint(rope.PointCount - 1), Is.EqualTo(end.position));
-        int grounded = 0;
-        for (int i = 1; i < rope.PointCount - 1; i++)
-        {
-            Assert.That(rope.GetPoint(i).z, Is.LessThanOrEqualTo(-rope.Radius + 0.001f));
-            if (Mathf.Abs(rope.GetPoint(i).z + rope.Radius) < 0.005f) grounded++;
-        }
-        Assert.That(grounded, Is.GreaterThan(rope.PointCount / 2));
+        CheckGrounded(rope, new Vector3(100, 100, 0), Vector3.back);
         CheckStretch(rope);
         yield return null;
     }
@@ -89,7 +83,7 @@ public class HoseRopeTests
         {
             Vector2 delta = rope.GetPoint(i) - rope.GetPoint(i - 1);
             Assert.That(Physics2D.CircleCast(rope.GetPoint(i - 1), rope.Radius * 0.99f,
-                delta.normalized, filter, hits, delta.magnitude), Is.Zero, $"Hose span {i} clips a building");
+                delta.normalized, filter, hits, delta.magnitude), Is.Zero, $"Hose span {i} clips a building: {rope.GetPoint(i - 1)} -> {rope.GetPoint(i)}");
         }
     }
 
@@ -129,6 +123,7 @@ public class HoseRopeTests
                 end.position = Vector3.Lerp(start, destination, i / 60f);
                 rope.Simulate(0.02f);
                 CheckClear(rope);
+                CheckGrounded(rope, new Vector3(100, 100, 0), Vector3.back);
             }
         }
         rope.GetTether(out var pivot, out float used);
@@ -172,12 +167,198 @@ public class HoseRopeTests
         Assert.That(pivot, Is.EqualTo(source.position));
     }
 
+    [Test]
+    public void NewCornerPreservesDistantSlackAndLengthBudget()
+    {
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(108, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, Vector3.zero, Vector3.back);
+        // Introduce contact near the player, with slack still lying beside the hydrant.
+        int contact = rope.PointCount * 3 / 4;
+        Vector3 center = (rope.GetPoint(contact) + rope.GetPoint(contact + 1)) * 0.5f;
+        Building(center, new Vector2(0.2f, 0.2f));
+        var untouched = new Vector3[rope.PointCount / 2];
+        for (int i = 0; i < untouched.Length; i++) untouched[i] = rope.GetPoint(i);
+        float budget = rope.PaidOutLength;
+        typeof(HoseRope).GetMethod("Render", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .Invoke(rope, null);
+        CheckClear(rope);
+        CheckGrounded(rope, Vector3.zero, Vector3.back);
+        for (int i = 0; i < untouched.Length; i++)
+            Assert.That(rope.GetPoint(i), Is.EqualTo(untouched[i]), "Corner contact erased distant slack");
+        float allocated = 0;
+        for (int i = 0; i < rope.PointCount - 1; i++) allocated += rope.GetSegmentRestLength(i);
+        Assert.That(allocated, Is.EqualTo(budget).Within(0.001f), "Local repairs must conserve the hose budget");
+    }
+
+    [Test]
+    public void RepeatedCornerPullsKeepSlackSimulationStable()
+    {
+        Building(new Vector2(104, 100), new Vector2(2, 4));
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(107, 97, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, Vector3.zero, Vector3.back);
+        Vector3 initialSlack = rope.GetPoint(10);
+        for (int i = 0; i < 1200; i++)
+        {
+            end.position = new Vector3(107, 97 + Mathf.PingPong(i * 0.025f, 5), -0.6f);
+            rope.Simulate(0.02f);
+            CheckClear(rope);
+            Assert.That(rope.PointCount, Is.LessThan(256), "Repeated contact keeps subdividing the hose");
+        }
+        Assert.That(Vector3.Distance(rope.GetPoint(10), initialSlack), Is.GreaterThan(0.01f),
+            "Tension should draw slack through the hose instead of leaving the old trail frozen");
+        CheckGrounded(rope, Vector3.zero, Vector3.back);
+        float budget = 0;
+        for (int i = 0; i < rope.PointCount - 1; i++) budget += rope.GetSegmentRestLength(i);
+        Assert.That(budget, Is.EqualTo(rope.PaidOutLength).Within(0.001f));
+    }
+
+    [TestCase(0f)]
+    [TestCase(30f)]
+    public void RepeatedNozzleWallEntryKeepsHoseVisibleAndBounded(float rotation)
+    {
+        var building = Building(new Vector2(104, 100), new Vector2(2, 4), rotation);
+        Vector3 At(float x, float y, float z)
+        {
+            Vector3 result = building.transform.TransformPoint(new Vector3(x, y, 0));
+            result.z = z;
+            return result;
+        }
+        var source = Make("Source", At(-5, -2, -0.2f)).transform;
+        var player = Make("Player anchor", At(-1.5f, 0, 0)).transform;
+        var tip = Make("Nozzle", At(-0.4f, 0, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, tip, Vector3.zero, Vector3.back, player);
+        var line = rope.GetComponent<LineRenderer>();
+        var render = typeof(HoseRope).GetMethod("Render", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.That(line.enabled, Is.True, "Binding with an embedded tip must still show the hose");
+        for (int i = 0; i < 1000; i++)
+        {
+            bool inside = i % 2 == 0;
+            Vector3 requested = At(inside ? -0.4f : -1.4f, 0, -0.6f);
+            tip.position = requested;
+            rope.Simulate(0.02f);
+            render.Invoke(rope, null);
+            Assert.That(line.enabled, Is.True, $"Hose vanished on wall entry {i}");
+            Assert.That(tip.position, Is.EqualTo(requested), "Clamping the rope must not move the weapon transform");
+            Assert.That(rope.PointCount, Is.LessThan(256), "Repeated wall entry grew the simulation without bound");
+            CheckClear(rope);
+            if (inside)
+                Assert.That(building.transform.InverseTransformPoint(rope.NozzlePosition).x, Is.LessThan(-1f - rope.Radius));
+            else
+                Assert.That(rope.NozzlePosition, Is.EqualTo(requested), "The hose must return to the nozzle when clear");
+            Assert.That(line.GetPosition(line.positionCount - 1), Is.EqualTo(rope.NozzlePosition));
+        }
+    }
+
+    [Test]
+    public void NozzlePastThinWallRetractsToPlayerSideWithoutPhysicsStep()
+    {
+        Building(new Vector2(104, 100), new Vector2(0.2f, 4));
+        var source = Make("Source", new Vector3(100, 98, -0.2f)).transform;
+        var player = Make("Player anchor", new Vector3(103.5f, 100, 0)).transform;
+        var tip = Make("Nozzle", new Vector3(103.6f, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, tip, Vector3.zero, Vector3.back, player);
+        tip.position = new Vector3(104.5f, 100, -0.6f); // Tip itself is clear, but the wall is in between.
+        typeof(HoseRope).GetMethod("Render", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .Invoke(rope, null);
+        Assert.That(rope.NozzlePosition.x, Is.LessThan(103.9f - rope.Radius));
+        Assert.That(rope.GetComponent<LineRenderer>().enabled, Is.True);
+        CheckClear(rope);
+    }
+
+    [TestCase(0f)]
+    [TestCase(25f)]
+    public void EmbeddedNozzleFollowsPlayerSlidingCloseToLongWall(float rotation)
+    {
+        var wall = Building(new Vector2(104, 100), new Vector2(2, 80), rotation);
+        Vector3 At(float x, float y, float z)
+        {
+            Vector3 position = wall.transform.TransformPoint(new Vector3(x, y, 0));
+            position.z = z;
+            return position;
+        }
+        var source = Make("Source", At(-5, -20, -0.2f)).transform;
+        var player = Make("Player", At(-1.04f, -20, 0)).transform;
+        var tip = Make("Tip", At(-0.4f, -20, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, tip, Vector3.zero, Vector3.back, player);
+        for (int i = 0; i < 200; i++)
+        {
+            float y = -20 + i * 0.2f;
+            player.position = At(-1.04f, y, 0); // Body is clear, but closer than the hose radius.
+            tip.position = At(-0.4f, y, -0.6f);
+            rope.Simulate(0.02f);
+            Vector3 local = wall.transform.InverseTransformPoint(rope.NozzlePosition);
+            Assert.That(local.y, Is.EqualTo(y).Within(0.01f), "Visual endpoint stayed at an old wall contact");
+            Assert.That(local.x, Is.LessThan(-1f - rope.Radius));
+            CheckClear(rope);
+        }
+    }
+
+    private static void CheckGrounded(HoseRope rope, Vector3 origin, Vector3 up)
+    {
+        for (int i = 1; i < rope.PointCount - 1; i++)
+            Assert.That(Vector3.Dot(rope.GetPoint(i) - origin, up),
+                Is.EqualTo(rope.GroundClearance).Within(0.0001f), $"Particle {i} left the ground plane");
+        Assert.That(rope.GetPoint(0), Is.EqualTo(rope.Source.position));
+        Assert.That(rope.GetPoint(rope.PointCount - 1), Is.EqualTo(rope.Nozzle.position));
+    }
+
+    [UnityTest]
+    public IEnumerator CornerReleaseAndRenderKeepHoseOnGround()
+    {
+        var building = Building(new Vector2(104, 100), new Vector2(2, 4));
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(108, 100, -1.5f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, Vector3.zero, Vector3.back);
+        CheckGrounded(rope, Vector3.zero, Vector3.back);
+        yield return null;
+        yield return null;
+        var line = rope.GetComponent<LineRenderer>();
+        for (int i = 1; i < line.positionCount - 1; i++)
+            Assert.That(line.GetPosition(i).z, Is.EqualTo(-rope.GroundClearance).Within(0.0001f));
+        building.enabled = false; // Release every corner at once with elevated fittings.
+        for (int i = 0; i < 120; i++)
+        {
+            end.position += new Vector3(0.01f, 0, Mathf.Sin(i) * 0.03f);
+            rope.Simulate(0.02f);
+            CheckGrounded(rope, Vector3.zero, Vector3.back);
+        }
+    }
+
+    [Test]
+    public void GroundLockUsesConfiguredPlaneAfterTeleportAndReenable()
+    {
+        Vector3 origin = new Vector3(100, 100, 3);
+        Vector3 up = new Vector3(0, 1, 1).normalized;
+        var source = Make("Source", origin + up).transform;
+        var end = Make("Nozzle", origin + Vector3.right * 4 + up * 2).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, origin, up);
+        CheckGrounded(rope, origin, up);
+        end.position += Vector3.right * 15;
+        rope.Simulate(0.02f);
+        CheckGrounded(rope, origin, up);
+        rope.enabled = false;
+        rope.enabled = true;
+        CheckGrounded(rope, origin, up);
+    }
+
     private static void CheckStretch(HoseRope rope)
     {
-        float spacing = rope.PaidOutLength / (rope.PointCount - 1);
         for (int i = 1; i < rope.PointCount; i++)
-            Assert.That(Vector3.Distance(rope.GetPoint(i - 1), rope.GetPoint(i)),
-                Is.LessThan(spacing * 1.2f + 0.005f), $"Segment {i} stretched too far");
+        {
+            Vector3 offset = rope.GetPoint(i) - rope.GetPoint(i - 1);
+            // End spans include the rise to the source/nozzle; the interior stays flat.
+            if (i == 1 || i == rope.PointCount - 1) offset.z = 0;
+            Assert.That(offset.magnitude, Is.LessThan(rope.GetSegmentRestLength(i - 1) * 1.2f + 0.005f), $"Segment {i} stretched too far");
+        }
     }
 
     [UnityTest]
@@ -219,6 +400,8 @@ public class HoseRopeTests
         Assert.That(supply.ConnectedPlayers, Is.EqualTo(2));
         var rope = first.GetComponentInChildren<HoseRope>();
         Assert.That(rope, Is.Not.Null);
+        CheckGrounded(rope, supply.transform.position, Vector3.back);
+        Assert.That(rope.GroundClearance, Is.LessThan(rope.Radius));
         Assert.That(second.GetComponentInChildren<HoseRope>(), Is.Not.SameAs(rope));
         var loadout = first.GetComponent<HoseLoadout>();
         loadout.Equip(NozzleType.Jet);

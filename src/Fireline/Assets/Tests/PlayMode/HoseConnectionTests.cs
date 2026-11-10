@@ -217,6 +217,57 @@ public class HoseConnectionTests
     }
 
     [UnityTest]
+    public IEnumerator EmbeddedTipStillRestrainsPlayerAlongWallWithoutSnapBack()
+    {
+        yield return LoadScene();
+        var player = Join(0);
+        player.GetComponent<PlayerController>().enabled = false;
+        yield return null;
+        yield return null;
+        var connection = player.GetComponent<PlayerHoseConnection>();
+        var supply = connection.Source;
+        connection.Detach();
+        supply.transform.position = new Vector3(100, 100, 0);
+        var body = player.GetComponent<Rigidbody2D>();
+        body.position = new Vector2(103.96f, 100);
+        player.transform.position = new Vector3(103.96f, 100, 0);
+        var tip = player.GetComponent<HoseLoadout>().Current.NozzleTransform;
+        tip.position = player.transform.position + new Vector3(0.6f, 0, -0.6f);
+        var wall = new GameObject("Long wall");
+        players.Add(wall);
+        wall.layer = LayerMask.NameToLayer(Structure.ObstacleLayer);
+        wall.transform.position = new Vector3(105, 100, 0);
+        wall.AddComponent<BoxCollider2D>().size = new Vector2(2, 80);
+        Physics2D.SyncTransforms();
+        Assert.That(connection.Attach(supply), Is.True);
+        var rules = Object.FindAnyObjectByType<HoseWaterRules>();
+        rules.LimitHoseLength = true;
+        rules.HoseLength = 6;
+        typeof(HoseWaterRules).GetField("secondsToBreak", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .SetValue(rules, 10000f); // Isolate restraint from the intentional sustained-pull break.
+        var tick = typeof(PlayerHoseConnection).GetMethod("FixedUpdate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        for (int i = 0; i < 200; i++)
+        {
+            tip.position = player.transform.position + new Vector3(0.6f, 0, -0.6f);
+            body.linearVelocity = Vector2.up * 5;
+            tick.Invoke(connection, null);
+            Vector2 next = body.position + body.linearVelocity * Time.fixedDeltaTime;
+            body.position = next;
+            player.transform.position = new Vector3(next.x, next.y, 0);
+            Physics2D.SyncTransforms();
+            Assert.That(Vector3.Distance(tip.position, connection.Rope.Source.position),
+                Is.LessThanOrEqualTo(rules.HoseLength + 0.03f), "Embedded tip granted unrestricted movement");
+        }
+        Assert.That(body.position.y, Is.LessThan(107));
+        Vector2 before = body.position;
+        tip.position = player.transform.position + new Vector3(-0.6f, 0, -0.6f);
+        body.linearVelocity = Vector2.zero;
+        tick.Invoke(connection, null);
+        Assert.That(Vector2.Distance(body.position, before), Is.LessThan(0.05f), "Clearing the wall teleported the player");
+        Assert.That(connection.IsConnected, Is.True);
+    }
+
+    [UnityTest]
     public IEnumerator UnlimitedToggleRemovesTetherWithoutChangingWaterRules()
     {
         yield return LoadScene();
