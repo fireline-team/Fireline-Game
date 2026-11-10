@@ -7,6 +7,7 @@ internal sealed class HoseObstacleRoute
 {
     public readonly List<Vector3> Points = new List<Vector3>();
     private readonly List<RaycastHit2D> hits = new List<RaycastHit2D>();
+    private readonly List<Collider2D> overlaps = new List<Collider2D>();
     private readonly List<Vector3> nodes = new List<Vector3>();
     private readonly HashSet<Collider2D> expanded = new HashSet<Collider2D>();
     private readonly List<Vector3> detour = new List<Vector3>();
@@ -42,6 +43,14 @@ internal sealed class HoseObstacleRoute
         }
         Length = 0;
         for (int i = 1; i < Points.Count; i++) Length += Vector3.Distance(Points[i - 1], Points[i]);
+    }
+
+    public bool Contains(Vector3 point)
+    {
+        int count = Physics2D.OverlapCircle(point, radius, filter, overlaps);
+        for (int i = 0; i < count; i++)
+            if (overlaps[i].gameObject.scene == scene) return true;
+        return false;
     }
 
     public Collider2D Blocker(Vector3 start, Vector3 end)

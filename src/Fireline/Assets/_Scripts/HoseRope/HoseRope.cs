@@ -12,6 +12,8 @@ public class HoseRope : MonoBehaviour
     [SerializeField, Min(0.1f)] private float minimumLength = 12f;
     [SerializeField, Min(0.1f)] private float payoutSlack = 2f;
     [SerializeField, Min(0.01f)] private float radius = 0.06f;
+    [Tooltip("Height of the hose center above the source base ground plane, independent of hose thickness.")]
+    [SerializeField, Min(0f)] private float groundClearance = 0.01f;
     [SerializeField, Min(0f)] private float airDrag = 1.5f;
     [SerializeField, Min(0f)] private float groundFriction = 12f;
     [SerializeField, Range(1, 8)] private int substeps = 3;
@@ -20,6 +22,8 @@ public class HoseRope : MonoBehaviour
     [SerializeField, Min(1f)] private float teleportDistance = 8f;
 
     private readonly HoseObstacleRoute obstacleRoute = new HoseObstacleRoute();
+    private readonly HoseObstacleRoute localRoute = new HoseObstacleRoute();
+    private float[] lengthWeights;
     private int[] routeSubdivisions = new int[8];
     private float[] routeSpanLengths = new float[8];
     private Transform source;
@@ -36,6 +40,8 @@ public class HoseRope : MonoBehaviour
 
     public float PaidOutLength { get; private set; }
     public float Radius => radius;
+    public float GroundClearance => groundClearance;
+    public float GetSegmentRestLength(int index) => PaidOutLength * lengthWeights[index];
     public int PointCount => points != null ? points.Length : 0;
     public Vector3 GetPoint(int index) => points[index];
     public Transform Source => source;
@@ -58,6 +64,8 @@ public class HoseRope : MonoBehaviour
         segments = Mathf.Max(4, segments);
         points = new Vector3[segments + 1];
         previous = new Vector3[segments + 1];
+        lengthWeights = new float[segments];
+        for (int i = 0; i < segments; i++) lengthWeights[i] = 1f / segments;
         PaidOutLength = Mathf.Max(minimumLength, Vector3.Distance(source.position, nozzle.position) + payoutSlack);
         LayOut();
         ResolveObstacles();
@@ -95,6 +103,8 @@ public class HoseRope : MonoBehaviour
 
     private void LayOut()
     {
+        // A full re-lay (bind/teleport) resets the adaptive local segment lengths.
+        for (int i = 0; i < segments; i++) lengthWeights[i] = 1f / segments;
         Vector3 start = source.position;
         Vector3 end = nozzle.position;
         Vector3 alongGround = Vector3.ProjectOnPlane(end - start, groundUp);
@@ -138,7 +148,6 @@ public class HoseRope : MonoBehaviour
         if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
         float dt = Mathf.Min(deltaTime, 0.05f) / substeps;
         float drag = Mathf.Exp(-airDrag * dt);
-        float spacing = PaidOutLength / segments;
         for (int step = 0; step < substeps; step++)
         {
             for (int i = 1; i < segments; i++)
@@ -156,6 +165,7 @@ public class HoseRope : MonoBehaviour
                     int i = iteration % 2 == 0 ? n : segments - 1 - n;
                     Vector3 offset = points[i + 1] - points[i];
                     float distance = offset.magnitude;
+                    float spacing = GetSegmentRestLength(i);
                     if (distance <= spacing || distance < 0.00001f) continue;
                     Vector3 correction = offset * ((distance - spacing) / distance);
                     if (i == 0) points[i + 1] -= correction;
@@ -189,7 +199,7 @@ public class HoseRope : MonoBehaviour
     {
         if (!UsesFootprints || source == null || nozzle == null) return;
         obstacleRoute.Update(source.position, nozzle.position, radius,
-            groundOrigin.z + groundUp.z * radius, gameObject.scene);
+            groundOrigin.z + groundUp.z * groundClearance, gameObject.scene);
     }
 
     /// <summary>The last contact is the tether pivot; earlier spans consume available hose.</summary>
@@ -209,51 +219,88 @@ public class HoseRope : MonoBehaviour
         if (!UsesFootprints) return;
         RefreshObstacleRoute();
         if (!obstacleRoute.Valid) return;
-        bool blocked = obstacleRoute.Points.Count > 2;
-        for (int i = 1; !blocked && i < points.Length; i++)
-            blocked = obstacleRoute.Blocker(points[i - 1], points[i]) != null;
-        if (!blocked) return;
-        // Contact spans are taut. Keep an actual particle at every corner so the renderer
-        // cannot cut across a footprint between two otherwise collision-free particles.
-        var route = obstacleRoute.Points;
+        // Only repair the local run that actually intersects a footprint. Unaffected
+        // particles keep their positions, velocity and share of the paid-out length.
+        for (int start = 0; start < segments; start++)
+        {
+            if (!obstacleRoute.Contains(points[start]) && !obstacleRoute.Contains(points[start + 1])
+                && obstacleRoute.Blocker(points[start], points[start + 1]) == null) continue;
+            int end = start + 1;
+            while (start > 0 && obstacleRoute.Contains(points[start])) start--;
+            while (end < segments && obstacleRoute.Contains(points[end])) end++;
+            if (obstacleRoute.Contains(points[start]) || obstacleRoute.Contains(points[end])) continue;
+            localRoute.Clear();
+            localRoute.Update(points[start], points[end], radius,
+                groundOrigin.z + groundUp.z * groundClearance, gameObject.scene);
+            if (!localRoute.Valid) continue;
+            int addedSegments = RepairSpan(start, end);
+            start += addedSegments - 1;
+        }
+    }
+
+    private int RepairSpan(int start, int end)
+    {
+        var route = localRoute.Points;
         int spans = route.Count - 1;
-        int count = Mathf.Max(segments, spans);
-        if (points.Length != count + 1) { segments = count; points = new Vector3[count + 1]; previous = new Vector3[count + 1]; }
+        int oldCount = end - start;
+        int count = Mathf.Max(oldCount, spans);
         if (routeSubdivisions.Length < spans)
         {
             routeSubdivisions = new int[spans];
             routeSpanLengths = new float[spans];
         }
-        var subdivisions = routeSubdivisions;
+        float totalLength = 0;
         for (int i = 0; i < spans; i++)
         {
-            subdivisions[i] = 1;
+            routeSubdivisions[i] = 1;
             routeSpanLengths[i] = Vector3.Distance(route[i], route[i + 1]);
+            totalLength += routeSpanLengths[i];
         }
         for (int extra = spans; extra < count; extra++)
         {
             int longest = 0;
             for (int i = 1; i < spans; i++)
-                if (routeSpanLengths[i] / subdivisions[i] >
-                    routeSpanLengths[longest] / subdivisions[longest]) longest = i;
-            subdivisions[longest]++;
+                if (routeSpanLengths[i] / routeSubdivisions[i] >
+                    routeSpanLengths[longest] / routeSubdivisions[longest]) longest = i;
+            routeSubdivisions[longest]++;
         }
-        int index = 0;
+        float weight = 0;
+        for (int i = start; i < end; i++) weight += lengthWeights[i];
+        int nextSegments = segments + count - oldCount;
+        var nextPoints = new Vector3[nextSegments + 1];
+        var nextPrevious = new Vector3[nextSegments + 1];
+        var nextWeights = new float[nextSegments];
+        System.Array.Copy(points, nextPoints, start + 1);
+        System.Array.Copy(previous, nextPrevious, start + 1);
+        System.Array.Copy(lengthWeights, nextWeights, start);
+        int index = start;
         for (int span = 0; span < spans; span++)
-            for (int j = 0; j < subdivisions[span]; j++)
+            for (int j = 0; j < routeSubdivisions[span]; j++)
             {
-                points[index] = Vector3.Lerp(route[span], route[span + 1], (float)j / subdivisions[span]);
-                if (index > 0) ProjectToGround(index);
-                previous[index] = points[index];
+                if (index > start)
+                {
+                    Vector3 position = Vector3.Lerp(route[span], route[span + 1], (float)j / routeSubdivisions[span]);
+                    position += groundUp * (groundClearance - Vector3.Dot(position - groundOrigin, groundUp));
+                    nextPoints[index] = nextPrevious[index] = position;
+                }
+                nextWeights[index] = totalLength > 0.00001f
+                    ? weight * routeSpanLengths[span] / (totalLength * routeSubdivisions[span]) : weight / count;
                 index++;
             }
-        PinEnds();
+        System.Array.Copy(points, end, nextPoints, index, segments - end + 1);
+        System.Array.Copy(previous, end, nextPrevious, index, segments - end + 1);
+        System.Array.Copy(lengthWeights, end, nextWeights, index, segments - end);
+        points = nextPoints;
+        previous = nextPrevious;
+        lengthWeights = nextWeights;
+        segments = nextSegments;
+        return count;
     }
 
     private void ProjectToGround(int i)
     {
         float height = Vector3.Dot(points[i] - groundOrigin, groundUp);
-        points[i] += groundUp * (radius - height);
+        points[i] += groundUp * (groundClearance - height);
     }
 
     private void PinEnds()
