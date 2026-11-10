@@ -69,6 +69,109 @@ public class HoseRopeTests
         yield return null;
     }
 
+    private BoxCollider2D Building(Vector2 position, Vector2 size, float rotation = 0)
+    {
+        var go = Make("Hose obstacle", position);
+        go.layer = LayerMask.NameToLayer(Structure.ObstacleLayer);
+        go.transform.rotation = Quaternion.Euler(0, 0, rotation);
+        var box = go.AddComponent<BoxCollider2D>();
+        box.size = size;
+        Physics2D.SyncTransforms();
+        return box;
+    }
+
+    private static void CheckClear(HoseRope rope)
+    {
+        var filter = new ContactFilter2D { useTriggers = false };
+        filter.SetLayerMask(LayerMask.GetMask(Structure.ObstacleLayer));
+        var hits = new List<RaycastHit2D>();
+        for (int i = 1; i < rope.PointCount; i++)
+        {
+            Vector2 delta = rope.GetPoint(i) - rope.GetPoint(i - 1);
+            Assert.That(Physics2D.CircleCast(rope.GetPoint(i - 1), rope.Radius * 0.99f,
+                delta.normalized, filter, hits, delta.magnitude), Is.Zero, $"Hose span {i} clips a building");
+        }
+    }
+
+    [Test]
+    public void RopeWrapsRotatedBuildingsAndTetherUsesCornerDistance()
+    {
+        Building(new Vector2(104, 100), new Vector2(2, 4), 25);
+        Building(new Vector2(108, 101), new Vector2(2, 4), -15);
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(112, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, new Vector3(100, 100, 0), Vector3.back);
+        CheckClear(rope); // Initial attachment must not render even one frame through a wall.
+        for (int i = 0; i < 20; i++) { rope.Simulate(0.02f); CheckClear(rope); }
+        rope.GetTether(out var pivot, out float used);
+        Assert.That(used, Is.GreaterThan(0));
+        Assert.That(used + Vector3.Distance(pivot, end.position),
+            Is.GreaterThan(Vector3.Distance(source.position, end.position)));
+        CheckStretch(rope);
+    }
+
+    [Test]
+    public void MovingAroundBuildingWrapsAndReturningReleasesCorners()
+    {
+        Building(new Vector2(104, 100), new Vector2(2, 4));
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(102, 97, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, new Vector3(100, 100, 0), Vector3.back);
+        var destinations = new[] { new Vector3(107, 97, -0.6f), new Vector3(107, 101, -0.6f),
+            new Vector3(107, 97, -0.6f), new Vector3(102, 97, -0.6f) };
+        foreach (var destination in destinations)
+        {
+            Vector3 start = end.position;
+            for (int i = 1; i <= 60; i++)
+            {
+                end.position = Vector3.Lerp(start, destination, i / 60f);
+                rope.Simulate(0.02f);
+                CheckClear(rope);
+            }
+        }
+        rope.GetTether(out var pivot, out float used);
+        Assert.That(used, Is.Zero);
+        Assert.That(pivot, Is.EqualTo(source.position));
+    }
+
+    [Test]
+    public void RemovedBuildingAndTeleportDoNotLeaveStaleWraps()
+    {
+        var building = Building(new Vector2(104, 100), new Vector2(2, 4));
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(108, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, Vector3.zero, Vector3.back);
+        rope.GetTether(out _, out float used);
+        Assert.That(used, Is.GreaterThan(0));
+        building.enabled = false;
+        rope.Simulate(0.02f);
+        rope.GetTether(out _, out used);
+        Assert.That(used, Is.Zero);
+        building.enabled = true;
+        end.position = new Vector3(100, 110, -0.6f);
+        Physics2D.SyncTransforms();
+        rope.Simulate(0.02f);
+        CheckClear(rope);
+        rope.GetTether(out _, out used);
+        Assert.That(used, Is.Zero);
+    }
+
+    [Test]
+    public void TriggerFootprintsDoNotSnagHose()
+    {
+        Building(new Vector2(104, 100), new Vector2(2, 4)).isTrigger = true;
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(108, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, end, Vector3.zero, Vector3.back);
+        rope.GetTether(out var pivot, out float used);
+        Assert.That(used, Is.Zero);
+        Assert.That(pivot, Is.EqualTo(source.position));
+    }
+
     private static void CheckStretch(HoseRope rope)
     {
         float spacing = rope.PaidOutLength / (rope.PointCount - 1);

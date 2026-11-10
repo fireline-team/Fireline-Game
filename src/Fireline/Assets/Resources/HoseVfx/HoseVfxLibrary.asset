@@ -24,6 +24,15 @@ MonoBehaviour:
     releaseFade: 0.12
     beamGravity: 18
     maximumDrop: 0.75
+    aimResponseTime: 0.22
+    pixelation:
+      enabled: 1
+      pixelSize: 2
+      strength: 1
+      pixelAspect: {x: 1, y: 1}
+      gridOffset: {x: 0, y: 0}
+      colorSteps: 0
+      alphaCutoff: 0
     dropletRate: 55
     dropletSize: 0.065
     sizeVariation: 0.35
@@ -34,21 +43,38 @@ MonoBehaviour:
     gravity: 4
     dropletColor: {r: 0.52, g: 0.82, b: 1, a: 0.8}
   jetAppearance:
+    pixelation:
+      enabled: 1
+      pixelSize: 2
+      strength: 1
+      pixelAspect: {x: 1, y: 1}
+      gridOffset: {x: 0, y: 0}
+      colorSteps: 0
+      alphaCutoff: 0
     length: 1.8
     width: 0.45
     travelTime: 0.12
     color: {r: 0.68, g: 0.91, b: 1, a: 1}
     fadeStart: 0.85
   mistAppearance:
+    pixelation:
+      enabled: 1
+      pixelSize: 2
+      strength: 1
+      pixelAspect: {x: 1, y: 1}
+      gridOffset: {x: 0, y: 0}
+      colorSteps: 0
+      alphaCutoff: 0
     density: 1
     size: 1
     lifetime: 1
     spread: 1
   splashAppearance:
+    streamRate: 310
     streamCount: 10
     jetCount: 28
     streamInterval: 0.065
-    size: 0.14
+    size: 0.19
     lifetime: 0.45
     speed: 1
     spread: 4
@@ -63,4 +89,12 @@ MonoBehaviour:
     minimumCount: 3
     maximumCount: 24
     color: {r: 0.86, g: 0.91, b: 0.95, a: 0.32}
-  graphVersion: 3
+  waterPixelation:
+    enabled: 1
+    pixelSize: 2
+    strength: 1
+    pixelAspect: {x: 1, y: 1}
+    gridOffset: {x: 0, y: 0}
+    colorSteps: 0
+    alphaCutoff: 0
+  graphVersion: 5

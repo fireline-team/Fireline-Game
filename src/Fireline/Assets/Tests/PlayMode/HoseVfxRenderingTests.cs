@@ -1,5 +1,7 @@
 using System.Collections;
 using System.IO;
+using System.Reflection;
+using Game.Runtime;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,13 +14,14 @@ public sealed class HoseVfxRenderingTests
     private Scene _scene;
     private HoseVfxLibrary _library;
     private RenderTexture _target;
+    private FireSmokeProfile _smokeProfile;
 
     [UnitySetUp]
     public IEnumerator Setup()
     {
         if (!SystemInfo.supportsComputeShaders) Assert.Ignore("Requires a graphics-capable VFX Graph player.");
         var source = Resources.Load<HoseVfxLibrary>(HoseVfxLibrary.ResourcePath);
-        Assert.That(source != null && source.GraphVersion >= 3, Is.True, "Upgrade the hose stream motion first.");
+        Assert.That(source != null && source.GraphVersion >= 5, Is.True, "Upgrade hose feel and ambient fire smoke first.");
         _library = Object.Instantiate(source);
         _scene = SceneManager.CreateScene("Hose VFX rendering tests");
         var cameraObject = NewObject("Verification camera");
@@ -54,6 +57,7 @@ public sealed class HoseVfxRenderingTests
         if (_scene.IsValid()) yield return SceneManager.UnloadSceneAsync(_scene);
         if (_target != null) { _target.Release(); Object.Destroy(_target); }
         if (_library != null) Object.Destroy(_library);
+        if (_smokeProfile != null) Object.Destroy(_smokeProfile);
     }
 
     [UnityTest]
@@ -61,6 +65,7 @@ public sealed class HoseVfxRenderingTests
     {
         _library.StreamAppearance.dropletRate = 0f;
         _library.StreamAppearance.beamGravity = 0f; // Isolate continuity from the separate curvature test.
+        _library.StreamAppearance.maximumDrop = 0f;
         var stream = Visual(NozzleType.Standard);
         float readyAt = Time.time + 0.55f;
         while (Time.time < readyAt)
@@ -189,5 +194,290 @@ public sealed class HoseVfxRenderingTests
         image.Apply();
         RenderTexture.active = previous;
         return image;
+    }
+
+    [UnityTest]
+    public IEnumerator WaterPixelationChangesRenderedSamplingAndCanBeDisabled()
+    {
+        _library.StreamAppearance.dropletRate = 0f;
+        _library.StreamAppearance.beamWidth = 1f;
+        _library.StreamAppearance.beamGravity = 0f;
+        _library.StreamAppearance.maximumDrop = 0f;
+        _library.WaterPixelation.enabled = false;
+        var stream = Visual(NozzleType.Standard);
+        stream.SetSpraying(true, new Vector3(-4f, 1f, 0f), new Vector2(1f, 0.12f).normalized,
+            8f, 0.6f, 0.3f, 60f, 0.6f);
+        yield return new WaitForSeconds(0.55f);
+        var smooth = ReadImage();
+        _library.WaterPixelation.enabled = true;
+        _library.WaterPixelation.pixelSize = 8;
+        for (int i = 0; i < 4; i++) yield return null;
+        var pixelated = ReadImage();
+        File.WriteAllBytes("Temp/HoseWater-smooth.png", smooth.EncodeToPNG());
+        File.WriteAllBytes("Temp/HoseWater-pixelated.png", pixelated.EncodeToPNG());
+        int changed = 0;
+        int flatPairs = 0;
+        int smoothFlatPairs = 0;
+        int visible = 0;
+        for (int y = 400; y < 500; y++)
+        for (int x = 480; x < 780; x++)
+        {
+            Color p = pixelated.GetPixel(x, y);
+            Color s = smooth.GetPixel(x, y);
+            if (p.grayscale < 0.3f) continue;
+            visible++;
+            if (Mathf.Abs(p.grayscale - s.grayscale) > 0.025f) changed++;
+            // Interior samples in a block should share a sampled texture color.
+            if (Mathf.Abs(p.grayscale - pixelated.GetPixel(x + 1, y).grayscale) < 0.002f) flatPairs++;
+            if (Mathf.Abs(s.grayscale - smooth.GetPixel(x + 1, y).grayscale) < 0.002f) smoothFlatPairs++;
+        }
+        Color[] smoothColors = smooth.GetPixels();
+        Object.Destroy(smooth);
+        Object.Destroy(pixelated);
+        Assert.That(visible, Is.GreaterThan(1000), "The water must render with the new VFX shader.");
+        Assert.That(changed, Is.GreaterThan(500), "The toggle must change rendered pixels, not just a graph parameter.");
+        Assert.That(flatPairs, Is.GreaterThan(smoothFlatPairs + 500), "Pixelated water must have visibly flat blocks.");
+        _library.WaterPixelation.strength = 0f;
+        for (int i = 0; i < 3; i++) yield return null;
+        var zeroStrength = ReadImage();
+        float difference = 0f;
+        int samples = 0;
+        for (int y = 410; y < 485; y++)
+        for (int x = 500; x < 760; x++)
+        {
+            difference += Mathf.Abs(zeroStrength.GetPixel(x, y).grayscale - smoothColors[y * 1280 + x].grayscale);
+            samples++;
+        }
+        Object.Destroy(zeroStrength);
+        Assert.That(difference / samples, Is.LessThan(0.005f), "Zero strength must restore smooth rendering even with a large pixel size.");
+        _library.WaterPixelation.enabled = false;
+        yield return null;
+        yield return null;
+        var water = stream.transform.Find("Water").GetComponent<VisualEffect>();
+        Assert.That(water.GetFloat("PixelSize"), Is.EqualTo(1f));
+        var tinted = ReadImage();
+        Color center = tinted.GetPixel(640, 449);
+        Assert.That(center.b - center.r, Is.GreaterThan(0.05f), "Shader Graph must preserve the beam's particle tint.");
+        Object.Destroy(tinted);
+        stream.Stop();
+    }
+
+    [UnityTest]
+    public IEnumerator BeamSplashFlowsAtContactAndFallsBackToGroundWhenContactIsLost()
+    {
+        _library.StreamAppearance.dropletRate = 0f;
+        _library.StreamAppearance.beamGravity = 0f;
+        _library.StreamAppearance.maximumDrop = 0f;
+        _library.SplashAppearance.streamRate = 180f;
+        var stream = Visual(NozzleType.Standard);
+        Vector3 origin = new Vector3(-4f, 1f, 0f);
+        Vector3 impact = new Vector3(2f, 1f, 0f);
+        stream.SetSpraying(true, origin, Vector2.right, 6f, 0.6f, 0.3f, 60f, 0.6f);
+        var splash = stream.transform.Find("Impact splash").GetComponent<VisualEffect>();
+        stream.ShowContinuousImpact(true, impact, Vector3.left);
+        Assert.That(splash.GetFloat("ContactRate"), Is.Zero, "No splash before water arrives.");
+        float until = Time.time + 1.4f;
+        while (Time.time < until)
+        {
+            stream.SetSpraying(true, origin, Vector2.right, 6f, 0.6f, 0.3f, 60f, 0.6f);
+            stream.ShowContinuousImpact(true, impact, Vector3.left);
+            yield return null;
+        }
+        Assert.That(splash.GetFloat("ContactRate"), Is.EqualTo(180f));
+        Assert.That(splash.aliveParticleCount, Is.GreaterThan(5), "The continuous spawner must actually produce particles.");
+        var image = ReadImage();
+        File.WriteAllBytes("Temp/HoseBeam-contact-splash.png", image.EncodeToPNG());
+        File.WriteAllText("Temp/HoseBeam-contact-state.txt", string.Format(
+            "particles={0}, origin={1}, direction={2}, size={3}, lifetime={4}, color={5}, bounds={6}, culled={7}",
+            splash.aliveParticleCount, splash.GetVector3("Origin"), splash.GetVector3("Direction"),
+            splash.GetFloat("ParticleSize"), splash.GetFloat("Lifetime"), splash.GetVector4("EffectColor"),
+            splash.GetComponent<VFXRenderer>().bounds, splash.culled));
+        int splashedPixels = 0;
+        for (int y = 380; y < 490; y++)
+        for (int x = 675; x < 790; x++)
+            if (Mathf.Abs(y - 420) > 12 && image.GetPixel(x, y).grayscale > 0.15f) splashedPixels++;
+        Object.Destroy(image);
+        Assert.That(splashedPixels, Is.GreaterThan(15), "Splash droplets must be visible around the contact.");
+        stream.ShowContinuousImpact(false, impact, Vector3.left);
+        Assert.That(splash.GetFloat("ContactRate"), Is.EqualTo(180f), "Losing an object contact must retain the ground splash.");
+        stream.SetSpraying(true, origin, Vector2.right, 5f, 0.6f, 0.3f, 60f, 0.6f);
+        stream.ShowContinuousImpact(true, impact - Vector3.right, Vector3.left);
+        yield return null;
+        stream.ShowContinuousImpact(true, impact - Vector3.right, Vector3.left);
+        Assert.That(splash.GetVector3("Origin").x, Is.EqualTo(0.975f).Within(0.01f), "The reused emitter must follow a moving impact.");
+        stream.Stop();
+        Assert.That(splash.GetFloat("ContactRate"), Is.Zero, "Release must stop new splash droplets immediately.");
+        yield return new WaitForSeconds(_library.SplashAppearance.lifetime + 1.1f);
+        Assert.That(splash.aliveParticleCount, Is.Zero, "Existing splash droplets must finish and expire.");
+    }
+
+    [UnityTest]
+    public IEnumerator BeamAlwaysLandsAndEndpointFollowsAimInWorldSpace()
+    {
+        var settings = _library.StreamAppearance;
+        settings.dropletRate = 0f;
+        settings.beamGravity = 0f;
+        settings.maximumDrop = 0.1f;
+        settings.aimResponseTime = 0.3f;
+        var stream = Visual(NozzleType.Standard);
+        Vector3 origin = new Vector3(-4f, 2f, 0f);
+        stream.SetSpraying(true, origin, Vector2.right, 6f, 0.6f, 0.3f, 60f, 0.6f, 0.7f);
+        // No ShowContinuousImpact call and no scene collider: this is a ground landing.
+        yield return new WaitForSeconds(0.65f);
+        var water = stream.transform.Find("Water").GetComponent<VisualEffect>();
+        var splash = stream.transform.Find("Impact splash").GetComponent<VisualEffect>();
+        Vector3 endpoint = MeshEndpoint(water);
+        Vector3 expected = origin + Vector3.right * 6f - TiltedView.Up * 0.7f;
+        Assert.That(Vector3.Distance(endpoint, expected), Is.LessThan(0.02f), "The tail must reach the ground even with low gravity/drop settings.");
+        Assert.That(splash.GetFloat("ContactRate"), Is.GreaterThan(0f));
+        Assert.That(Vector3.Distance(splash.GetVector3("Origin"), endpoint + TiltedView.Up * 0.025f), Is.LessThan(0.02f));
+        var landed = ReadImage();
+        File.WriteAllBytes("Temp/HoseBeam-ground-splash.png", landed.EncodeToPNG());
+        Object.Destroy(landed);
+
+        Vector3 target = origin + Vector3.up * 6f - TiltedView.Up * 0.7f;
+        stream.SetSpraying(true, origin, Vector2.up, 6f, 0.6f, 0.3f, 60f, 0.6f, 0.7f);
+        Assert.That(Vector3.Distance(MeshEndpoint(water), target), Is.GreaterThan(5f), "An aim change must not teleport the far end.");
+        yield return new WaitForSeconds(0.15f);
+        float halfway = Vector3.Distance(MeshEndpoint(water), target);
+        Assert.That(halfway, Is.InRange(2f, 7f), "The endpoint must ease through world space toward the new aim.");
+        var lagged = ReadImage();
+        File.WriteAllBytes("Temp/HoseBeam-aim-lag.png", lagged.EncodeToPNG());
+        Object.Destroy(lagged);
+        yield return new WaitForSeconds(1.2f);
+        Assert.That(Vector3.Distance(MeshEndpoint(water), target), Is.LessThan(0.2f), "The lagged endpoint must converge.");
+        Vector3 beforeMove = MeshEndpoint(water);
+        stream.SetSpraying(true, origin + Vector3.right, Vector2.up, 6f, 0.6f, 0.3f, 60f, 0.6f, 0.7f);
+        Assert.That(Vector3.Distance(MeshEndpoint(water), beforeMove), Is.LessThan(0.25f), "Moving the player must not drag the whole stream rigidly with the muzzle.");
+        Assert.That(water.GetVector3("Origin"), Is.EqualTo(origin + Vector3.right));
+        stream.Stop();
+        Assert.That(splash.GetFloat("ContactRate"), Is.Zero);
+    }
+
+    private static Vector3 MeshEndpoint(VisualEffect water)
+    {
+        Vector3[] vertices = water.GetMesh("BeamMesh").vertices;
+        return water.GetVector3("Origin") + (vertices[vertices.Length - 2] + vertices[vertices.Length - 1]) * 0.5f;
+    }
+
+    [UnityTest]
+    public IEnumerator EveryNozzleHasIndependentPixelationAndExtendedControls()
+    {
+        var streamSettings = _library.StreamAppearance.pixelation;
+        streamSettings.pixelSize = 8;
+        streamSettings.strength = 0.7f;
+        streamSettings.pixelAspect = new Vector2(2f, 1f);
+        streamSettings.gridOffset = new Vector2(2f, 3f);
+        streamSettings.colorSteps = 5;
+        streamSettings.alphaCutoff = 0.1f;
+        _library.MistAppearance.pixelation.pixelSize = 3;
+        _library.JetAppearance.pixelation.pixelSize = 12;
+        _library.JetAppearance.pixelation.colorSteps = 3;
+        _library.JetAppearance.travelTime = 0.8f;
+        var stream = Visual(NozzleType.Standard);
+        var mist = Visual(NozzleType.Mist);
+        var jet = Visual(NozzleType.Jet);
+        stream.SetSpraying(true, new Vector3(-4f, 3f, 0f), Vector2.right, 8f, 0.6f, 0.3f, 60f, 0.6f);
+        mist.SetSpraying(true, new Vector3(-4f, 0f, 0f), Vector2.right, 3f, 3f, 0.35f, 90f, 0.9f);
+        yield return new WaitForSeconds(0.6f);
+        jet.Pulse(new Vector3(-4f, -3f, 0f), Vector2.right, 8f, 0.25f, 0.2f, 0.45f, 200, false, Vector3.zero, Vector3.zero);
+        for (int i = 0; i < 5; i++) yield return null;
+        var streamWater = stream.transform.Find("Water").GetComponent<VisualEffect>();
+        var mistWater = mist.transform.Find("Water").GetComponent<VisualEffect>();
+        var jetWater = jet.transform.Find("Water").GetComponent<VisualEffect>();
+        Assert.That(streamWater.GetFloat("PixelSize"), Is.EqualTo(8f));
+        Assert.That(mistWater.GetFloat("PixelSize"), Is.EqualTo(3f));
+        Assert.That(jetWater.GetFloat("PixelSize"), Is.EqualTo(12f));
+        Assert.That(streamWater.GetFloat("PixelStrength"), Is.EqualTo(0.7f).Within(0.01f));
+        Assert.That(streamWater.GetVector2("PixelAspect"), Is.EqualTo(new Vector2(2f, 1f)));
+        Assert.That(streamWater.GetVector2("PixelOffset"), Is.EqualTo(new Vector2(2f, 3f)));
+        Assert.That(streamWater.GetFloat("ColorSteps"), Is.EqualTo(5f));
+        Assert.That(streamWater.GetFloat("AlphaCutoff"), Is.EqualTo(0.1f).Within(0.01f));
+        var image = ReadImage();
+        File.WriteAllBytes("Temp/HosePixelation-modes.png", image.EncodeToPNG());
+        Object.Destroy(image);
+        streamSettings.enabled = false;
+        yield return null;
+        yield return null;
+        Assert.That(streamWater.GetFloat("PixelSize"), Is.EqualTo(1f));
+        Assert.That(streamWater.GetFloat("ColorSteps"), Is.Zero);
+        Assert.That(mistWater.GetFloat("PixelSize"), Is.EqualTo(3f), "Changing the beam filter must not change mist.");
+        Assert.That(jetWater.GetFloat("PixelSize"), Is.EqualTo(12f), "Changing the beam filter must not change jet.");
+        stream.Stop();
+        mist.Stop();
+    }
+
+    [UnityTest]
+    public IEnumerator AmbientSmokeRendersWhileBurningAndFadesAfterExtinguishing()
+    {
+        var source = Resources.Load<FireSmokeProfile>(FireSmokeProfile.ResourcePath);
+        Assert.That(source, Is.Not.Null);
+        _smokeProfile = Object.Instantiate(source);
+        _smokeProfile.lifetime = 0.65f;
+        _smokeProfile.rate = 30f;
+        _smokeProfile.color = new Color(0.65f, 0.67f, 0.7f, 0.8f);
+        var go = NewObject("Smoke fire");
+        go.SetActive(false);
+        var fire = go.AddComponent<FireZone>();
+        typeof(FireZone).GetField("smokeProfile", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(fire, _smokeProfile);
+        go.SetActive(true);
+        yield return new WaitForSeconds(1.3f);
+        var smoke = go.GetComponentInChildren<FireSmokeVisual>();
+        Assert.That(smoke, Is.Not.Null, "Existing FireZones must receive smoke without prefab rewiring.");
+        var effect = smoke.GetComponent<VisualEffect>();
+        Assert.That(smoke.IsEmitting, Is.True);
+        Assert.That(effect.aliveParticleCount, Is.GreaterThan(0));
+        Assert.That(effect.GetFloat("PixelSize"), Is.EqualTo(6f));
+        var image = ReadImage();
+        File.WriteAllBytes("Temp/FireAmbientSmoke.png", image.EncodeToPNG());
+        int visible = 0;
+        for (int y = 320; y < 540; y++)
+        for (int x = 500; x < 780; x++)
+            if (image.GetPixel(x, y).grayscale > 0.1f) visible++;
+        Object.Destroy(image);
+        Assert.That(visible, Is.GreaterThan(200), "The pixelated smoke must actually render.");
+        int completed = 0;
+        fire.OnExtinguished.AddListener(() => completed++);
+        fire.ApplyWater(1000f);
+        yield return null;
+        yield return null;
+        Assert.That(smoke.IsEmitting, Is.False);
+        Assert.That(effect.GetFloat("Rate"), Is.Zero);
+        Assert.That(completed, Is.EqualTo(1));
+        yield return new WaitForSeconds(_smokeProfile.lifetime + 1.1f);
+        Assert.That(effect.aliveParticleCount, Is.Zero);
+        fire.Ignite();
+        yield return null;
+        yield return null;
+        Assert.That(smoke.IsEmitting, Is.True, "Reigniting must resume the same smoke emitter.");
+        Assert.That(go.GetComponentsInChildren<FireSmokeVisual>().Length, Is.EqualTo(1));
+        go.SetActive(false);
+        Assert.That(smoke.IsEmitting, Is.False);
+    }
+
+    [UnityTest]
+    public IEnumerator SmokeCanBePlacedStandaloneAndClearedFiresDoNotEmit()
+    {
+        var source = Resources.Load<FireSmokeProfile>(FireSmokeProfile.ResourcePath);
+        Assert.That(source, Is.Not.Null);
+        _smokeProfile = Object.Instantiate(source);
+        _smokeProfile.rate = 10f;
+        var standalone = NewObject("Standalone smoke").AddComponent<FireSmokeVisual>();
+        standalone.Configure(null, _smokeProfile, null);
+        var go = NewObject("Initially cleared fire");
+        go.SetActive(false);
+        var fire = go.AddComponent<FireZone>();
+        typeof(FireZone).GetField("startsBurning", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(fire, false);
+        go.SetActive(true);
+        yield return null;
+        yield return null;
+        Assert.That(standalone.IsEmitting, Is.True);
+        Assert.That(go.GetComponentInChildren<FireSmokeVisual>().IsEmitting, Is.False);
+        fire.Ignite();
+        yield return null;
+        yield return null;
+        Assert.That(go.GetComponentInChildren<FireSmokeVisual>().IsEmitting, Is.True);
+        standalone.enabled = false;
+        Assert.That(standalone.IsEmitting, Is.False);
     }
 }

@@ -20,6 +20,9 @@ public class HoseRope : MonoBehaviour
     [Tooltip("Re-lay the hose after a teleport rather than whipping it across the map.")]
     [SerializeField, Min(1f)] private float teleportDistance = 8f;
 
+    private readonly HoseObstacleRoute obstacleRoute = new HoseObstacleRoute();
+    private int[] routeSubdivisions = new int[8];
+    private float[] routeSpanLengths = new float[8];
     private Transform source;
     private Transform nozzle;
     private Vector3 groundOrigin;
@@ -41,6 +44,7 @@ public class HoseRope : MonoBehaviour
 
     public void Bind(Transform waterSource, Transform nozzleHead, Vector3 planeOrigin, Vector3 planeUp)
     {
+        obstacleRoute.Clear();
         source = waterSource;
         nozzle = nozzleHead;
         groundOrigin = planeOrigin;
@@ -57,6 +61,7 @@ public class HoseRope : MonoBehaviour
         previous = new Vector3[segments + 1];
         PaidOutLength = Mathf.Max(minimumLength, Vector3.Distance(source.position, nozzle.position) + payoutSlack);
         LayOut();
+        ResolveObstacles();
         Render();
     }
 
@@ -125,7 +130,13 @@ public class HoseRope : MonoBehaviour
         if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
         if ((source.position - lastSource).sqrMagnitude > teleportDistance * teleportDistance
             || (nozzle.position - lastNozzle).sqrMagnitude > teleportDistance * teleportDistance)
+        {
+            obstacleRoute.Clear();
             LayOut();
+        }
+        RefreshObstacleRoute();
+        PaidOutLength = Mathf.Max(PaidOutLength, obstacleRoute.Length + payoutSlack);
+        if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
         float dt = Mathf.Min(deltaTime, 0.05f) / substeps;
         float drag = Mathf.Exp(-airDrag * dt);
         float spacing = PaidOutLength / segments;
@@ -168,8 +179,75 @@ public class HoseRope : MonoBehaviour
             }
             PinEnds();
         }
+        ResolveObstacles();
         lastSource = source.position;
         lastNozzle = nozzle.position;
+    }
+
+    private bool UsesFootprints => Mathf.Abs(groundUp.z) > 0.999f;
+
+    private void RefreshObstacleRoute()
+    {
+        if (!UsesFootprints || source == null || nozzle == null) return;
+        obstacleRoute.Update(source.position, nozzle.position, radius,
+            groundOrigin.z + groundUp.z * radius, gameObject.scene);
+    }
+
+    /// <summary>The last contact is the tether pivot; earlier spans consume available hose.</summary>
+    public void GetTether(out Vector3 pivot, out float usedLength)
+    {
+        RefreshObstacleRoute();
+        pivot = source.position;
+        usedLength = 0;
+        if (!UsesFootprints || !obstacleRoute.Valid) return;
+        var route = obstacleRoute.Points;
+        pivot = route[route.Count - 2];
+        for (int i = 1; i < route.Count - 1; i++) usedLength += Vector3.Distance(route[i - 1], route[i]);
+    }
+
+    private void ResolveObstacles()
+    {
+        if (!UsesFootprints) return;
+        RefreshObstacleRoute();
+        if (!obstacleRoute.Valid) return;
+        bool blocked = obstacleRoute.Points.Count > 2;
+        for (int i = 1; !blocked && i < points.Length; i++)
+            blocked = obstacleRoute.Blocker(points[i - 1], points[i]) != null;
+        if (!blocked) return;
+        // Contact spans are taut. Keep an actual particle at every corner so the renderer
+        // cannot cut across a footprint between two otherwise collision-free particles.
+        var route = obstacleRoute.Points;
+        int spans = route.Count - 1;
+        int count = Mathf.Max(segments, spans);
+        if (points.Length != count + 1) { segments = count; points = new Vector3[count + 1]; previous = new Vector3[count + 1]; }
+        if (routeSubdivisions.Length < spans)
+        {
+            routeSubdivisions = new int[spans];
+            routeSpanLengths = new float[spans];
+        }
+        var subdivisions = routeSubdivisions;
+        for (int i = 0; i < spans; i++)
+        {
+            subdivisions[i] = 1;
+            routeSpanLengths[i] = Vector3.Distance(route[i], route[i + 1]);
+        }
+        for (int extra = spans; extra < count; extra++)
+        {
+            int longest = 0;
+            for (int i = 1; i < spans; i++)
+                if (routeSpanLengths[i] / subdivisions[i] >
+                    routeSpanLengths[longest] / subdivisions[longest]) longest = i;
+            subdivisions[longest]++;
+        }
+        int index = 0;
+        for (int span = 0; span < spans; span++)
+            for (int j = 0; j < subdivisions[span]; j++)
+            {
+                points[index] = Vector3.Lerp(route[span], route[span + 1], (float)j / subdivisions[span]);
+                previous[index] = points[index];
+                index++;
+            }
+        PinEnds();
     }
 
     private void ProjectToGround(int i)
@@ -195,6 +273,8 @@ public class HoseRope : MonoBehaviour
         if (!line.enabled) return;
         // Follow the held nozzle exactly between physics steps, including aim rotation.
         PinEnds();
+        ResolveObstacles();
+        if (UsesFootprints && !obstacleRoute.Valid) { line.enabled = false; return; }
         line.positionCount = points.Length;
         line.SetPositions(points);
     }
