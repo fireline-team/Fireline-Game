@@ -95,7 +95,7 @@ public class PlayerHoseConnection : MonoBehaviour
         var nozzle = CurrentNozzle();
         if (nozzle == null) return;
         Rope.GetTether(out Vector3 pivot, out float usedLength);
-        Vector3 offset = nozzle.NozzleTransform.position - pivot;
+        Vector3 offset = Rope.NozzlePosition - pivot;
         float remainingLength = Mathf.Max(0f, rules.HoseLength - usedLength);
         // Gameplay moves in XY. Nozzle height uses part of the total hose length.
         float reach = Mathf.Sqrt(Mathf.Max(0f, remainingLength * remainingLength - offset.z * offset.z));

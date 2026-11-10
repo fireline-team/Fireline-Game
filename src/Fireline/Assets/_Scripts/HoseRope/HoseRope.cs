@@ -28,6 +28,10 @@ public class HoseRope : MonoBehaviour
     private float[] routeSpanLengths = new float[8];
     private Transform source;
     private Transform nozzle;
+    private Transform nozzleOwner;
+    private Vector3 resolvedNozzle;
+    private Vector3 lastClearNozzle;
+    private bool hasClearNozzle;
     private Vector3 groundOrigin;
     private Vector3 groundUp = Vector3.back;
     private Vector3[] points;
@@ -46,12 +50,15 @@ public class HoseRope : MonoBehaviour
     public Vector3 GetPoint(int index) => points[index];
     public Transform Source => source;
     public Transform Nozzle => nozzle;
+    public Vector3 NozzlePosition => resolvedNozzle;
 
-    public void Bind(Transform waterSource, Transform nozzleHead, Vector3 planeOrigin, Vector3 planeUp)
+    public void Bind(Transform waterSource, Transform nozzleHead, Vector3 planeOrigin, Vector3 planeUp, Transform playerAnchor = null)
     {
         obstacleRoute.Clear();
         source = waterSource;
         nozzle = nozzleHead;
+        nozzleOwner = playerAnchor;
+        hasClearNozzle = false;
         groundOrigin = planeOrigin;
         groundUp = planeUp.sqrMagnitude > 0.001f ? planeUp.normalized : Vector3.back;
         line = GetComponent<LineRenderer>();
@@ -66,7 +73,8 @@ public class HoseRope : MonoBehaviour
         previous = new Vector3[segments + 1];
         lengthWeights = new float[segments];
         for (int i = 0; i < segments; i++) lengthWeights[i] = 1f / segments;
-        PaidOutLength = Mathf.Max(minimumLength, Vector3.Distance(source.position, nozzle.position) + payoutSlack);
+        RefreshNozzlePosition();
+        PaidOutLength = Mathf.Max(minimumLength, Vector3.Distance(source.position, resolvedNozzle) + payoutSlack);
         LayOut();
         ResolveObstacles();
         Render();
@@ -105,8 +113,9 @@ public class HoseRope : MonoBehaviour
     {
         // A full re-lay (bind/teleport) resets the adaptive local segment lengths.
         for (int i = 0; i < segments; i++) lengthWeights[i] = 1f / segments;
+        RefreshNozzlePosition();
         Vector3 start = source.position;
-        Vector3 end = nozzle.position;
+        Vector3 end = resolvedNozzle;
         Vector3 alongGround = Vector3.ProjectOnPlane(end - start, groundUp);
         if (alongGround.sqrMagnitude < 0.001f)
             alongGround = Vector3.ProjectOnPlane(Vector3.right, groundUp);
@@ -134,11 +143,12 @@ public class HoseRope : MonoBehaviour
     {
         if (source == null || nozzle == null || points == null || deltaTime <= 0f
             || float.IsNaN(deltaTime) || float.IsInfinity(deltaTime)) return;
+        RefreshNozzlePosition();
         // The source is a reel: pay out when taut, but keep the trail when returning.
-        PaidOutLength = Mathf.Max(PaidOutLength, Vector3.Distance(source.position, nozzle.position) + payoutSlack);
+        PaidOutLength = Mathf.Max(PaidOutLength, Vector3.Distance(source.position, resolvedNozzle) + payoutSlack);
         if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
         if ((source.position - lastSource).sqrMagnitude > teleportDistance * teleportDistance
-            || (nozzle.position - lastNozzle).sqrMagnitude > teleportDistance * teleportDistance)
+            || (resolvedNozzle - lastNozzle).sqrMagnitude > teleportDistance * teleportDistance)
         {
             obstacleRoute.Clear();
             LayOut();
@@ -190,15 +200,42 @@ public class HoseRope : MonoBehaviour
         }
         ResolveObstacles();
         lastSource = source.position;
-        lastNozzle = nozzle.position;
+        lastNozzle = resolvedNozzle;
     }
 
     private bool UsesFootprints => Mathf.Abs(groundUp.z) > 0.999f;
 
+    private void RefreshNozzlePosition()
+    {
+        if (source == null || nozzle == null) return;
+        resolvedNozzle = nozzle.position;
+        if (!UsesFootprints) return;
+        obstacleRoute.Configure(radius, groundOrigin.z + groundUp.z * groundClearance, gameObject.scene);
+        Vector3 anchor = nozzleOwner != null ? nozzleOwner.position :
+            hasClearNozzle ? lastClearNozzle : source.position;
+        // Prefer the player's side of the wall, even if a thin wall lies entirely
+        // between the player and a tip whose final position happens to be clear.
+        bool needsClamp = obstacleRoute.Contains(resolvedNozzle) ||
+            (nozzleOwner != null && obstacleRoute.Blocker(anchor, resolvedNozzle) != null);
+        if (needsClamp)
+        {
+            if (obstacleRoute.Contains(anchor))
+                anchor = hasClearNozzle && !obstacleRoute.Contains(lastClearNozzle) ? lastClearNozzle : source.position;
+            if (!obstacleRoute.Contains(anchor))
+                resolvedNozzle = obstacleRoute.ClampEndpoint(anchor, resolvedNozzle);
+        }
+        if (!obstacleRoute.Contains(resolvedNozzle))
+        {
+            lastClearNozzle = resolvedNozzle;
+            hasClearNozzle = true;
+        }
+    }
+
     private void RefreshObstacleRoute()
     {
         if (!UsesFootprints || source == null || nozzle == null) return;
-        obstacleRoute.Update(source.position, nozzle.position, radius,
+        RefreshNozzlePosition();
+        obstacleRoute.Update(source.position, resolvedNozzle, radius,
             groundOrigin.z + groundUp.z * groundClearance, gameObject.scene);
     }
 
@@ -221,18 +258,23 @@ public class HoseRope : MonoBehaviour
         if (!obstacleRoute.Valid) return;
         // Only repair the local run that actually intersects a footprint. Unaffected
         // particles keep their positions, velocity and share of the paid-out length.
-        for (int start = 0; start < segments; start++)
+        int remainingChecks = segments;
+        for (int start = 0; start < segments && remainingChecks-- > 0; start++)
         {
             if (!obstacleRoute.Contains(points[start]) && !obstacleRoute.Contains(points[start + 1])
                 && obstacleRoute.Blocker(points[start], points[start + 1]) == null) continue;
             int end = start + 1;
             while (start > 0 && obstacleRoute.Contains(points[start])) start--;
             while (end < segments && obstacleRoute.Contains(points[end])) end++;
-            if (obstacleRoute.Contains(points[start]) || obstacleRoute.Contains(points[end])) continue;
+            if (obstacleRoute.Contains(points[start]) || obstacleRoute.Contains(points[end]))
+            {
+                start = end - 1; // Backtracking must never retry the same unrepairable run.
+                continue;
+            }
             localRoute.Clear();
             localRoute.Update(points[start], points[end], radius,
                 groundOrigin.z + groundUp.z * groundClearance, gameObject.scene);
-            if (!localRoute.Valid) continue;
+            if (!localRoute.Valid) { start = end - 1; continue; }
             int addedSegments = RepairSpan(start, end);
             start += addedSegments - 1;
         }
@@ -306,7 +348,7 @@ public class HoseRope : MonoBehaviour
     private void PinEnds()
     {
         points[0] = source.position;
-        points[segments] = nozzle.position;
+        points[segments] = resolvedNozzle;
         previous[0] = points[0];
         previous[segments] = points[segments];
     }
@@ -318,10 +360,10 @@ public class HoseRope : MonoBehaviour
         if (line == null) return;
         line.enabled = source != null && nozzle != null && points != null;
         if (!line.enabled) return;
-        // Follow the held nozzle exactly between physics steps, including aim rotation.
+        // Clamp between physics steps too, so aiming cannot flash the hose inside a wall.
+        RefreshNozzlePosition();
         PinEnds();
         ResolveObstacles();
-        if (UsesFootprints && !obstacleRoute.Valid) { line.enabled = false; return; }
         line.positionCount = points.Length;
         line.SetPositions(points);
     }

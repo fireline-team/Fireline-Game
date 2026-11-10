@@ -73,7 +73,7 @@ public class HoseRopeSource : Interactable
         var rope = Instantiate(ropePrefab, player.transform);
         rope.name = "Supply hose";
         // The outlet is raised above the hydrant base; it is not the ground plane.
-        rope.Bind(sourcePoint, nozzle, transform.position, GroundNormal);
+        rope.Bind(sourcePoint, nozzle, transform.position, GroundNormal, player.transform);
         connections.Add(player);
         return rope;
     }

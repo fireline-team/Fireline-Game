@@ -20,13 +20,20 @@ internal sealed class HoseObstacleRoute
 
     public void Clear() => Points.Clear();
 
-    public void Update(Vector3 start, Vector3 end, float clearance, float z, Scene ownerScene)
+    public void Configure(float clearance, float z, Scene ownerScene)
     {
         scene = ownerScene;
         radius = clearance;
         groundZ = z;
         filter = new ContactFilter2D { useTriggers = false };
         filter.SetLayerMask(LayerMask.GetMask(Structure.ObstacleLayer));
+    }
+
+    public void Update(Vector3 start, Vector3 end, float clearance, float z, Scene ownerScene)
+    {
+        Configure(clearance, z, ownerScene);
+        // There is no path into a solid footprint. Do not expand a graph looking for one.
+        if (Contains(start) || Contains(end)) { Valid = false; Length = 0; return; }
         if (Points.Count < 2) { Points.Clear(); Points.Add(start); Points.Add(end); }
         Points[0] = start;
         Points[Points.Count - 1] = end;
@@ -51,6 +58,41 @@ internal sealed class HoseObstacleRoute
         for (int i = 0; i < count; i++)
             if (overlaps[i].gameObject.scene == scene) return true;
         return false;
+    }
+
+    /// <summary>Retract toward a clear player-side anchor instead of routing into a wall.</summary>
+    public Vector3 ClampEndpoint(Vector3 anchor, Vector3 desired)
+    {
+        Vector2 delta = desired - anchor;
+        float distance = delta.magnitude;
+        if (distance < 0.00001f) return anchor;
+        int count = Physics2D.CircleCast(anchor, radius, delta / distance, filter, hits, distance);
+        float allowed = distance;
+        bool blocked = false;
+        for (int i = 0; i < count; i++)
+        {
+            if (hits[i].collider.gameObject.scene != scene) continue;
+            allowed = Mathf.Min(allowed, Mathf.Max(0, hits[i].distance - 0.025f));
+            blocked = true;
+        }
+        if (!blocked && !Contains(desired)) return desired;
+        Vector3 result = Vector3.Lerp(anchor, desired, allowed / distance);
+        result.z = desired.z;
+        // Overlap/cast contact tolerances can differ at rotated corners. Stay on the
+        // same side of the wall as the anchor, with a bounded retreat if necessary.
+        if (Contains(result))
+        {
+            float low = 0, high = allowed / distance;
+            for (int i = 0; i < 12; i++)
+            {
+                float t = (low + high) * 0.5f;
+                if (Contains(Vector3.Lerp(anchor, desired, t))) high = t;
+                else low = t;
+            }
+            result = Vector3.Lerp(anchor, desired, low);
+            result.z = desired.z;
+        }
+        return result;
     }
 
     public Collider2D Blocker(Vector3 start, Vector3 end)

@@ -216,6 +216,61 @@ public class HoseRopeTests
         Assert.That(budget, Is.EqualTo(rope.PaidOutLength).Within(0.001f));
     }
 
+    [TestCase(0f)]
+    [TestCase(30f)]
+    public void RepeatedNozzleWallEntryKeepsHoseVisibleAndBounded(float rotation)
+    {
+        var building = Building(new Vector2(104, 100), new Vector2(2, 4), rotation);
+        Vector3 At(float x, float y, float z)
+        {
+            Vector3 result = building.transform.TransformPoint(new Vector3(x, y, 0));
+            result.z = z;
+            return result;
+        }
+        var source = Make("Source", At(-5, -2, -0.2f)).transform;
+        var player = Make("Player anchor", At(-1.5f, 0, 0)).transform;
+        var tip = Make("Nozzle", At(-0.4f, 0, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, tip, Vector3.zero, Vector3.back, player);
+        var line = rope.GetComponent<LineRenderer>();
+        var render = typeof(HoseRope).GetMethod("Render", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.That(line.enabled, Is.True, "Binding with an embedded tip must still show the hose");
+        for (int i = 0; i < 1000; i++)
+        {
+            bool inside = i % 2 == 0;
+            Vector3 requested = At(inside ? -0.4f : -1.4f, 0, -0.6f);
+            tip.position = requested;
+            rope.Simulate(0.02f);
+            render.Invoke(rope, null);
+            Assert.That(line.enabled, Is.True, $"Hose vanished on wall entry {i}");
+            Assert.That(tip.position, Is.EqualTo(requested), "Clamping the rope must not move the weapon transform");
+            Assert.That(rope.PointCount, Is.LessThan(256), "Repeated wall entry grew the simulation without bound");
+            CheckClear(rope);
+            if (inside)
+                Assert.That(building.transform.InverseTransformPoint(rope.NozzlePosition).x, Is.LessThan(-1f - rope.Radius));
+            else
+                Assert.That(rope.NozzlePosition, Is.EqualTo(requested), "The hose must return to the nozzle when clear");
+            Assert.That(line.GetPosition(line.positionCount - 1), Is.EqualTo(rope.NozzlePosition));
+        }
+    }
+
+    [Test]
+    public void NozzlePastThinWallRetractsToPlayerSideWithoutPhysicsStep()
+    {
+        Building(new Vector2(104, 100), new Vector2(0.2f, 4));
+        var source = Make("Source", new Vector3(100, 98, -0.2f)).transform;
+        var player = Make("Player anchor", new Vector3(103.5f, 100, 0)).transform;
+        var tip = Make("Nozzle", new Vector3(103.6f, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        rope.Bind(source, tip, Vector3.zero, Vector3.back, player);
+        tip.position = new Vector3(104.5f, 100, -0.6f); // Tip itself is clear, but the wall is in between.
+        typeof(HoseRope).GetMethod("Render", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .Invoke(rope, null);
+        Assert.That(rope.NozzlePosition.x, Is.LessThan(103.9f - rope.Radius));
+        Assert.That(rope.GetComponent<LineRenderer>().enabled, Is.True);
+        CheckClear(rope);
+    }
+
     private static void CheckGrounded(HoseRope rope, Vector3 origin, Vector3 up)
     {
         for (int i = 1; i < rope.PointCount - 1; i++)
