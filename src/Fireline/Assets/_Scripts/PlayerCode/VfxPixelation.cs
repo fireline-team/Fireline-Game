@@ -11,6 +11,17 @@ public static class VfxPixelation
     private static readonly int Colors = Shader.PropertyToID("ColorSteps");
     private static readonly int Cutoff = Shader.PropertyToID("AlphaCutoff");
 
+    public static void Apply(MaterialPropertyBlock properties, HoseVfxLibrary.PixelationSettings settings)
+    {
+        properties.SetFloat(Size, settings.enabled ? Mathf.Clamp(settings.pixelSize, 1, 32) : 1f);
+        properties.SetFloat(Strength, settings.enabled ? Mathf.Clamp01(settings.strength) : 0f);
+        properties.SetVector(Aspect, new Vector4(Mathf.Clamp(settings.pixelAspect.x, 0.25f, 4f),
+            Mathf.Clamp(settings.pixelAspect.y, 0.25f, 4f), 0f, 0f));
+        properties.SetVector(Offset, new Vector4(settings.gridOffset.x, settings.gridOffset.y, 0f, 0f));
+        properties.SetFloat(Colors, settings.enabled && settings.colorSteps >= 2 ? Mathf.Clamp(settings.colorSteps, 2, 32) : 0f);
+        properties.SetFloat(Cutoff, settings.enabled ? Mathf.Clamp(settings.alphaCutoff, 0f, 0.95f) : 0f);
+    }
+
     public static void Apply(VisualEffect effect, HoseVfxLibrary.PixelationSettings settings)
     {
         if (effect == null || !effect.HasFloat(Size)) return;

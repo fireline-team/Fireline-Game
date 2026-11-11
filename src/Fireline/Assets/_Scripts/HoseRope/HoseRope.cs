@@ -39,6 +39,7 @@ public class HoseRope : MonoBehaviour
     private LineRenderer line;
     private float maximumLength;
     private MaterialPropertyBlock colorProperties;
+    private HoseVfxLibrary vfxLibrary;
     private Vector3 lastSource;
     private Vector3 lastNozzle;
 
@@ -62,6 +63,7 @@ public class HoseRope : MonoBehaviour
         groundOrigin = planeOrigin;
         groundUp = planeUp.sqrMagnitude > 0.001f ? planeUp.normalized : Vector3.back;
         line = GetComponent<LineRenderer>();
+        vfxLibrary = Resources.Load<HoseVfxLibrary>(HoseVfxLibrary.ResourcePath);
         line.useWorldSpace = true;
         line.widthMultiplier = radius * 2f;
         line.numCapVertices = 4;
@@ -99,7 +101,7 @@ public class HoseRope : MonoBehaviour
 
     public void SetColor(Color color)
     {
-        // URP Unlit uses _BaseColor rather than LineRenderer vertex colors.
+        // Preserve compatibility with URP Unlit and the shared pixelated water shader.
         var renderer = GetComponent<LineRenderer>();
         var properties = colorProperties ?? (colorProperties = new MaterialPropertyBlock());
         renderer.GetPropertyBlock(properties);
@@ -360,6 +362,13 @@ public class HoseRope : MonoBehaviour
         if (line == null) return;
         line.enabled = source != null && nozzle != null && points != null;
         if (!line.enabled) return;
+        if (vfxLibrary != null)
+        {
+            var properties = colorProperties ?? (colorProperties = new MaterialPropertyBlock());
+            line.GetPropertyBlock(properties);
+            VfxPixelation.Apply(properties, vfxLibrary.SupplyHosePixelation);
+            line.SetPropertyBlock(properties);
+        }
         // Clamp between physics steps too, so aiming cannot flash the hose inside a wall.
         RefreshNozzlePosition();
         PinEnds();

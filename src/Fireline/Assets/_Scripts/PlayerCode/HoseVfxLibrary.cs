@@ -128,6 +128,8 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [SerializeField] private MistSettings mistAppearance = new MistSettings();
     [SerializeField] private SplashSettings splashAppearance = new SplashSettings();
     [SerializeField] private SteamSettings steamAppearance = new SteamSettings();
+    [Tooltip("Independent pixel filter for the supply hose rope. Updates connected hoses during Play Mode.")]
+    [SerializeField] private PixelationSettings supplyHosePixelation = new PixelationSettings { pixelSize = 2 };
     [SerializeField, HideInInspector] private PixelationSettings waterPixelation = new PixelationSettings();
     [SerializeField, HideInInspector] private int graphVersion;
 
@@ -141,6 +143,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     public MistSettings MistAppearance => mistAppearance;
     public SplashSettings SplashAppearance => splashAppearance;
     public SteamSettings SteamAppearance => steamAppearance;
+    public PixelationSettings SupplyHosePixelation => supplyHosePixelation;
     // Compatibility for callers that previously tuned the shared water filter.
     public PixelationSettings WaterPixelation => streamAppearance.pixelation;
     public PixelationSettings PixelationFor(NozzleType mode) => mode == NozzleType.Jet ? jetAppearance.pixelation

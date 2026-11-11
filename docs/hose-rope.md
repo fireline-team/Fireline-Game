@@ -64,6 +64,8 @@ These settings can change during Play Mode. Shortening a connected hose also pul
 
 ## Tuning SupplyHose
 
+In `Assets/Resources/HoseVfx/HoseVfxLibrary.asset`, expand **Supply Hose Pixelation** to tune the rope independently of stream, jet, and mist. The supply material reuses `PixelatedWater.shadergraph`, with pixelation enabled at size 2 by default. Enabled, Pixel Size, Strength, Pixel Aspect, Grid Offset, Color Steps, and Alpha Cutoff use the same shader bindings as water. Changes update connected ropes during Play Mode; player colors and strain warnings are preserved. Disable Enabled for smooth sampling. Color Steps and Alpha Cutoff filter the sampled texture before player tint, so they have little effect on the current solid white hose texture. This is the existing UV sampling filter; it does not expand the LineRenderer silhouette into full pixel blocks.
+
 | Setting | Default | Effect |
 |---|---:|---|
 | Segments | 64 | More points make smoother bends at higher CPU cost. |
