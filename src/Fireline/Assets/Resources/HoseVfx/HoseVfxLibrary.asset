@@ -91,7 +91,7 @@ MonoBehaviour:
     color: {r: 0.86, g: 0.91, b: 0.95, a: 0.32}
   supplyHosePixelation:
     enabled: 1
-    pixelSize: 2
+    pixelSize: 6
     strength: 1
     pixelAspect: {x: 1, y: 1}
     gridOffset: {x: 0, y: 0}
