@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(PlayerInput))]
-public class PlayerHealth : MonoBehaviour
+public partial class PlayerHealth : MonoBehaviour
 {
     [SerializeField, Min(1f)] private float maxHealth = 100f;
     [Tooltip("Brief immunity shared across all touching enemies and fire zones, in seconds.")]
@@ -77,6 +77,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void Update()
     {
+        UpdateBurning();
         bool fadeNow = false;
         if (IsInvulnerable && !RollInvulnerable)
         {
@@ -103,6 +104,7 @@ public class PlayerHealth : MonoBehaviour
     {
         if (RollInvulnerable) return;
         if (!health.TakeDamage(amount)) return;
+        ClearFire();
         revivalWater = 0f;
         if (blinkedOut) SetBlink(false);
         body.linearVelocity = Vector2.zero;
@@ -172,8 +174,13 @@ public class PlayerHealth : MonoBehaviour
         if (fire != null && fire.isActiveAndEnabled)
             damage = Mathf.Max(damage, fire.ContactDamage);
         if (damage <= 0f) return;
-        nextContactTime = Time.time + contactDamageCooldown;
-        TakeDamage(damage);
+        if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHealth > 0f)
+            TakeEnemyDamage(damage);
+        else
+        {
+            nextContactTime = Time.time + contactDamageCooldown;
+            TakeDamage(damage);
+        }
     }
 
     public void ResetScene()

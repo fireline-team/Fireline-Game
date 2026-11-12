@@ -42,8 +42,28 @@ public class CombatRollTests
         controller.RollEnded += () => ends++;
         controller.RollReady += () => ready++;
         controller.RollCooldownChanged += (value, total) => remaining = value;
+        typeof(PlayerHealth).GetField("contactDamageCooldown", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(health, 0.05f);
+        health.TakeEnemyDamage(30);
+        Assert.That(health.IsBurning, Is.True);
+        var burningVisual = player.GetComponent<PlayerDownedFire>();
+        Assert.That(burningVisual.IsBurningVisible, Is.True);
+        var flame = player.transform.Find("Player flames");
+        Assert.That(flame.GetComponent<MeshRenderer>().sharedMaterial.HasProperty("_FlameLength"), Is.True);
+        Assert.That(flame.GetComponentInChildren<Game.Runtime.FireZone>(), Is.Null);
         Assert.That(controller.TryCombatRoll(Vector2.zero), Is.False);
+        Assert.That(health.IsBurning, Is.True, "Rejected rolls cannot extinguish.");
         Assert.That(controller.TryCombatRoll(Vector2.right), Is.True);
+        Assert.That(health.IsBurning, Is.False);
+        Assert.That(burningVisual.IsBurningVisible, Is.False);
+        Assert.That(burningVisual.IsExtinguishSteamPlaying, Is.True);
+        var steam = player.GetComponentInChildren<ExtinguishSteam>();
+        Assert.That(steam, Is.Not.Null);
+        var steamEffect = steam.GetComponent<UnityEngine.VFX.VisualEffect>();
+        var library = Resources.Load<HoseVfxLibrary>(HoseVfxLibrary.ResourcePath);
+        Assert.That(steamEffect.visualEffectAsset, Is.EqualTo(library.Steam));
+        Assert.That(steamEffect.GetFloat("Lifetime"), Is.EqualTo(library.SteamAppearance.lifetime));
+        Assert.That(player.GetComponentsInChildren<ParticleSystem>(true)
+            .All(p => !p.isPlaying), Is.True, "Legacy player steam must not restart on extinguish.");
         Assert.That(controller.TryCombatRoll(Vector2.up), Is.False);
         Assert.That(health.IsInvulnerable, Is.True);
         float before = health.CurrentHealth;

@@ -42,6 +42,7 @@ public partial class PlayerController
         EndRollImmunity();
         immunityEndsAt = Time.time + Mathf.Clamp(immunityDuration, 0.01f, 2f);
         health.RollInvulnerable = true;
+        health.Extinguish();
         var flash = Resources.Load<Material>("CombatRollFlash");
         rollSprites = GetComponentsInChildren<SpriteRenderer>(true);
         rollMaterials = new Material[rollSprites.Length];

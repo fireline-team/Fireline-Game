@@ -107,7 +107,19 @@ public class PlayerRevivalTests
         Set(health, "waterToRevive", 1);
         foreach (var type in new[] { NozzleType.Standard, NozzleType.Mist, NozzleType.Jet })
         {
-            loadout.Equip(type); health.TakeDamage(10000); PlaceTarget(shooter,target);
+            loadout.Equip(type);
+            Set(health, "nextContactTime", 0);
+            Set(health, "waterToExtinguish", 1);
+            health.TakeEnemyDamage(30);
+            PlaceTarget(shooter,target);
+            Assert.That(health.IsBurning, Is.True);
+            Assert.That(target.GetComponent<PlayerDownedFire>().IsBurningVisible, Is.True);
+            loadout.Current.Spray(Vector2.right,1);
+            Assert.That(health.IsBurning, Is.False, type.ToString());
+            Assert.That(target.GetComponent<PlayerDownedFire>().IsBurningVisible, Is.False);
+            Assert.That(target.GetComponent<PlayerDownedFire>().IsExtinguishSteamPlaying, Is.True);
+            yield return new WaitForSeconds(0.6f); // Jet pulse cooldown.
+            health.TakeDamage(10000); PlaceTarget(shooter,target);
             loadout.Current.Spray(Vector2.right,1);
             Assert.That(health.IsDowned, Is.False, type.ToString());
         }

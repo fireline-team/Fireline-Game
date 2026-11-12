@@ -7,6 +7,51 @@ using UnityEngine;
 
 public static partial class HoseVfxAssets
 {
+    [MenuItem("Fireline/VFX/Upgrade Contact Pixelation")]
+    public static void UpgradeContactPixelation()
+    {
+        var library = AssetDatabase.LoadAssetAtPath<HoseVfxLibrary>(Root + "/HoseVfxLibrary.asset");
+        if (library == null) throw new InvalidOperationException("Create the hose VFX library first.");
+        if (library.GraphVersion < 5) UpgradeHoseFeelAndSmoke();
+        string shaderPath = Root + "/PixelatedWater.shadergraph";
+        AssetDatabase.ImportAsset(shaderPath, ImportAssetOptions.ForceSynchronousImport);
+        object shader = Call(TypeOf("UnityEditor.VFX.VFXShaderGraphHelpers"), "LoadShaderGraphAssetAtPath", shaderPath);
+        if (shader == null) throw new InvalidOperationException("Pixelated water shader did not import.");
+        string path = AssetDatabase.GetAssetPath(library.Steam);
+        var model = OpenModel(path, false);
+        PixelDefaults(model);
+        foreach (object output in ((IEnumerable)Get(model.Graph, "children")).Cast<object>()
+            .Where(c => c.GetType().Name == "VFXPlanarPrimitiveOutput" || c.GetType().Name == "VFXComposedParticleOutput").ToArray())
+        {
+            object replacement = output;
+            if (output.GetType().Name != "VFXComposedParticleOutput")
+            {
+                var links = new List<(object block, string[] path, object value, object[] sources)>();
+                foreach (object block in ((IEnumerable)Get(output, "children")))
+                foreach (object slot in Slots(block, "inputSlots")) CaptureSlotLinks(block, slot, new string[0], links);
+                object texture = Get(Slots(output, "inputSlots").First(s => (string)Get(s, "name") == "mainTexture"), "value");
+                object[] previous = ((IEnumerable)Get(model.Graph, "children")).Cast<object>().ToArray();
+                Setting(output, "shaderGraph", shader);
+                Call(TypeOf("UnityEditor.VFX.SanitizeHelper"), "MigrateSGOutputToComposed", output);
+                replacement = ((IEnumerable)Get(model.Graph, "children")).Cast<object>()
+                    .Single(c => !previous.Contains(c) && c.GetType().Name == "VFXComposedParticleOutput");
+                Set(Slots(replacement, "inputSlots").First(s => (string)Get(s, "name") == "_BaseMap"), "value", texture);
+                foreach (object block in ((IEnumerable)Get(replacement, "children"))) Call(block, "ResyncSlots", true);
+                foreach (var link in links.Where(l => l.path.Length == 1)) Set(FindBlockSlot(link.block, link.path), "value", link.value);
+                foreach (var link in links)
+                foreach (object source in link.sources)
+                    if (!(bool)Call(FindBlockSlot(link.block, link.path), "Link", source))
+                        throw new InvalidOperationException("Could not preserve a steam output block input.");
+            }
+            BindParticleTint(model, replacement);
+            BindPixelInputs(model, replacement);
+        }
+        SaveModel(model, path);
+        CheckProperties(library.Steam, PixelProperties);
+        CheckProperties(library.Splash, PixelProperties);
+        Debug.Log("[Hose VFX] Independent splash and steam pixelation ready.");
+    }
+
     [MenuItem("Fireline/VFX/Upgrade Water Pixelation and Contact Splash")]
     public static void UpgradeWaterPixelation()
     {

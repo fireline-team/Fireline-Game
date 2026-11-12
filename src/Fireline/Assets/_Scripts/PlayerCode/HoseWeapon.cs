@@ -277,15 +277,16 @@ public abstract class HoseWeapon : MonoBehaviour
         Vector2 across = new Vector2(-AimDirection.y, AimDirection.x);
         foreach (var player in PlayerHealth.ActivePlayers)
         {
-            if (player == null || !player.IsDowned || player == _health
+            if (player == null || (!player.IsDowned && !player.IsBurning) || player == _health
                 || player.gameObject.scene != gameObject.scene
                 || (hitLayers.value & (1 << player.gameObject.layer)) == 0) continue;
             Vector2 offset = (Vector2)player.transform.position - Origin;
             float forward = Vector2.Dot(offset, AimDirection);
             if (forward < 0f || forward > CurrentRange || Mathf.Abs(Vector2.Dot(offset, across)) > width * 0.5f + 0.3f) continue;
-            // A wide stream must not revive someone behind a wall beside its center line.
+            // A wide stream must not reach someone behind a wall beside its center line.
             if (blockingLayers != 0 && Physics2D.Linecast(Origin, player.transform.position, blockingLayers).collider != null) continue;
-            player.ApplyRevivalWater(_health, amount);
+            if (player.IsDowned) player.ApplyRevivalWater(_health, amount);
+            else player.ApplyExtinguishingWater(_health, amount);
         }
     }
 
