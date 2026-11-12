@@ -257,6 +257,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f83341ee3db443eb9e2fc91eaec03e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  rollDuration: 0.25
+  rollSpeedMultiplier: 3
+  rollCooldown: 5
   moveSpeed: 5
   boundarySprite: {fileID: 1087674415940790308}
   screenEdgePaddingPixels: 0
