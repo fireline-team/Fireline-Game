@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b31be682199c4dd499230ee309134eb, type: 3}
+  m_Name: BasicRangedAttack
+  m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.RangedAttackAbility
+  range: 8
+  fireInterval: 2.5
+  aimTime: 0.4
+  needsLineOfSight: 1
+  projectileSpeed: 7
+  damage: 10
+  lifetime: 3
+  radius: 0.25
+  reflectSpeedMultiplier: 1.5
+  reflectDamage: 25
+  projectilePrefab: {fileID: 0}
+  sprite: {fileID: 0}
+  color: {r: 1, g: 0.55, b: 0.15, a: 1}
+  size: 1
+  height: 0.6

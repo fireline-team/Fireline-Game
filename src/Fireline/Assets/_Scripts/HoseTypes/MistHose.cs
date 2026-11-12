@@ -6,6 +6,8 @@ public class MistHose : HoseWeapon
 {
     [Header("Mist Nozzle")]
     [SerializeField, Min(0f)] private float damagePerSecond = 8f;
+    [Tooltip("Water used per second of spraying while off a hydrant.")]
+    [SerializeField, Min(0f)] private float waterPerSecond = 6f;
     [Tooltip("Speed multiplier while slowed. 0.4 = enemies move at 40% speed.")]
     [SerializeField, Range(0.05f, 1f)] private float slowMultiplier = 0.4f;
     [Tooltip("How long the slow lasts after an enemy leaves the mist, in seconds.")]
@@ -15,6 +17,7 @@ public class MistHose : HoseWeapon
 
     protected override void OnSpray(float deltaTime)
     {
+        UseWater(waterPerSecond * deltaTime);
         List<HordeEnemy> hits = FindEnemiesInHitbox();
         float damage = damagePerSecond * deltaTime;
 

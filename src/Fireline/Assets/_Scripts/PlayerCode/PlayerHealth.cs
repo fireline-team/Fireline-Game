@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(PlayerInput))]
-public class PlayerHealth : MonoBehaviour
+public partial class PlayerHealth : MonoBehaviour
 {
     [SerializeField, Min(1f)] private float maxHealth = 100f;
     [Tooltip("Brief immunity shared across all touching enemies and fire zones, in seconds.")]
@@ -58,7 +58,8 @@ public class PlayerHealth : MonoBehaviour
     public float MaxHealth => health.Maximum;
     public bool IsDead => health != null && health.IsDead;
     /// <summary>True during the brief immunity after a hit (the "i-frames").</summary>
-    public bool IsInvulnerable => !IsDead && Time.time < nextContactTime;
+    public bool IsInvulnerable => !IsDead && (RollInvulnerable || Time.time < nextContactTime);
+    internal bool RollInvulnerable { get; set; }
     public event Action Died;
 
     private void Awake()
@@ -76,8 +77,9 @@ public class PlayerHealth : MonoBehaviour
 
     private void Update()
     {
+        UpdateBurning();
         bool fadeNow = false;
-        if (IsInvulnerable)
+        if (IsInvulnerable && !RollInvulnerable)
         {
             // Alternate between faded and solid, starting faded right after the hit.
             float elapsed = contactDamageCooldown - (nextContactTime - Time.time);
@@ -100,7 +102,9 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if (RollInvulnerable) return;
         if (!health.TakeDamage(amount)) return;
+        ClearFire();
         revivalWater = 0f;
         if (blinkedOut) SetBlink(false);
         body.linearVelocity = Vector2.zero;
@@ -141,14 +145,14 @@ public class PlayerHealth : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (IsDead || Time.time < nextContactTime) return;
+        if (IsDead || IsInvulnerable) return;
         // TriggerStay is not delivered for sleeping rigidbodies. Keep contact damage
         // running even when a player stands still, and prune despawned enemies.
         contacts.RemoveWhere(c => c == null || !c.enabled || !c.gameObject.activeInHierarchy);
         foreach (Collider2D contact in contacts)
         {
             TryContactDamage(contact);
-            if (IsDead || Time.time < nextContactTime) break;
+            if (IsDead || IsInvulnerable) break;
         }
     }
 
@@ -161,7 +165,7 @@ public class PlayerHealth : MonoBehaviour
 
     private void TryContactDamage(Collider2D other)
     {
-        if (IsDead || Time.time < nextContactTime) return;
+        if (IsDead || IsInvulnerable) return;
         HordeEnemy enemy = other.GetComponentInParent<HordeEnemy>();
         float damage = 0f;
         if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHealth > 0f)
@@ -170,8 +174,13 @@ public class PlayerHealth : MonoBehaviour
         if (fire != null && fire.isActiveAndEnabled)
             damage = Mathf.Max(damage, fire.ContactDamage);
         if (damage <= 0f) return;
-        nextContactTime = Time.time + contactDamageCooldown;
-        TakeDamage(damage);
+        if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHealth > 0f)
+            TakeEnemyDamage(damage);
+        else
+        {
+            nextContactTime = Time.time + contactDamageCooldown;
+            TakeDamage(damage);
+        }
     }
 
     public void ResetScene()

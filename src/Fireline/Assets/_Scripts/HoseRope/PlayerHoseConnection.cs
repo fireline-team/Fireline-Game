@@ -161,6 +161,9 @@ public class PlayerHoseConnection : MonoBehaviour
     private void StopIfDry()
     {
         if (HoseWaterRules.CanSpray(gameObject)) return;
+        // Detached but carrying water: keep spraying from the tank.
+        var tank = GetComponent<WaterTankController>();
+        if (tank != null && tank.HasWater) return;
         foreach (var nozzle in GetComponents<HoseWeapon>()) nozzle.StopSpraying();
     }
 

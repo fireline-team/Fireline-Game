@@ -61,6 +61,7 @@ public abstract class HoseWeapon : MonoBehaviour
     private HoseStreamVisual _stream;
     private HoseGraphVisual _graph;
     private PlayerHealth _health;
+    private WaterTankController _water;
     private RaycastHit2D _wall;
     private float _enemyImpactDistance;
     private Vector2 _enemyImpactPoint;
@@ -92,6 +93,9 @@ public abstract class HoseWeapon : MonoBehaviour
     protected virtual void Awake()
     {
         _health = GetComponent<PlayerHealth>();
+        // All nozzles on the player share one tank.
+        _water = GetComponent<WaterTankController>();
+        if (_water == null) _water = gameObject.AddComponent<WaterTankController>();
         if (blockingLayers == 0)
             blockingLayers = LayerMask.GetMask(Structure.ObstacleLayer);
 
@@ -130,7 +134,7 @@ public abstract class HoseWeapon : MonoBehaviour
     public void Spray(Vector2 direction, float deltaTime)
     {
         if (!isActiveAndEnabled || (_health != null && _health.IsDead)
-            || !HoseWaterRules.CanSpray(gameObject) || direction.sqrMagnitude < 0.001f)
+            || !_water.HasWater || direction.sqrMagnitude < 0.001f)
         {
             StopSpraying();
             return;
@@ -183,6 +187,15 @@ public abstract class HoseWeapon : MonoBehaviour
     /// then apply this nozzle's effects (damage, knockback, slow...).
     /// </summary>
     protected abstract void OnSpray(float deltaTime);
+
+    /// <summary>
+    /// For continuous nozzles: call every OnSpray with this step's water (per-second cost x deltaTime).
+    /// Free while on a hydrant; otherwise drains the tank.
+    /// </summary>
+    protected void UseWater(float amount) => _water.Use(amount);
+
+    /// <summary>For shots: takes the whole cost or nothing. Returns false if the tank can't cover it.</summary>
+    protected bool TryUseWater(float amount) => _water.TryUse(amount);
 
     /// <summary>Optional: react to the spray button being released.</summary>
     protected virtual void OnStopSpraying() { }
@@ -277,15 +290,16 @@ public abstract class HoseWeapon : MonoBehaviour
         Vector2 across = new Vector2(-AimDirection.y, AimDirection.x);
         foreach (var player in PlayerHealth.ActivePlayers)
         {
-            if (player == null || !player.IsDowned || player == _health
+            if (player == null || (!player.IsDowned && !player.IsBurning) || player == _health
                 || player.gameObject.scene != gameObject.scene
                 || (hitLayers.value & (1 << player.gameObject.layer)) == 0) continue;
             Vector2 offset = (Vector2)player.transform.position - Origin;
             float forward = Vector2.Dot(offset, AimDirection);
             if (forward < 0f || forward > CurrentRange || Mathf.Abs(Vector2.Dot(offset, across)) > width * 0.5f + 0.3f) continue;
-            // A wide stream must not revive someone behind a wall beside its center line.
+            // A wide stream must not reach someone behind a wall beside its center line.
             if (blockingLayers != 0 && Physics2D.Linecast(Origin, player.transform.position, blockingLayers).collider != null) continue;
-            player.ApplyRevivalWater(_health, amount);
+            if (player.IsDowned) player.ApplyRevivalWater(_health, amount);
+            else player.ApplyExtinguishingWater(_health, amount);
         }
     }
 

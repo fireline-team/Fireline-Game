@@ -5,8 +5,12 @@ using PlaneVector = System.Numerics.Vector2;
 
 namespace Game.Runtime
 {
+    /// <summary>
+    /// Moves every enemy each frame (seek players, keep spacing, slide along walls) and runs
+    /// their abilities. Abilities see it only as IHordeTargets.
+    /// </summary>
     [DefaultExecutionOrder(-100)]
-    public class HordeManager : MonoBehaviour
+    public class HordeManager : MonoBehaviour, IHordeTargets
     {
         public static HordeManager Instance { get; private set; }
 
@@ -170,15 +174,19 @@ namespace Game.Runtime
                 PlaneVector pos = _positions[i];
                 if (enemy.IsFlashing) enemy.UpdateFlash(now);
 
-                PlaneVector seek = ChooseDirection(pos, field);
+                // Rising out of the ground or channeling an ability: stand still.
+                bool still = enemy.IsRising || enemy.IsHeld;
+                PlaneVector seek = still ? PlaneVector.Zero
+                    : ChooseDirection(pos, field, Mathf.Max(stopDistance, enemy.KeepDistance));
 
                 _hash.QueryNeighbors(pos, _neighborBuffer);
                 PlaneVector push = HordeSteering.Separation(i, _positions, _neighborBuffer, separationRadius, maxNeighbors);
 
                 Vector2 knockback = enemy.KnockbackVelocity;
-                PlaneVector velocity = seek * (enemy.MoveSpeed * enemy.SpeedMultiplier)
-                                       + push * separationStrength
-                                       + new PlaneVector(knockback.x, knockback.y);
+                PlaneVector velocity = enemy.IsRising ? PlaneVector.Zero
+                                       : seek * (enemy.MoveSpeed * enemy.SpeedMultiplier)
+                                         + push * separationStrength
+                                         + new PlaneVector(knockback.x, knockback.y);
                 PlaneVector newPos = pos + velocity * dt;
                 if (field != null) newPos = field.Slide(pos, newPos); // slide along walls instead of walking through them
 
@@ -197,12 +205,20 @@ namespace Game.Runtime
                     enemy.Sprite.flipX = (seek.X < 0f) != enemy.ArtFacesLeft;
             }
 
+            // Abilities run after movement. They may spawn enemies (added to the end of the list)
+            // or end their own enemy's life (swapped out of the list), so walk backwards.
+            for (int i = Mathf.Min(count, _enemies.Count) - 1; i >= 0; i--)
+            {
+                if (i >= _enemies.Count) continue;
+                _enemies[i].TickBehaviors(dt, this);
+            }
+
             _stopwatch.Stop();
             LastUpdateMs = (float)_stopwatch.Elapsed.TotalMilliseconds;
         }
 
         // Which way an enemy wants to walk (unit length, or zero when close enough to its target).
-        private PlaneVector ChooseDirection(PlaneVector pos, FlowField field)
+        private PlaneVector ChooseDirection(PlaneVector pos, FlowField field, float stopDistance)
         {
             if (_playerPositions.Count == 0) return PlaneVector.Zero;
 
@@ -222,6 +238,18 @@ namespace Game.Runtime
             // No grid, outside it, or walled off from everyone: straight at the nearest player, as before.
             int nearest = HordeSteering.FindNearest(pos, _playerPositions);
             return nearest >= 0 ? HordeSteering.Seek(pos, _playerPositions[nearest], stopDistance) : PlaneVector.Zero;
+        }
+
+        public bool TryGetNearestPlayer(Vector2 from, out Vector2 position)
+        {
+            int nearest = HordeSteering.FindNearest(new PlaneVector(from.x, from.y), _playerPositions);
+            if (nearest < 0)
+            {
+                position = default;
+                return false;
+            }
+            position = new Vector2(_playerPositions[nearest].X, _playerPositions[nearest].Y);
+            return true;
         }
 
 #if UNITY_EDITOR

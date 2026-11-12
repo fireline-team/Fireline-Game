@@ -16,6 +16,8 @@ public class JetHose : HoseWeapon
     [SerializeField, Min(0f)] private float knockbackImpulse = 6f;
     [Tooltip("How many water blobs each shot throws out.")]
     [SerializeField, Min(1)] private int particlesPerShot = 18;
+    [Tooltip("Water used per shot while off a hydrant. A shot won't fire without this much in the tank.")]
+    [SerializeField, Min(0f)] private float waterPerShot = 8f;
 
     private float _nextFireTime;
 
@@ -30,6 +32,7 @@ public class JetHose : HoseWeapon
     {
         // The cooldown keeps running after release, so tapping the button can't fire faster.
         if (!IsReady) return;
+        if (!TryUseWater(waterPerShot)) return; // not enough for a full shot
 
         _nextFireTime = Time.time + fireInterval;
         PulseStream(particlesPerShot);

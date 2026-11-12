@@ -35,12 +35,12 @@ Select **Assets/Resources/HoseVfx/HoseVfxLibrary.asset** in the Project browser 
 | Stream Appearance | Beam width/color, extension speed, aim response time, release fade, beam gravity, maximum drop; droplet rate/size/lifetime/motion/color, and its own Pixelation settings |
 | Jet Appearance | Spear length, width, flight time, color, fade start, and its own Pixelation settings |
 | Mist Appearance | Density, size, lifetime, spread multipliers, and its own Pixelation settings |
-| Splash Appearance | Stream Rate for continuous contact, jet burst count, droplet size/lifetime/speed/spread/color; legacy stream count/interval support older custom graphs |
-| Steam Appearance | Cloud size/lifetime/rise speed/spread/color, puff interval, particles per water unit, and minimum/maximum puff counts |
+| Splash Appearance | Stream Rate for continuous contact, jet burst count, droplet size/lifetime/speed/spread/color; independent Pixelation settings; legacy stream count/interval support older custom graphs |
+| Steam Appearance | Cloud size/lifetime/rise speed/spread/color, puff interval, particles per water unit, minimum/maximum puff counts, and independent Pixelation settings |
 
 Colors include an alpha channel for transparency. Dimensions are in world units, durations are in seconds, and speeds are world units per second. Changes to the library are read during firing and are visible in both gameplay and the preview scene. The library is an asset: Inspector edits during Play Mode persist, so undo experiments or make a duplicate library for alternate art settings. Assign a duplicate in a hose component's **Hose Vfx** slot for a separate per-nozzle style; assign it to the preview component's **Library** slot to preview that same style.
 
-Expand **Pixelation** inside **Stream Appearance**, **Mist Appearance**, or **Jet Appearance**. Each nozzle's water and splashes use that nozzle's settings; changing one does not change the others. Water-contact steam keeps its soft appearance. The filter has:
+Expand **Pixelation** inside **Stream Appearance**, **Mist Appearance**, **Jet Appearance**, **Splash Appearance**, or **Steam Appearance**. Each group has its own filter. Splash and steam settings apply across all nozzles and update existing effects during Play Mode. Both contact filters default to enabled with Pixel Size 2. Disable Steam Pixelation to restore smooth sampling of the original soft texture. **Fireline > VFX > Upgrade Contact Pixelation** upgrades older steam graphs while preserving their texture, simulation, tint, and lifetime fades. The filter has:
 
 - **Enabled:** bypass the whole filter when disabled.
 - **Pixel Size** (1–32): block size in render-target pixels; larger gives coarser pixels.
@@ -49,6 +49,8 @@ Expand **Pixelation** inside **Stream Appearance**, **Mist Appearance**, or **Je
 - **Grid Offset:** shifts the pixel grid in render-target pixels.
 - **Color Steps:** levels per texture color channel; zero preserves gradients, two or more posterizes them.
 - **Alpha Cutoff:** discards faint texture edges while preserving particle lifetime fades.
+
+Fully extinguished environmental fires, extinguished players (including combat rolls), and revived players also use the library's Steam graph and Steam Appearance settings. Completion emits one puff using Maximum Count and the configured Lifetime; it does not reuse the old long-lived prefab ParticleSystem. Reigniting or disabling the owner clears the puff.
 
 The unlit VFX shader samples the original texture on a screen-aligned grid. No full-screen post-process, extra camera, layer, or renderer feature is needed. Camera upscaling/post-processing can soften the final pixels. Fine droplets may occupy part of a block; use larger droplets or smaller Pixel Size to retain fine mist density.
 

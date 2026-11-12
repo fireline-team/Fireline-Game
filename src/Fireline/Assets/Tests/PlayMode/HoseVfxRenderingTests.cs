@@ -361,6 +361,75 @@ public sealed class HoseVfxRenderingTests
     }
 
     [UnityTest]
+    public IEnumerator ExtinguishedFireUsesLibrarySteamAndClearsItOnReignite()
+    {
+        var go = NewObject("Completion fire");
+        go.SetActive(false);
+        var legacyObject = new GameObject("Legacy steam");
+        legacyObject.transform.SetParent(go.transform, false);
+        var legacy = legacyObject.AddComponent<ParticleSystem>();
+        var fire = go.AddComponent<FireZone>();
+        typeof(FireZone).GetField("extinguishSteam", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(fire, legacy);
+        go.SetActive(true);
+        fire.ApplyWater(1000f);
+        var steam = go.GetComponentInChildren<ExtinguishSteam>();
+        Assert.That(steam, Is.Not.Null);
+        Assert.That(steam.IsPlaying, Is.True);
+        Assert.That(legacy.isPlaying, Is.False);
+        Assert.That(legacy.gameObject.activeSelf, Is.False);
+        var effect = steam.GetComponent<VisualEffect>();
+        var library = Resources.Load<HoseVfxLibrary>(HoseVfxLibrary.ResourcePath);
+        Assert.That(effect.visualEffectAsset, Is.EqualTo(library.Steam));
+        Assert.That(effect.GetFloat("Lifetime"), Is.EqualTo(library.SteamAppearance.lifetime));
+        Assert.That(effect.GetFloat("PixelSize"), Is.EqualTo(library.SteamAppearance.pixelation.enabled
+            ? library.SteamAppearance.pixelation.pixelSize : 1));
+        fire.Ignite();
+        Assert.That(steam.IsPlaying, Is.False);
+        fire.ApplyWater(1000f);
+        Assert.That(go.GetComponentsInChildren<ExtinguishSteam>().Length, Is.EqualTo(1));
+        yield return new WaitForSeconds(library.SteamAppearance.lifetime * 1.2f + 0.1f);
+        Assert.That(steam.IsPlaying, Is.False, "Completion steam is a bounded puff.");
+    }
+
+    [UnityTest]
+    public IEnumerator ContactPixelationIsIndependentAndUpdatesExistingSteam()
+    {
+        _library.MistAppearance.pixelation.pixelSize = 3;
+        _library.SplashAppearance.pixelation.pixelSize = 7;
+        var settings = _library.SteamAppearance.pixelation;
+        settings.pixelSize = 11;
+        settings.strength = 0.6f;
+        settings.pixelAspect = new Vector2(2f, 1f);
+        settings.gridOffset = new Vector2(3f, 4f);
+        settings.colorSteps = 5;
+        settings.alphaCutoff = 0.2f;
+        var visual = Visual(NozzleType.Mist);
+        visual.WaterFire(visual, Vector3.zero, 1f);
+        var water = visual.transform.Find("Water").GetComponent<VisualEffect>();
+        var splash = visual.transform.Find("Impact splash").GetComponent<VisualEffect>();
+        var steam = visual.transform.Find("Fire contact steam").GetComponent<VisualEffect>();
+        Assert.That(water.GetFloat("PixelSize"), Is.EqualTo(3f));
+        Assert.That(splash.GetFloat("PixelSize"), Is.EqualTo(7f));
+        Assert.That(steam.GetFloat("PixelSize"), Is.EqualTo(11f));
+        Assert.That(steam.GetFloat("PixelStrength"), Is.EqualTo(0.6f));
+        Assert.That(steam.GetVector2("PixelAspect"), Is.EqualTo(settings.pixelAspect));
+        Assert.That(steam.GetVector2("PixelOffset"), Is.EqualTo(settings.gridOffset));
+        Assert.That(steam.GetFloat("ColorSteps"), Is.EqualTo(5f));
+        Assert.That(steam.GetFloat("AlphaCutoff"), Is.EqualTo(0.2f));
+        settings.enabled = false;
+        _library.SplashAppearance.pixelation.pixelSize = 9;
+        yield return null;
+        yield return null;
+        Assert.That(steam.GetFloat("PixelSize"), Is.EqualTo(1f));
+        Assert.That(steam.GetFloat("PixelStrength"), Is.Zero);
+        Assert.That(steam.GetFloat("ColorSteps"), Is.Zero);
+        Assert.That(steam.GetFloat("AlphaCutoff"), Is.Zero);
+        Assert.That(splash.GetFloat("PixelSize"), Is.EqualTo(9f));
+        Assert.That(water.GetFloat("PixelSize"), Is.EqualTo(3f));
+    }
+
+    [UnityTest]
     public IEnumerator EveryNozzleHasIndependentPixelationAndExtendedControls()
     {
         var streamSettings = _library.StreamAppearance.pixelation;

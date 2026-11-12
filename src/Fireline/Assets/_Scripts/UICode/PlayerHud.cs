@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Drives one player's HUD panel: health bar, hose ring, axe cooldown and portrait.
+/// Drives one player's HUD panel: health bar, water bar, hose ring, axe cooldown and portrait.
 /// Put this on the root of the HUD panel prefab and drag the pieces in.
 /// PlayerHudManager spawns one per player and calls Bind(); you can also call Bind() yourself.
 ///
@@ -27,6 +27,10 @@ public class PlayerHud : MonoBehaviour
     [Tooltip("Seconds the trail waits before draining.")]
     [SerializeField, Min(0f)] private float trailDelay = 0.4f;
     [SerializeField, Min(0.1f)] private float trailSpeed = 1.5f;
+
+    [Header("Water Bar")]
+    [Tooltip("The water tank bar (a WaterBarView). If left empty, the first one inside this panel is used.")]
+    [SerializeField] private WaterBarView waterBar;
 
     [Header("Hose Ring")]
     [Tooltip("The red coiled hose. Spins when the player switches nozzles.")]
@@ -104,6 +108,10 @@ public class PlayerHud : MonoBehaviour
         _axe = player.GetComponentInChildren<AxeSwing>();
         _input = player.GetComponent<PlayerInput>();
 
+        // The water bar listens to the tank itself; we just tell it which tank.
+        var water = player.GetComponent<WaterTankController>();
+        if (waterBar != null) waterBar.Bind(water != null ? water.Tank : null);
+
         if (_loadout != null)
         {
             _loadout.Changed += OnNozzleChanged;
@@ -121,6 +129,7 @@ public class PlayerHud : MonoBehaviour
     private void Unbind()
     {
         if (_loadout != null) _loadout.Changed -= OnNozzleChanged;
+        if (waterBar != null) waterBar.Bind(null);
         _loadout = null;
         _axe = null;
         _input = null;
@@ -129,6 +138,7 @@ public class PlayerHud : MonoBehaviour
 
     private void Awake()
     {
+        if (waterBar == null) waterBar = GetComponentInChildren<WaterBarView>(true);
         if (axeIcon != null) _axeBaseScale = axeIcon.rectTransform.localScale;
         if (shakeTarget != null) _shakeBase = shakeTarget.anchoredPosition;
     }

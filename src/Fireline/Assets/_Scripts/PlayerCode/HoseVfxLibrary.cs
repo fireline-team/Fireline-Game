@@ -75,6 +75,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [Serializable]
     public sealed class SplashSettings
     {
+        public PixelationSettings pixelation = new PixelationSettings { pixelSize = 2 };
         [Tooltip("Continuous droplets per second at the visible beam endpoint, including its ground landing. Zero disables the beam splash.")]
         [Range(0f, 600f)] public float streamRate = 155f;
         [Tooltip("Legacy burst count, used only by older custom splash graphs without a continuous emitter.")]
@@ -92,6 +93,7 @@ public sealed class HoseVfxLibrary : ScriptableObject
     [Serializable]
     public sealed class SteamSettings
     {
+        public PixelationSettings pixelation = new PixelationSettings { pixelSize = 2 };
         [Min(0.005f)] public float size = 0.45f;
         [Range(0.05f, 5f)] public float lifetime = 1.3f;
         [Min(0f)] public float riseSpeed = 1f;

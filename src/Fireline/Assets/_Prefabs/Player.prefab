@@ -116,6 +116,7 @@ GameObject:
   - component: {fileID: 2627532492962399250}
   - component: {fileID: 2109946662711708551}
   - component: {fileID: 5913907959130893562}
+  - component: {fileID: 5909500234918799618}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -257,6 +258,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f83341ee3db443eb9e2fc91eaec03e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  rollDuration: 0.25
+  immunityDuration: 0.5
+  rollSpeedMultiplier: 3
+  rollCooldown: 5
   moveSpeed: 5
   boundarySprite: {fileID: 1087674415940790308}
   screenEdgePaddingPixels: 0
@@ -276,6 +281,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75557b8445c8442abfb8cbb917c1eb94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageToIgnite: 30
+  waterToExtinguish: 45
+  burningDamagePerSecond: 5
   maxHealth: 100
   contactDamageCooldown: 0.75
   waterToRevive: 90
@@ -548,8 +556,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1767d346037429a8fc0eedf4bc74e8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::PlayerDownedFire
-  fireVisualPrefab: {fileID: 2722837022463238924, guid: 07b9c96bb518d294f8e8f1ed9abe5a07, type: 3}
+  fireVisualPrefab: {fileID: 2285449017428956352, guid: 8b846f07a08e4ca5879e85ac86886684, type: 3}
   fireScale: {x: 1.3, y: 2, z: 1}
+--- !u!114 &5909500234918799618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5675f6b0d5b464f5ca6e9cea5438f230, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::WaterTankController
+  capacity: 100
+  refillPerSecond: 25
+  useTankWhileConnected: 0
 --- !u!1 &1376534921308105634
 GameObject:
   m_ObjectHideFlags: 0

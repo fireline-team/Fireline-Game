@@ -350,6 +350,7 @@ public class FireMissionTests
         var enemyObject = Make("Enemy", civilian.transform.position);
         enemyObject.SetActive(false);
         var definition = ScriptableObject.CreateInstance<EnemyDefinition>();
+        Set(definition, "riseDuration", 0f); // hurt right away instead of rising out of the ground
         var enemy = enemyObject.AddComponent<HordeEnemy>();
         Set(enemy, "definition", definition);
         enemyObject.AddComponent<CircleCollider2D>().isTrigger = true;
