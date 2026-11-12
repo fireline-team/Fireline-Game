@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(PlayerHealth))] // plus at least one hose: StandardHose, MistHose, or JetHose
-public class PlayerController : MonoBehaviour
+public partial class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
         health.Died += OnDied;
         playerInput = GetComponent<PlayerInput>();
 
+        rollAction = playerInput.actions.FindAction("CombatRoll");
         moveAction = playerInput.actions["Move"];
         aimAction = playerInput.actions["Aim"];
         useWeaponAction = playerInput.actions["UseWeapon"];
@@ -78,6 +79,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        UpdateRoll();
         if (Fireline.Missions.GameManager.BlocksGameplay)
         {
             moveInput = Vector2.zero;
@@ -96,6 +98,7 @@ public class PlayerController : MonoBehaviour
         }
 
         ReadMovement();
+        if (rollAction != null && rollAction.WasPressedThisFrame()) TryCombatRoll(moveInput);
         ReadAim();
         UpdateAnimation();
         ReadActions();
@@ -123,7 +126,8 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        Vector2 desired = rb.position + moveInput * moveSpeed * Time.fixedDeltaTime;
+        Vector2 velocity = IsRolling ? rollDirection * moveSpeed * rollSpeedMultiplier : moveInput * moveSpeed;
+        Vector2 desired = rb.position + velocity * Time.fixedDeltaTime;
         Vector2 constrained = ConstrainToScreen(desired);
         rb.linearVelocity = (constrained - rb.position) / Time.fixedDeltaTime;
     }
@@ -293,6 +297,8 @@ public class PlayerController : MonoBehaviour
 
     private void OnDisable()
     {
+        EndRoll();
+        EndRollImmunity();
         spraying = false;
         if (rb != null) rb.linearVelocity = Vector2.zero;
         if (hose != null) hose.StopSpraying();
@@ -312,7 +318,7 @@ public class PlayerController : MonoBehaviour
     private void UpdateAnimation()
     {
         if (_animator == null) return;
-        _animator.SetBool(IsMovingParam, moveInput.sqrMagnitude > 0.01f);
+        _animator.SetBool(IsMovingParam, IsRolling || moveInput.sqrMagnitude > 0.01f);
     }
     
     private Vector2 ScreenToGround(Vector2 screenPos)
