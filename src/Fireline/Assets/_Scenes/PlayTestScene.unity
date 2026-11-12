@@ -2680,7 +2680,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!114 &376665639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3117,7 +3117,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &484846396
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3572,7 +3572,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1 &532505315
 GameObject:
   m_ObjectHideFlags: 0
@@ -5879,7 +5879,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &819351141
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6051,7 +6051,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &847086037
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6420,7 +6420,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &905660855
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7269,7 +7269,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &1045244917
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8645,7 +8645,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &1350243981
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9422,7 +9422,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &1464008565
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10884,7 +10884,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1 &1721440122
 GameObject:
   m_ObjectHideFlags: 0
@@ -11794,7 +11794,7 @@ MonoBehaviour:
   lossIntervalSeconds: 30
   warningSeconds: 20
   releaseIntervalSeconds: 1
-  civilianSprite: {fileID: 1060473404610889872, guid: 4f2ab66b936d44a1b873d15176e330be, type: 3}
+  civilianPrefab: {fileID: 8727352316659291011, guid: e2111d07cf4714647908ee11aa603964, type: 3}
 --- !u!1001 &1934808647
 PrefabInstance:
   m_ObjectHideFlags: 0

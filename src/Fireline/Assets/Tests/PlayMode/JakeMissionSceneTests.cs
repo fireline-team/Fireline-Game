@@ -98,7 +98,10 @@ public class JakeMissionSceneTests
         var civilianArt = civilian.GetComponentInChildren<SpriteRenderer>();
         var playerArt = player.transform.Find("PlayerSprite").GetComponent<SpriteRenderer>();
         Assert.That(civilianArt.sprite, Is.Not.Null);
-        Assert.That(civilianArt.sprite.texture, Is.SameAs(playerArt.sprite.texture));
+        var appearance = civilian.GetComponentInChildren<CivilianAppearance>();
+        Assert.That(appearance, Is.Not.Null);
+        Assert.That(appearance.VariantCount, Is.EqualTo(3));
+        Assert.That(civilianArt.sprite.texture.name, Is.EqualTo($"fireline_civiliansprites_civilian{appearance.SelectedVariant + 1}"));
         Assert.That(civilianArt.transform.lossyScale.y, Is.LessThan(playerArt.transform.lossyScale.y));
         Assert.That(civilian.MoveSpeed, Is.LessThan(player.GetComponent<PlayerController>().MoveSpeed));
         Assert.That(civilian.GetComponent<PlayerHealth>(), Is.Null, "Civilians must not become player slots.");
