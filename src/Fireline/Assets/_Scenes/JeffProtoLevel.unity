@@ -3953,6 +3953,15 @@ MonoBehaviour:
   - type: {fileID: 11400000, guid: e92455087af1e4facad1ce6d12660e0e, type: 2}
     spawnPercent: 10
     unlockTime: 20
+  - type: {fileID: 11400000, guid: 19957844c9dff48bcb8342fa52ee1040, type: 2}
+    spawnPercent: 10
+    unlockTime: 20
+  - type: {fileID: 11400000, guid: b693397ecb86a42beb394cce5000869e, type: 2}
+    spawnPercent: 10
+    unlockTime: 20
+  - type: {fileID: 11400000, guid: ddb85f5c2ba784524a16db4a6821073a, type: 2}
+    spawnPercent: 15
+    unlockTime: 10
   maxAlive: 300
   rampDuration: 300
   rampCurve:
@@ -6724,7 +6733,7 @@ Sprite:
       height: 4
     textureRectOffset: {x: 0, y: 0}
     atlasRectOffset: {x: -1, y: -1}
-    settingsRaw: 2112
+    settingsRaw: 3136
     uvTransform: {x: 4, y: 2, z: 4, w: 2}
     downscaleMultiplier: 1
   m_AtlasRD:
@@ -6805,7 +6814,7 @@ Sprite:
         format: 0
         dimension: 0
       m_DataSize: 80
-      _typelessdata: 000000bf0000003f000000000000003f0000003f00000000000000bf000000bf000000000000003f000000bf000000000000000000000000000000000000000000000000000000000000000000000000
+      _typelessdata: 000000bf0000003f000000000000003f0000003f00000000000000bf000000bf000000000000003f000000bf00000000000000000000803f0000803f0000803f00000000000000000000803f00000000
     m_Bindpose: []
     m_BlendShapes:
       vertices: []

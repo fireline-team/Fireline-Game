@@ -2,7 +2,10 @@ using UnityEngine;
 
 namespace Game.Runtime
 {
-    // recently added knockback
+    /// <summary>
+    /// One enemy type: stats, looks and behaviors. The shared HordeEnemy prefab becomes this
+    /// type when spawned. To make a new type, create one of these and add abilities to it.
+    /// </summary>
     [CreateAssetMenu(fileName = "NewEnemy", menuName = "Fireline/Enemy Definition")]
     public class EnemyDefinition : ScriptableObject
     {
@@ -14,6 +17,14 @@ namespace Game.Runtime
         [SerializeField, Min(0f)] private float contactDamage = 10f;
         [Tooltip("0 = full knockback from hoses, 1 = can't be pushed at all (tanks, bosses).")]
         [SerializeField, Range(0f, 1f)] private float knockbackResistance = 0f;
+
+        [Header("Behavior")]
+        [Tooltip("Stops walking once this close to a player. 0 = walk right into them (melee). Ranged and support enemies hang back.")]
+        [SerializeField, Min(0f)] private float keepDistance = 0f;
+        [Tooltip("Seconds spent climbing out of the ground when spawned. It can't move or hurt anyone meanwhile. 0 = appear instantly.")]
+        [SerializeField, Min(0f)] private float riseDuration = 0.6f;
+        [Tooltip("What this enemy does besides walking at players: shoot, summon, leave fires... (Create > Fireline > Enemy Abilities).")]
+        [SerializeField] private EnemyAbility[] abilities = new EnemyAbility[0];
 
         [Header("Looks")]
         [Tooltip("Each spawn picks one at random, so a single enemy type doesn't look copy-pasted. One entry is fine. Leave empty to keep the prefab's sprite.")]
@@ -35,6 +46,9 @@ namespace Game.Runtime
         public float MaxHealth => maxHealth;
         public float ContactDamage => contactDamage;
         public float KnockbackResistance => knockbackResistance;
+        public float KeepDistance => keepDistance;
+        public float RiseDuration => riseDuration;
+        public System.Collections.Generic.IReadOnlyList<EnemyAbility> Abilities => abilities;
         public Color Tint => tint;
         public bool ArtFacesLeft => artFacesLeft;
         public RuntimeAnimatorController AnimatorController => animatorController;

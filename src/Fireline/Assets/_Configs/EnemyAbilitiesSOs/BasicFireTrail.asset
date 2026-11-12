@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59186cfbac5ef454b85746a11b54a7a4, type: 3}
+  m_Name: BasicFireTrail
+  m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.FireTrailAbility
+  firePrefab: {fileID: 4049022197182683722, guid: 24f7262dfdd414b88a0b6e9a19110a98, type: 3}
+  fireScale: 0.5
+  interval: 3
+  fireLifetime: 8
+  minSpacing: 1.5
+  maxPerEnemy: 3
+  maxInLevel: 40

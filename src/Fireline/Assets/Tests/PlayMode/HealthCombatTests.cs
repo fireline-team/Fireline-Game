@@ -30,6 +30,9 @@ public class HealthCombatTests
         go.AddComponent<CircleCollider2D>().isTrigger = true;
         var definition = ScriptableObject.CreateInstance<EnemyDefinition>();
         created.Add(definition);
+        // These tests need enemies that can hurt right away, not ones climbing out of the ground.
+        typeof(EnemyDefinition).GetField("riseDuration", BindingFlags.NonPublic | BindingFlags.Instance)
+            .SetValue(definition, 0f);
         var enemy = go.AddComponent<HordeEnemy>();
         enemy.SetDefinition(definition);
         go.SetActive(true);
