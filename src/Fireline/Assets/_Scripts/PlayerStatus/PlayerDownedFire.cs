@@ -8,9 +8,9 @@ public class PlayerDownedFire : MonoBehaviour
     [SerializeField] private Vector3 fireScale = new Vector3(1.3f, 2f, 1f);
     private PlayerHealth health;
     private GameObject fire;
-    private ParticleSystem steam;
+    private ExtinguishSteam steam;
     public bool IsBurningVisible => fire != null && fire.activeInHierarchy;
-    public bool IsExtinguishSteamPlaying => steam != null && steam.isPlaying;
+    public bool IsExtinguishSteamPlaying => steam != null && steam.IsPlaying;
 
     private void Awake() => health = GetComponent<PlayerHealth>();
     private void OnEnable()
@@ -47,15 +47,17 @@ public class PlayerDownedFire : MonoBehaviour
             foreach (var collider in fire.GetComponentsInChildren<Collider>(true)) collider.enabled = false;
             foreach (var collider in fire.GetComponentsInChildren<Collider2D>(true)) collider.enabled = false;
 
-            steam = fire.GetComponentInChildren<ParticleSystem>(true);
-            if (steam != null)
+            // Retire the legacy prefab particles; hiding/showing flames must never restart them.
+            foreach (var legacy in fire.GetComponentsInChildren<ParticleSystem>(true))
             {
-                // A sibling survives hiding the flame mesh and does not shrink with water progress.
-                steam.transform.SetParent(transform, true);
-                steam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                legacy.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                var main = legacy.main;
+                main.playOnAwake = false;
+                legacy.gameObject.SetActive(false);
             }
+            steam = ExtinguishSteam.Create(transform, fire.transform.position, bodySprite);
         }
-        if (steam != null) steam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (steam != null) steam.Clear();
         if (fire != null) { fire.SetActive(true); Update(); }
     }
 
@@ -77,8 +79,7 @@ public class PlayerDownedFire : MonoBehaviour
         Hide();
         if (wasVisible && steam != null)
         {
-            steam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            steam.Play(true);
+            steam.Play();
         }
     }
 
@@ -94,7 +95,7 @@ public class PlayerDownedFire : MonoBehaviour
             health.Extinguished -= OnExtinguished;
         }
         Hide();
-        if (steam != null) steam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        if (steam != null) steam.Clear();
     }
 
     private void OnDestroy()

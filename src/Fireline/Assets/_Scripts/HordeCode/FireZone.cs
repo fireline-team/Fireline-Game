@@ -13,6 +13,7 @@ namespace Game.Runtime
         [SerializeField] private bool startsBurning = true;
         [Tooltip("Child containing only fire visuals; the gameplay collider stays at full size.")]
         [SerializeField] private Transform fireVisual;
+        [Tooltip("Legacy prefab reference used only for puff placement. Its particles are disabled; HoseVfxLibrary supplies the steam effect.")]
         [SerializeField] private ParticleSystem extinguishSteam;
         [SerializeField] private UnityEvent onExtinguished = new UnityEvent();
         [Header("Ambient Smoke")]
@@ -20,6 +21,7 @@ namespace Game.Runtime
         [Tooltip("Optional override; otherwise uses Resources/FireVfx/FireSmokeProfile.")]
         [SerializeField] private FireSmokeProfile smokeProfile;
 
+        private ExtinguishSteam completionSteam;
         private HealthPool strength;
         private Vector3 fullVisualScale;
         private Material fireMaterial;
@@ -53,7 +55,12 @@ namespace Game.Runtime
             if (extinguishSteam != null && fireVisual != null && extinguishSteam.transform.IsChildOf(fireVisual))
                 extinguishSteam.transform.SetParent(transform, true);
             if (extinguishSteam != null)
+            {
                 extinguishSteam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                var main = extinguishSteam.main;
+                main.playOnAwake = false;
+                extinguishSteam.gameObject.SetActive(false);
+            }
             UpdateVisuals();
             if (emitAmbientSmoke && SystemInfo.supportsComputeShaders
                 && GetComponentInChildren<FireSmokeVisual>(true) == null)
@@ -75,7 +82,11 @@ namespace Game.Runtime
             bool extinguished = strength.TakeDamage(amount);
             UpdateVisuals();
             if (!extinguished) return;
-            if (extinguishSteam != null) extinguishSteam.Play(true);
+            if (completionSteam == null)
+                completionSteam = ExtinguishSteam.Create(transform,
+                    extinguishSteam != null ? extinguishSteam.transform.position : transform.position,
+                    fireVisual != null ? fireVisual.GetComponent<Renderer>() : null);
+            completionSteam.Play();
             onExtinguished.Invoke();
         }
 
@@ -84,8 +95,7 @@ namespace Game.Runtime
         {
             if (strength == null || IsBurning) return;
             strength.Reset(extinguishResistance);
-            if (extinguishSteam != null)
-                extinguishSteam.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            if (completionSteam != null) completionSteam.Clear();
             UpdateVisuals();
         }
 

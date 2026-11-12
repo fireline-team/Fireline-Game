@@ -50,6 +50,8 @@ Expand **Pixelation** inside **Stream Appearance**, **Mist Appearance**, **Jet A
 - **Color Steps:** levels per texture color channel; zero preserves gradients, two or more posterizes them.
 - **Alpha Cutoff:** discards faint texture edges while preserving particle lifetime fades.
 
+Fully extinguished environmental fires, extinguished players (including combat rolls), and revived players also use the library's Steam graph and Steam Appearance settings. Completion emits one puff using Maximum Count and the configured Lifetime; it does not reuse the old long-lived prefab ParticleSystem. Reigniting or disabling the owner clears the puff.
+
 The unlit VFX shader samples the original texture on a screen-aligned grid. No full-screen post-process, extra camera, layer, or renderer feature is needed. Camera upscaling/post-processing can soften the final pixels. Fine droplets may occupy part of a block; use larger droplets or smaller Pixel Size to retain fine mist density.
 
 For stream motion, start with these controls:
