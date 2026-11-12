@@ -14,15 +14,22 @@ public class PlayerDownedFire : MonoBehaviour
     private void OnEnable()
     {
         health.Died += Show;
-        health.Revived += Hide;
-        if (health.IsDowned) Show();
+        health.Revived += Refresh;
+        health.Ignited += Refresh;
+        health.Extinguished += Refresh;
+        Refresh();
+    }
+    private void Refresh()
+    {
+        if (health.IsDowned || health.IsBurning) Show();
+        else Hide();
     }
     private void Show()
     {
         if (fire == null && fireVisualPrefab != null)
         {
             fire = Instantiate(fireVisualPrefab, transform);
-            fire.name = "Downed player flames";
+            fire.name = "Player flames";
             
             fire.transform.localPosition = TiltedView.Up * 0.6f + Vector3.back * 0.12f;
             fire.transform.rotation = TiltedView.StandingRotation;
@@ -40,14 +47,14 @@ public class PlayerDownedFire : MonoBehaviour
     {
         if (fire == null || !fire.activeSelf) return;
         // Existing fire material animates; shrinking/flickering makes extinguishing visible too.
-        float strength = Mathf.Lerp(1f, 0.5f, health.ReviveProgress);
+        float strength = Mathf.Lerp(1f, 0.5f, health.IsDowned ? health.ReviveProgress : health.ExtinguishProgress);
         float flicker = 1f; //1f + 0.08f * Mathf.Sin(Time.time * 13f);
         fire.transform.localScale = fireScale * (strength * flicker);
     }
     private void Hide() { if (fire != null) fire.SetActive(false); }
     private void OnDisable()
     {
-        if (health != null) { health.Died -= Show; health.Revived -= Hide; }
+        if (health != null) { health.Died -= Show; health.Revived -= Refresh; health.Ignited -= Refresh; health.Extinguished -= Refresh; }
         Hide();
     }
 }
