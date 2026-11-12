@@ -70,6 +70,14 @@ MonoBehaviour:
     lifetime: 1
     spread: 1
   splashAppearance:
+    pixelation:
+      enabled: 1
+      pixelSize: 2
+      strength: 1
+      pixelAspect: {x: 1, y: 1}
+      gridOffset: {x: 0, y: 0}
+      colorSteps: 0
+      alphaCutoff: 0
     streamRate: 310
     streamCount: 10
     jetCount: 28
@@ -80,6 +88,14 @@ MonoBehaviour:
     spread: 4
     color: {r: 0.52, g: 0.82, b: 1, a: 0.85}
   steamAppearance:
+    pixelation:
+      enabled: 1
+      pixelSize: 2
+      strength: 1
+      pixelAspect: {x: 1, y: 1}
+      gridOffset: {x: 0, y: 0}
+      colorSteps: 0
+      alphaCutoff: 0
     size: 0.45
     lifetime: 1.3
     riseSpeed: 1

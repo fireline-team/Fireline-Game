@@ -78,7 +78,7 @@ public sealed class HoseGraphVisual : MonoBehaviour
         _water = CreateEffect(asset, "Water");
         _splash = CreateEffect(library.Splash, "Impact splash");
         ApplyPixelation(_water);
-        ApplyPixelation(_splash);
+        VfxPixelation.Apply(_splash, _library.SplashAppearance.pixelation);
         if (_splash.HasFloat(ContactRateId)) _splash.SetFloat(ContactRateId, 0f);
         if (mode == NozzleType.Standard && _water.HasMesh(BeamMeshId))
         {
@@ -189,6 +189,7 @@ public sealed class HoseGraphVisual : MonoBehaviour
         if (Time.time < contact.NextPuffTime) return;
         var settings = _library.SteamAppearance;
         contact.NextPuffTime = Time.time + Mathf.Max(0.02f, settings.puffInterval);
+        VfxPixelation.Apply(contact.Effect, settings.pixelation);
         ConfigureContact(contact.Effect, contactPoint, TiltedView.Up);
         ConfigureAppearance(contact.Effect, settings.size, settings.lifetime, settings.color, settings.riseSpeed, settings.spread);
         contact.Effect.SetFloat(CountId, Mathf.Clamp(amount * settings.particlesPerWaterUnit,
@@ -211,7 +212,9 @@ public sealed class HoseGraphVisual : MonoBehaviour
     {
         if (_water == null) return;
         ApplyPixelation(_water);
-        ApplyPixelation(_splash);
+        VfxPixelation.Apply(_splash, _library.SplashAppearance.pixelation);
+        foreach (SteamContact contact in _steamContacts)
+            if (contact != null) VfxPixelation.Apply(contact.Effect, _library.SteamAppearance.pixelation);
         if (_streamRibbon != null && _streamRibbon.IsVisible) RefreshRibbon(Time.deltaTime);
         if (_mode == NozzleType.Standard && _splash.HasFloat(ContactRateId)) RefreshContinuousImpact();
         while (_pendingImpacts.Count > 0 && _pendingImpacts.Peek().Time <= Time.time)
