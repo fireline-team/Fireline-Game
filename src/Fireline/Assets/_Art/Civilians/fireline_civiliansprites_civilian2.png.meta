@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -77,7 +77,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -90,7 +90,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -431,6 +431,116 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: CivilianPose_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 5
+        width: 59
+        height: 103
+      alignment: 9
+      pivot: {x: 0.5338983050847458, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6ce039e0fed447ffbcefe829d4ae89f4
+      internalID: 2100100
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CivilianPose_1
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 5
+        width: 59
+        height: 103
+      alignment: 9
+      pivot: {x: 0.5169491525423728, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b8128cce2f64670b3141a1e9dfd414c
+      internalID: 2100101
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CivilianPose_2
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 5
+        width: 59
+        height: 103
+      alignment: 9
+      pivot: {x: 0.5084745762711864, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 221e3cb0f78740118d2d3376d8ee4702
+      internalID: 2100102
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CivilianPose_3
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 5
+        width: 59
+        height: 103
+      alignment: 9
+      pivot: {x: 0.4830508474576271, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f64655e8d554edfa58a72d22f75315b
+      internalID: 2100103
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CivilianPose_4
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 5
+        width: 54
+        height: 103
+      alignment: 9
+      pivot: {x: 0.5092592592592593, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 40dcf85d961241bea75c998c240a3e43
+      internalID: 2100104
+      vertices: []
+      indices:
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -445,10 +555,15 @@ TextureImporter:
     spriteCustomMetadata:
       entries:
       - key: SpriteEditor.SliceOnImport
-        value: True
+        value: False
       - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":true,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
+      CivilianPose_0: 2100100
+      CivilianPose_1: 2100101
+      CivilianPose_2: 2100102
+      CivilianPose_3: 2100103
+      CivilianPose_4: 2100104
       fireline_civiliansprites_civilian2_0: -6484629686744364117
       fireline_civiliansprites_civilian2_1: -373439111
       fireline_civiliansprites_civilian2_10: -986564418

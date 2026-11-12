@@ -19,8 +19,8 @@ namespace Fireline.Missions
         [SerializeField, Min(0)] private float warningSeconds = 20f;
         [Tooltip("Seconds between survivors emerging after the objective is cleared.")]
         [SerializeField, Min(0.1f)] private float releaseIntervalSeconds = 1f;
-        [Tooltip("Player-like body art for the smaller civilian visual.")]
-        [SerializeField] private Sprite civilianSprite;
+        [Tooltip("Reusable survivor prefab with randomized civilian appearances.")]
+        [SerializeField] private CivilianEscort civilianPrefab;
         private readonly List<CivilianEscort> civilians = new List<CivilianEscort>();
         private FireRescueMission mission;
         private float releaseTimer;
@@ -92,11 +92,18 @@ namespace Fireline.Missions
             if (!space) { releaseTimer = 0.1f; return; }
             // At most one per frame: a hitch must not spawn the whole crowd at once.
             releaseTimer = Mathf.Max(0.1f, releaseIntervalSeconds);
-            var go = new GameObject($"Civilian {civilians.Count + 1}");
-            go.transform.SetParent(transform, false);
-            go.transform.position = position;
-            var civilian = go.AddComponent<CivilianEscort>();
-            civilian.Initialize(this, mission, civilianSprite);
+            var prefab = civilianPrefab != null ? civilianPrefab : Resources.Load<CivilianEscort>("Civilians/Civilian");
+            CivilianEscort civilian;
+            if (prefab != null) civilian = Instantiate(prefab, position, Quaternion.identity, transform);
+            else
+            {
+                var go = new GameObject("Civilian");
+                go.transform.SetParent(transform, false);
+                go.transform.position = position;
+                civilian = go.AddComponent<CivilianEscort>();
+            }
+            civilian.name = $"Civilian {civilians.Count + 1}";
+            civilian.Initialize(this, mission);
             civilians.Add(civilian);
             CiviliansPendingRelease--;
             CiviliansEscorting++;
