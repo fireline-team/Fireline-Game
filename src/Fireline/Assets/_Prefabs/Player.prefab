@@ -551,7 +551,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1767d346037429a8fc0eedf4bc74e8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::PlayerDownedFire
-  fireVisualPrefab: {fileID: 2722837022463238924, guid: 07b9c96bb518d294f8e8f1ed9abe5a07, type: 3}
+  fireVisualPrefab: {fileID: 2285449017428956352, guid: 8b846f07a08e4ca5879e85ac86886684, type: 3}
   fireScale: {x: 1.3, y: 2, z: 1}
 --- !u!1 &1376534921308105634
 GameObject:

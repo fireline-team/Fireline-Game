@@ -45,10 +45,17 @@ public class CombatRollTests
         typeof(PlayerHealth).GetField("contactDamageCooldown", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(health, 0.05f);
         health.TakeEnemyDamage(30);
         Assert.That(health.IsBurning, Is.True);
+        var burningVisual = player.GetComponent<PlayerDownedFire>();
+        Assert.That(burningVisual.IsBurningVisible, Is.True);
+        var flame = player.transform.Find("Player flames");
+        Assert.That(flame.GetComponent<MeshRenderer>().sharedMaterial.HasProperty("_FlameLength"), Is.True);
+        Assert.That(flame.GetComponentInChildren<Game.Runtime.FireZone>(), Is.Null);
         Assert.That(controller.TryCombatRoll(Vector2.zero), Is.False);
         Assert.That(health.IsBurning, Is.True, "Rejected rolls cannot extinguish.");
         Assert.That(controller.TryCombatRoll(Vector2.right), Is.True);
         Assert.That(health.IsBurning, Is.False);
+        Assert.That(burningVisual.IsBurningVisible, Is.False);
+        Assert.That(burningVisual.IsExtinguishSteamPlaying, Is.True);
         Assert.That(controller.TryCombatRoll(Vector2.up), Is.False);
         Assert.That(health.IsInvulnerable, Is.True);
         float before = health.CurrentHealth;
