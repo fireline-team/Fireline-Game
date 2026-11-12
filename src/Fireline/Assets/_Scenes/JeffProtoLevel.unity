@@ -3858,10 +3858,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7c8f0baa7ab3c4eb5a61a223ab10b925, type: 2}
   - {fileID: 11400000, guid: e92455087af1e4facad1ce6d12660e0e, type: 2}
   - {fileID: 11400000, guid: 3d240795ddcd44faeb04d153f50a233c, type: 2}
+  - {fileID: 11400000, guid: b693397ecb86a42beb394cce5000869e, type: 2}
+  - {fileID: 11400000, guid: 19957844c9dff48bcb8342fa52ee1040, type: 2}
+  - {fileID: 11400000, guid: ddb85f5c2ba784524a16db4a6821073a, type: 2}
   rightClickToSpawn: 1
   enemiesPerClick: 1
   clickScatter: 0.4
-  showPanel: 0
+  showPanel: 1
 --- !u!114 &532505318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4007,9 +4010,9 @@ MonoBehaviour:
   offscreenMargin: 0.1
   recycleDistance: 45
   recycleDelay: 6
-  lockJoiningUntilStart: 1
-  startAutomatically: 0
-  showPanel: 1
+  lockJoiningUntilStart: 0
+  startAutomatically: 1
+  showPanel: 0
   uiScale: 1.5
 --- !u!1001 &555045256
 PrefabInstance:

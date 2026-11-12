@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcd5d0bfa036546d38b68491f200406c, type: 3}
   m_Name: SummonerEnemy
   m_EditorClassIdentifier: Fireline.Gameplay::Game.Runtime.EnemyDefinition
-  displayName: Ranged Enemy
+  displayName: Summoner Enemy
   moveSpeed: 2
   maxHealth: 10
   contactDamage: 10
