@@ -105,7 +105,13 @@ public class HoseConnectionTests
         yield return null;
         yield return null;
         Assert.That(connection.IsConnected, Is.False);
-        Assert.That(loadout.Current.IsStreamActive, Is.False);
+        yield return new WaitForFixedUpdate();
+        yield return null;
+        Assert.That(loadout.Current.IsStreamActive, Is.True, "Detached players keep spraying from their tank.");
+        player.GetComponent<WaterTankController>().Use(10000f);
+        yield return new WaitForFixedUpdate();
+        yield return null;
+        Assert.That(loadout.Current.IsStreamActive, Is.False, "...until the tank runs dry.");
         player.GetComponent<PlayerController>().enabled = false;
         var rules = Object.FindAnyObjectByType<HoseWaterRules>();
         foreach (var type in new[] { NozzleType.Standard, NozzleType.Mist, NozzleType.Jet })

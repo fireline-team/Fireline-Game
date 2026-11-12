@@ -22,6 +22,8 @@ Material:
     RenderType: Transparent
   disabledShaderPasses:
   - MOTIONVECTORS
+  - DepthOnly
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -56,10 +58,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - AlphaCutoff: 0
+    - ColorSteps: 0
     - PixelSize: 2
     - PixelStrength: 1
-    - ColorSteps: 0
-    - AlphaCutoff: 0
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
@@ -69,6 +71,7 @@ Material:
     - _CameraFadingEnabled: 0
     - _CameraFarFadeDistance: 2
     - _CameraNearFadeDistance: 1
+    - _CastShadows: 0
     - _ColorMode: 0
     - _Cull: 2
     - _Cutoff: 0.5
@@ -82,6 +85,7 @@ Material:
     - _FlipbookMode: 0
     - _LightingEnabled: 0
     - _Mode: 0
+    - _QueueControl: 1
     - _QueueOffset: 0
     - _SampleGI: 0
     - _SoftParticlesEnabled: 0
@@ -91,7 +95,9 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 1
     - _XRMotionVectorsPass: 1
+    - _ZTest: 4
     - _ZWrite: 0
+    - _ZWriteControl: 0
     m_Colors:
     - PixelAspect: {r: 1, g: 1, b: 0, a: 0}
     - PixelOffset: {r: 0, g: 0, b: 0, a: 0}

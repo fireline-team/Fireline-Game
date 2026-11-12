@@ -134,6 +134,7 @@ public class PlayerRevivalTests
         Object.Destroy(wall); yield return null;
         var rules = Object.FindAnyObjectByType<HoseWaterRules>(); rules.RequireWaterSource = true;
         shooter.GetComponent<PlayerHoseConnection>().Detach();
+        shooter.GetComponent<WaterTankController>().Use(10000f); // detached AND out of tank water
         loadout.Current.Spray(Vector2.right,10);
         Assert.That(health.ReviveProgress, Is.Zero);
         rules.RequireWaterSource = false;

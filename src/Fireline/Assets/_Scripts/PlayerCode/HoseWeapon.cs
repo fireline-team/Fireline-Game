@@ -61,6 +61,7 @@ public abstract class HoseWeapon : MonoBehaviour
     private HoseStreamVisual _stream;
     private HoseGraphVisual _graph;
     private PlayerHealth _health;
+    private WaterTankController _water;
     private RaycastHit2D _wall;
     private float _enemyImpactDistance;
     private Vector2 _enemyImpactPoint;
@@ -92,6 +93,9 @@ public abstract class HoseWeapon : MonoBehaviour
     protected virtual void Awake()
     {
         _health = GetComponent<PlayerHealth>();
+        // All nozzles on the player share one tank.
+        _water = GetComponent<WaterTankController>();
+        if (_water == null) _water = gameObject.AddComponent<WaterTankController>();
         if (blockingLayers == 0)
             blockingLayers = LayerMask.GetMask(Structure.ObstacleLayer);
 
@@ -130,7 +134,7 @@ public abstract class HoseWeapon : MonoBehaviour
     public void Spray(Vector2 direction, float deltaTime)
     {
         if (!isActiveAndEnabled || (_health != null && _health.IsDead)
-            || !HoseWaterRules.CanSpray(gameObject) || direction.sqrMagnitude < 0.001f)
+            || !_water.HasWater || direction.sqrMagnitude < 0.001f)
         {
             StopSpraying();
             return;
@@ -183,6 +187,15 @@ public abstract class HoseWeapon : MonoBehaviour
     /// then apply this nozzle's effects (damage, knockback, slow...).
     /// </summary>
     protected abstract void OnSpray(float deltaTime);
+
+    /// <summary>
+    /// For continuous nozzles: call every OnSpray with this step's water (per-second cost x deltaTime).
+    /// Free while on a hydrant; otherwise drains the tank.
+    /// </summary>
+    protected void UseWater(float amount) => _water.Use(amount);
+
+    /// <summary>For shots: takes the whole cost or nothing. Returns false if the tank can't cover it.</summary>
+    protected bool TryUseWater(float amount) => _water.TryUse(amount);
 
     /// <summary>Optional: react to the spray button being released.</summary>
     protected virtual void OnStopSpraying() { }
