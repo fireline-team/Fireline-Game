@@ -2,9 +2,9 @@
 
 Press Space (keyboard) or L1 / left bumper (gamepad) while moving. The player dashes in that movement direction for 0.25 seconds at 3× normal speed. Direction is locked for the dash; diagonal and analog inputs produce the same dash speed. Pressing while stationary does nothing. Holding the button does not repeat rolls.
 
-Tune Roll Duration (0.01–0.99 seconds), Roll Speed Multiplier, and Roll Cooldown on PlayerController. The default cooldown is 1.5 seconds after the dash ends. Timers use scaled game time. Movement continues through the existing Rigidbody2D and shared screen boundary constraints.
+Tune Roll Duration (0.01–0.99 seconds), Immunity Duration (0.01–2 seconds, default 0.5), Roll Speed Multiplier, and Roll Cooldown on PlayerController. The default cooldown is 1.5 seconds after the dash ends. Timers use scaled game time. Movement continues through the existing Rigidbody2D and shared screen boundary constraints.
 
-During the dash, all player sprites use the white CombatRollFlash material and PlayerHealth rejects damage, including contact damage. Original materials return afterward, and existing contact/revival immunity retains its own timer. Disabling the controller or blocking gameplay cancels the dash and starts its cooldown. No burning status or extinguishing behavior is implemented.
+For the immunity duration measured from dash activation, all player sprites use the white CombatRollFlash material and PlayerHealth rejects damage, including contact damage. Immunity and the white flash continue after dash movement ends when immunity duration is longer. Original materials return when immunity ends, and existing contact/revival immunity retains its own timer. Disabling the controller or blocking gameplay cancels the dash and starts its cooldown. No burning status or extinguishing behavior is implemented.
 
 Future UI can subscribe to per-player PlayerController events:
 

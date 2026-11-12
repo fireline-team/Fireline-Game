@@ -298,6 +298,7 @@ public partial class PlayerController : MonoBehaviour
     private void OnDisable()
     {
         EndRoll();
+        EndRollImmunity();
         spraying = false;
         if (rb != null) rb.linearVelocity = Vector2.zero;
         if (hose != null) hose.StopSpraying();

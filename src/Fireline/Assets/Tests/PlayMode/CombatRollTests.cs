@@ -56,9 +56,16 @@ public class CombatRollTests
         Assert.That(player.GetComponent<Rigidbody2D>().linearVelocity.y, Is.EqualTo(0).Within(0.001f));
         yield return new WaitForSeconds(0.3f);
         Assert.That(controller.IsRolling, Is.False);
-        Assert.That(health.IsInvulnerable, Is.False);
+        Assert.That(health.IsInvulnerable, Is.True, "Immunity must outlast dash movement.");
+        health.TakeDamage(1000);
+        Assert.That(health.CurrentHealth, Is.EqualTo(before));
+        Assert.That(sprites.All(s => s.sharedMaterial == Resources.Load<Material>("CombatRollFlash")), Is.True);
         Assert.That(controller.TryCombatRoll(Vector2.right), Is.False);
         Assert.That(remaining, Is.GreaterThan(0));
+        yield return new WaitForSeconds(0.25f);
+        Assert.That(health.IsInvulnerable, Is.False);
+        health.TakeDamage(1);
+        Assert.That(health.CurrentHealth, Is.EqualTo(before - 1));
         for (int i = 0; i < sprites.Length; i++) Assert.That(sprites[i].sharedMaterial, Is.SameAs(materials[i]));
         yield return new WaitForSeconds(1.6f);
         Assert.That(starts, Is.EqualTo(1));

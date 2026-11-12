@@ -6,6 +6,8 @@ public partial class PlayerController
 {
     [Header("Combat roll")]
     [SerializeField, Range(0.01f, 0.99f)] private float rollDuration = 0.25f;
+    [Tooltip("Damage immunity in seconds from the start of the roll, independent of movement duration.")]
+    [SerializeField, Range(0.01f, 2f)] private float immunityDuration = 0.5f;
     [SerializeField, Min(1f)] private float rollSpeedMultiplier = 3f;
     [Tooltip("Seconds after the roll ends before another roll is available.")]
     [SerializeField, Min(0f)] private float rollCooldown = 1.5f;
@@ -13,6 +15,7 @@ public partial class PlayerController
     private InputAction rollAction;
     private Vector2 rollDirection;
     private float rollEndsAt;
+    private float immunityEndsAt;
     private float rollReadyAt;
     private bool cooldownPending;
     private SpriteRenderer[] rollSprites;
@@ -36,6 +39,8 @@ public partial class PlayerController
         rollEndsAt = Time.time + Mathf.Clamp(rollDuration, 0.01f, 0.99f);
         rollReadyAt = rollEndsAt + Mathf.Max(0f, rollCooldown);
         IsRolling = true;
+        EndRollImmunity();
+        immunityEndsAt = Time.time + Mathf.Clamp(immunityDuration, 0.01f, 2f);
         health.RollInvulnerable = true;
         var flash = Resources.Load<Material>("CombatRollFlash");
         rollSprites = GetComponentsInChildren<SpriteRenderer>(true);
@@ -51,7 +56,10 @@ public partial class PlayerController
 
     private void UpdateRoll()
     {
-        if (IsRolling && (Time.time >= rollEndsAt || health.IsDead || Fireline.Missions.GameManager.BlocksGameplay))
+        bool cancelled = health.IsDead || Fireline.Missions.GameManager.BlocksGameplay;
+        if (health.RollInvulnerable && (Time.time >= immunityEndsAt || cancelled))
+            EndRollImmunity();
+        if (IsRolling && (Time.time >= rollEndsAt || cancelled))
             EndRoll();
         if (!cooldownPending) return;
         float remaining = RollCooldownRemaining;
@@ -61,13 +69,18 @@ public partial class PlayerController
         RollReady?.Invoke();
     }
 
+    private void EndRollImmunity()
+    {
+        if (health == null || !health.RollInvulnerable) return;
+        health.RollInvulnerable = false;
+        for (int i = 0; i < rollSprites.Length; i++)
+            if (rollSprites[i] != null) rollSprites[i].sharedMaterial = rollMaterials[i];
+    }
+
     private void EndRoll()
     {
         if (!IsRolling) return;
         IsRolling = false;
-        health.RollInvulnerable = false;
-        for (int i = 0; i < rollSprites.Length; i++)
-            if (rollSprites[i] != null) rollSprites[i].sharedMaterial = rollMaterials[i];
         rb.linearVelocity = Vector2.zero;
         rollReadyAt = Time.time + Mathf.Max(0f, rollCooldown);
         cooldownPending = true;
