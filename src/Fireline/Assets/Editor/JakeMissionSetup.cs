@@ -40,8 +40,7 @@ public static class JakeMissionSetup
         Physics2D.SyncTransforms();
         var buildings = Object.FindObjectsByType<Structure>(FindObjectsSortMode.None)
             .Where(HasClearApproach).OrderBy(x => x.transform.position.x).ToArray();
-        var playerBodySprite = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Prefabs/Player.prefab")
-            .transform.Find("PlayerSprite").GetComponent<SpriteRenderer>().sprite;
+        var civilianPrefab = Resources.Load<CivilianEscort>("Civilians/Civilian");
         var sites = buildings.Select((building, i) =>
         {
             var box = building.GetComponent<BoxCollider2D>();
@@ -51,7 +50,7 @@ public static class JakeMissionSetup
             var site = Child(sitesRoot.transform, $"Objective {i + 1} - {building.name}", front + Vector3.down * 1.5f).AddComponent<MissionObjectiveSite>();
             SetFloat(site.Point, "exclusionRadius", 9);
             var siteSettings = new SerializedObject(site);
-            siteSettings.FindProperty("civilianSprite").objectReferenceValue = playerBodySprite;
+            siteSettings.FindProperty("civilianPrefab").objectReferenceValue = civilianPrefab;
             siteSettings.ApplyModifiedPropertiesWithoutUndo();
             var step = site.gameObject.AddComponent<FireObjectiveStep>();
             var fireList = new FireZone[3];
