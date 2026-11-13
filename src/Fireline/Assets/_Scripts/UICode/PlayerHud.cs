@@ -74,6 +74,10 @@ public class PlayerHud : MonoBehaviour
     [Tooltip("Optional label like 'P1'.")]
     [SerializeField] private TMP_Text playerLabel;
 
+    [Header("Player Identity")]
+    [Tooltip("Tinted with the player's color when the panel is bound, e.g. the badge outline, the name label. Any UI Image or Text works.")]
+    [SerializeField] private Graphic[] playerColorTargets = new Graphic[0];
+
     public PlayerHealth Player { get; private set; }
 
     private HoseLoadout _loadout;
@@ -92,6 +96,11 @@ public class PlayerHud : MonoBehaviour
     private bool _axeWasReady = true;
     private float _axePop;
     private Vector3 _axeBaseScale = Vector3.one;
+
+    // The faces in use: the player's profile portrait if it has one, else the defaults above.
+    private Sprite[] _healthFaces;
+    private Sprite _hitFace;
+    private Sprite _downedFace;
 
     private float _hitExpressionLeft;
     private float _shakeLeft;
@@ -122,8 +131,7 @@ public class PlayerHud : MonoBehaviour
         _shownHealth = _trailHealth = fraction;
         _lastHealth = player.CurrentHealth;
 
-        if (playerLabel != null && _input != null)
-            playerLabel.text = $"P{_input.playerIndex + 1}";
+        ApplyIdentity(PlayerIdentity.Of(player.gameObject));
     }
 
     private void Unbind()
@@ -270,6 +278,30 @@ public class PlayerHud : MonoBehaviour
         }
     }
 
+    // ------------------------------------------------------------------ identity
+
+    private void ApplyIdentity(PlayerIdentity identity)
+    {
+        if (playerLabel != null) playerLabel.text = identity.DisplayName;
+
+        Color color = identity.Color;
+        foreach (var target in playerColorTargets)
+        {
+            if (target == null) continue;
+            color.a = target.color.a; // keep each graphic's own transparency
+            target.color = color;
+        }
+
+        var profile = identity.Profile;
+        bool custom = profile != null && profile.HasPortrait;
+        _healthFaces = custom && profile.HealthExpressions != null && profile.HealthExpressions.Length > 0
+            ? profile.HealthExpressions : healthExpressions;
+        _hitFace = custom && profile.HitExpression != null ? profile.HitExpression : hitExpression;
+        _downedFace = custom && profile.DownedExpression != null ? profile.DownedExpression : downedExpression;
+        _hitExpressionLeft = 0f;
+        UpdatePortrait(0f);
+    }
+
     // ------------------------------------------------------------------ portrait
 
     private void UpdatePortrait(float dt)
@@ -277,16 +309,17 @@ public class PlayerHud : MonoBehaviour
         if (portrait == null) return;
         _hitExpressionLeft -= dt;
 
+        Sprite[] faces = _healthFaces; // resolved in ApplyIdentity
         Sprite face = null;
-        if (Player.IsDowned) face = downedExpression;
-        else if (_hitExpressionLeft > 0f) face = hitExpression;
+        if (Player.IsDowned) face = _downedFace;
+        else if (_hitExpressionLeft > 0f) face = _hitFace;
 
-        if (face == null && healthExpressions != null && healthExpressions.Length > 0)
+        if (face == null && faces != null && faces.Length > 0)
         {
             // Split 0-1 health evenly: 3 sprites -> above 66%, above 33%, the rest.
             float missing = 1f - HealthFraction();
-            int index = Mathf.Min(healthExpressions.Length - 1, Mathf.FloorToInt(missing * healthExpressions.Length));
-            face = healthExpressions[index];
+            int index = Mathf.Min(faces.Length - 1, Mathf.FloorToInt(missing * faces.Length));
+            face = faces[index];
         }
 
         if (face != null && portrait.sprite != face) portrait.sprite = face;

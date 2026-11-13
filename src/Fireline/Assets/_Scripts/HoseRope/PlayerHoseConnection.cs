@@ -132,10 +132,7 @@ public class PlayerHoseConnection : MonoBehaviour
 
     private void RefreshPlayerColor()
     {
-        var input = GetComponent<PlayerInput>();
-        int index = input != null ? input.playerIndex : 0;
-        var rules = HoseWaterRules.ForPlayer(gameObject);
-        playerColor = rules != null ? rules.GetHoseColor(index) : ColorForPlayer(index);
+        playerColor = PlayerIdentity.Of(gameObject).Color;
     }
 
     private void UpdateWarning()

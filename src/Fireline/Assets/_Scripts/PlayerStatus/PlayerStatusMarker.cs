@@ -34,7 +34,7 @@ public class PlayerStatusMarker : MonoBehaviour
     private Text progressText;
     public float CurrentProgress { get; private set; } = -1f;
     public PlayerStatusDefinition CurrentStatus { get; private set; }
-    public string PlayerLabel => $"P{Mathf.Max(0, input != null ? input.playerIndex : 0) + 1}";
+    public string PlayerLabel => PlayerIdentity.Of(gameObject).DisplayName;
     public bool IsVisible => badge != null && badge.gameObject.activeInHierarchy;
 
     public void SetStatus(Object owner, PlayerStatusDefinition status)
@@ -142,10 +142,8 @@ public class PlayerStatusMarker : MonoBehaviour
         badge.anchoredPosition = new Vector2(point.x, point.y);
         badge.sizeDelta = badgeSize;
         background.color = backgroundColor;
-        var rules = HoseWaterRules.ForPlayer(gameObject);
-        int index = input != null ? input.playerIndex : 0;
         stripe.color = useHosePlayerColors
-            ? (rules != null ? rules.GetHoseColor(index) : PlayerHoseConnection.ColorForPlayer(index)) : identityColor;
+            ? PlayerIdentity.Of(gameObject).Color : identityColor;
         stripe.rectTransform.sizeDelta = new Vector2(badgeSize.x, 4);
         stripe.rectTransform.anchoredPosition = new Vector2(0, -badgeSize.y / 2 + 2);
         text.rectTransform.sizeDelta = badgeSize;
@@ -176,10 +174,8 @@ public class PlayerStatusMarker : MonoBehaviour
     {
         rescueArrow.PointTo(camera, transform.position, health != null && health.IsDowned);
         if (!rescueArrow.gameObject.activeSelf) return;
-        var rules = HoseWaterRules.ForPlayer(gameObject);
-        int index = input != null ? input.playerIndex : 0;
         rescueArrow.color = useHosePlayerColors
-            ? (rules != null ? rules.GetHoseColor(index) : PlayerHoseConnection.ColorForPlayer(index)) : identityColor;
+            ? PlayerIdentity.Of(gameObject).Color : identityColor;
     }
 
     private void OnEnable() { if (canvas != null) canvas.gameObject.SetActive(true); }

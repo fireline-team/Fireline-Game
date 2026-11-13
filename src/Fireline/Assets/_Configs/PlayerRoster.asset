@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3ce152c331bd47d988183fab58381e8, type: 3}
+  m_Name: PlayerRoster
+  m_EditorClassIdentifier: Fireline.Gameplay::PlayerRoster
+  players:
+  - {fileID: 11400000, guid: 6fbadbc4787c54ce6af7908290b045c1, type: 2}
+  - {fileID: 11400000, guid: ef6ce615e255246a6a32b5a5a368e2f3, type: 2}
+  - {fileID: 11400000, guid: 9ba9fa3ca57f9456c9c8ea9c882ee990, type: 2}
+  - {fileID: 11400000, guid: 5254a083d682b4156a331b9ab1a0b35b, type: 2}
