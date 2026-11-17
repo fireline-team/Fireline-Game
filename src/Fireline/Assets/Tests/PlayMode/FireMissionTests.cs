@@ -58,6 +58,42 @@ public class FireMissionTests
         yield return null;
     }
     [Test]
+    public void GuidanceArrowsGrowWithDistanceAndStayInsideScreenAtEveryHeading()
+    {
+        var step = Make("Step").AddComponent<TestObjectiveStep>();
+        var mission = Mission(new MissionObjectiveStep[] { step });
+        var camera = Make("Camera").AddComponent<Camera>();
+        camera.orthographic = true;
+        camera.orthographicSize = 5;
+        camera.transform.position = new Vector3(0, 0, -10);
+        var guidance = mission.gameObject.AddComponent<MissionGuidance>();
+        var arrow = mission.transform.Find("Mission direction arrows/Evacuation direction").GetComponent<PlayerRescueArrow>();
+        var resize = typeof(MissionGuidance).GetMethod("UpdateArrowSize", BindingFlags.NonPublic | BindingFlags.Instance);
+        resize.Invoke(guidance, new object[] { arrow, camera, new Vector3(10, 0, 0) });
+        Assert.That(arrow.rectTransform.sizeDelta, Is.EqualTo(new Vector2(96, 80)));
+        resize.Invoke(guidance, new object[] { arrow, camera, new Vector3(35, 0, 0) });
+        Assert.That(arrow.rectTransform.sizeDelta.x, Is.EqualTo(120).Within(0.01));
+        resize.Invoke(guidance, new object[] { arrow, camera, new Vector3(1000, 0, 0) });
+        Assert.That(arrow.rectTransform.sizeDelta, Is.EqualTo(new Vector2(144, 120)));
+        foreach (Vector3 destination in new[] { Vector3.right, Vector3.left, Vector3.up, Vector3.down,
+            new Vector3(1, 1), new Vector3(-1, 1), new Vector3(1, -1), new Vector3(-1, -1) })
+        {
+            arrow.PointTo(camera, destination * 100, true);
+            Canvas.ForceUpdateCanvases();
+            Assert.That(arrow.gameObject.activeSelf, Is.True);
+            var corners = new Vector3[4];
+            arrow.rectTransform.GetWorldCorners(corners);
+            foreach (var corner in corners)
+                Assert.That(camera.pixelRect.Contains(new Vector2(corner.x, corner.y)), Is.True,
+                    "Enlarged arrows must remain completely inside the screen, including at corners.");
+        }
+        resize.Invoke(guidance, new object[] { arrow, camera, Vector3.zero });
+        Assert.That(arrow.rectTransform.sizeDelta, Is.EqualTo(new Vector2(96, 80)), "Approaching a destination shrinks the arrow again.");
+        arrow.PointTo(camera, Vector3.zero, true);
+        Assert.That(arrow.gameObject.activeSelf, Is.False);
+    }
+
+    [Test]
     public void PairingUsesGroundDistanceAndBothExclusionRadii()
     {
         var a = Make("A").AddComponent<MissionPoint>();
