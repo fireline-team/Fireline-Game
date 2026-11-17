@@ -10,6 +10,7 @@ public class CameraTargetSetter : MonoBehaviour
 
     private void Awake()
     {
+        if (GetComponent<PixelMinimap>() == null) gameObject.AddComponent<PixelMinimap>();
         targetGroup = FindAnyObjectByType<CinemachineTargetGroup>();
         if (targetGroup == null) return;
         foreach (var camera in FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None))
