@@ -3864,7 +3864,7 @@ MonoBehaviour:
   rightClickToSpawn: 1
   enemiesPerClick: 1
   clickScatter: 0.4
-  showPanel: 1
+  showPanel: 0
 --- !u!114 &532505318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7362,7 +7362,7 @@ MonoBehaviour:
   - {fileID: 809686175}
   - {fileID: 376665638}
   - {fileID: 1488768505}
-  objectiveCount: 7
+  objectiveCount: 3
   evacuationRadius: 3
   evacuationHoldSeconds: 2
   seed: 0
