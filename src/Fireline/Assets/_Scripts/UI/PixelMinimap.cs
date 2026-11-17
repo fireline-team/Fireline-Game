@@ -13,7 +13,12 @@ public sealed class PixelMinimap : MonoBehaviour
     [Header("Map")]
     [SerializeField, Range(64, 256)] private int resolution = 128;
     [SerializeField, Min(10)] private float worldSpan = 60;
-    [SerializeField, Range(1, 3)] private int displayScale = 2;
+    [Tooltip("Outer width and height of the square minimap in screen pixels.")]
+    [SerializeField, Range(128, 512)] private int minimapSizePixels = 268;
+    [Header("Mission panels")]
+    [SerializeField, Min(1)] private float countdownSeconds = 600;
+    [Tooltip("Reveal a site checklist when a standing teammate comes this close to the site or one of its targets.")]
+    [SerializeField, Min(1)] private float objectiveRevealDistance = 8;
     [SerializeField, Min(0.05f)] private float refreshInterval = 0.1f;
     [Tooltip("Optional explicit ground tilemaps. Empty discovers non-obstacle tilemaps in this scene.")]
     [SerializeField] private Tilemap[] groundTilemaps;
@@ -31,6 +36,9 @@ public sealed class PixelMinimap : MonoBehaviour
     private Color32[] pixels;
     private Canvas canvas;
     private RectTransform panel;
+    private MinimapMissionHud missionHud;
+    private readonly List<ObjectiveChecklistItem> objectiveItems = new List<ObjectiveChecklistItem>();
+    public MinimapMissionHud MissionHud => missionHud;
     private Camera view;
     private float nextRefresh, nextDiscovery;
     private Collider2D[] obstacles = new Collider2D[0];
@@ -73,10 +81,9 @@ public sealed class PixelMinimap : MonoBehaviour
         map.texture = texture;
         map.rectTransform.anchorMin = new Vector2(0, 0);
         map.rectTransform.anchorMax = new Vector2(1, 1);
-        map.rectTransform.offsetMin = new Vector2(6, 36);
-        map.rectTransform.offsetMax = new Vector2(-6, -24);
-        Label("TACTICAL                         N ^", panel, true);
-        Label("<color=#FF5959>ENEMIES</color>  <color=#FFAC36>FIRE</color>  ALLIES\n<color=#FFE65A>OBJECTIVE</color>  <color=#55E5ED>EVAC</color>", panel, false);
+        map.rectTransform.offsetMin = new Vector2(6, 6);
+        map.rectTransform.offsetMax = new Vector2(-6, -6);
+        missionHud = new MinimapMissionHud(root.transform);
         foreach (var graphic in root.GetComponentsInChildren<Graphic>()) graphic.raycastTarget = false;
         UpdatePanelSize();
     }
@@ -88,30 +95,16 @@ public sealed class PixelMinimap : MonoBehaviour
         return rect;
     }
 
-    private static void Label(string value, Transform parent, bool title)
-    {
-        var label = MakeRect(title ? "Heading" : "Legend", parent).gameObject.AddComponent<Text>();
-        label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        label.fontSize = title ? 13 : 11;
-        label.fontStyle = FontStyle.Bold;
-        label.alignment = TextAnchor.MiddleCenter;
-        label.supportRichText = true;
-        label.color = Color.white;
-        label.text = value;
-        label.rectTransform.anchorMin = new Vector2(0, title ? 1 : 0);
-        label.rectTransform.anchorMax = new Vector2(1, title ? 1 : 0);
-        label.rectTransform.pivot = new Vector2(0.5f, title ? 1 : 0);
-        label.rectTransform.sizeDelta = new Vector2(0, title ? 24 : 36);
-    }
-
     private void UpdatePanelSize()
     {
-        int scale = Mathf.Clamp(Mathf.Min((Screen.width - 48) / resolution, (Screen.height - 96) / resolution), 1, displayScale);
-        panel.sizeDelta = new Vector2(resolution * scale + 12, resolution * scale + 60);
+        float limit = Mathf.Max(96, Mathf.Min(Screen.width - 36, Screen.height - 156));
+        float size = Mathf.Clamp(minimapSizePixels, 96, limit);
+        panel.sizeDelta = new Vector2(size, size);
     }
 
     private void LateUpdate()
     {
+        missionHud?.TickScroll();
         if (Time.unscaledTime < nextRefresh) return;
         nextRefresh = Time.unscaledTime + Mathf.Max(0.05f, refreshInterval);
         if (Time.unscaledTime >= nextDiscovery) RefreshSources();
@@ -149,6 +142,11 @@ public sealed class PixelMinimap : MonoBehaviour
         canvas.gameObject.SetActive(view != null);
         if (view == null) return;
         UpdatePanelSize();
+        FireRescueMission activeMission = null;
+        foreach (var mission in missions)
+            if (mission != null && mission.isActiveAndEnabled && mission.gameObject.scene == gameObject.scene)
+            { activeMission = mission; break; }
+        missionHud.Refresh(activeMission, panel.sizeDelta.x, objectiveRevealDistance, countdownSeconds);
         Ray ray = view.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         var floor = new Plane(Vector3.forward, Vector3.zero);
         MapCenter = floor.Raycast(ray, out float distance) ? (Vector2)ray.GetPoint(distance) : (Vector2)view.transform.position;
@@ -180,15 +178,25 @@ public sealed class PixelMinimap : MonoBehaviour
         DrawDensity();
         foreach (var fire in fires)
             if (fire != null && fire.gameObject.scene == gameObject.scene && fire.isActiveAndEnabled && fire.IsBurning)
-                Icon(fire.transform.position, 'F', new Color32(255, 161, 40, 255), false);
+                Icon(fire.transform.position, 'F', MinimapSymbols.Fire, false);
         foreach (var mission in missions)
         {
             if (mission == null || !mission.isActiveAndEnabled || mission.gameObject.scene != gameObject.scene) continue;
             if (mission.State == FireRescueMission.Phase.Objective)
                 foreach (var site in mission.Objectives)
-                    if (site != null && mission.GetCurrentStep(site) != null) Icon(site.transform.position, 'O', new Color32(255, 230, 80, 255), true);
+                    if (site != null && mission.GetCurrentStep(site) != null)
+                    {
+                        // Mission crates are icons, never terrain footprints; ordinary debris stays excluded.
+                        if (mission.GetCurrentStep(site) is DebrisObjectiveStep debrisStep)
+                        {
+                            objectiveItems.Clear(); debrisStep.CollectChecklist(objectiveItems);
+                            foreach (var item in objectiveItems)
+                                if (!item.Complete) Icon(item.Position, item.Symbol, item.Color, false);
+                        }
+                        Icon(site.transform.position, 'O', MinimapSymbols.Objective, true);
+                    }
             if (mission.ShowEvacuationGuidance && mission.Spawn != null)
-                Icon(mission.Spawn.transform.position, 'E', new Color32(70, 230, 240, 255), true);
+                Icon(mission.Spawn.transform.position, 'E', MinimapSymbols.Evac, true);
         }
         foreach (var player in PlayerHealth.ActivePlayers)
         {
@@ -259,12 +267,7 @@ public sealed class PixelMinimap : MonoBehaviour
         for (int y = -2; y <= 2; y++)
             for (int x = -2; x <= 2; x++)
             {
-                bool draw = symbol == 'O' ? Mathf.Abs(x) + Mathf.Abs(y) == 2
-                    : symbol == 'X' ? Mathf.Abs(x) == Mathf.Abs(y)
-                    : symbol == 'E' ? x == 0 || y == 0
-                    : symbol == 'F' ? (y <= 0 && Mathf.Abs(x) <= 1) || (y > 0 && x == (y == 2 ? 0 : -1))
-                    : Mathf.Abs(x) + Mathf.Abs(y) <= 2;
-                if (draw) Put(p.x + x, p.y + y, color);
+                if (MinimapSymbols.Contains(symbol, x, y)) Put(p.x + x, p.y + y, color);
             }
     }
 
@@ -274,6 +277,7 @@ public sealed class PixelMinimap : MonoBehaviour
     private void OnDisable() { if (canvas != null) canvas.gameObject.SetActive(false); }
     private void OnDestroy()
     {
+        missionHud?.Dispose();
         if (texture != null) Destroy(texture);
         if (canvas != null) Destroy(canvas.gameObject);
     }

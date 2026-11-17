@@ -27,4 +27,19 @@ namespace Fireline.Missions
         /// <summary>Adds markers for the targets still left. Does not clear the list.</summary>
         void CollectMarkers(List<ObjectiveMarker> markers);
     }
+    public readonly struct ObjectiveChecklistItem
+    {
+        public readonly string Label;
+        public readonly Vector3 Position;
+        public readonly bool Complete;
+        public readonly char Symbol;
+        public readonly Color Color;
+        public ObjectiveChecklistItem(string label, Vector3 position, bool complete, char symbol, Color color)
+        { Label = label; Position = position; Complete = complete; Symbol = symbol; Color = color; }
+    }
+
+    public interface IObjectiveChecklistSource
+    {
+        void CollectChecklist(List<ObjectiveChecklistItem> items);
+    }
 }

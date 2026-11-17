@@ -105,7 +105,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Fireline.Gameplay::PixelMinimap
   resolution: 128
   worldSpan: 60
-  displayScale: 2
+  minimapSizePixels: 268
+  countdownSeconds: 600
+  objectiveRevealDistance: 8
   refreshInterval: 0.1
   groundTilemaps: []
   obstacleLayers:

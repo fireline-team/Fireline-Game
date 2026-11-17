@@ -10,6 +10,7 @@ namespace Fireline.Missions
         public event Action Completed;
         public abstract bool IsConfigured { get; }
         public abstract string Instruction { get; }
+        public virtual string DisplayName => Instruction;
 
         public void BeginStep()
         {

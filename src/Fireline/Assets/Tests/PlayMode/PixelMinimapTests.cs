@@ -7,6 +7,9 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Tilemaps;
+using TMPro;
+using UnityEngine.UI;
+using System.Linq;
 
 public class PixelMinimapTests
 {
@@ -128,6 +131,81 @@ public class PixelMinimapTests
         UnityEngine.SceneManagement.SceneManager.SetActiveScene(UnityEngine.SceneManagement.SceneManager.CreateScene("Minimap cleanup"));
         yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
 #endif
+    }
+
+    [UnityTest]
+    public IEnumerator SquareHudRevealsTargetsStrikesCompletedTasksAndAddsExtraction()
+    {
+        var map = Map(out _);
+        var fire1 = Make("Fire 1", new Vector3(0, 0)).AddComponent<FireZone>();
+        var fire2 = Make("Fire 2", new Vector3(2, 0)).AddComponent<FireZone>();
+        var fireStep = Make("Fires").AddComponent<FireObjectiveStep>();
+        Set(fireStep, "fires", new[] { fire1, fire2, fire1 });
+        var crate1 = Make("Crate 1", new Vector3(30, 0)).AddComponent<Debris>();
+        var crate2 = Make("Crate 2", new Vector3(32, 0)).AddComponent<Debris>();
+        var crateStep = Make("Crates").AddComponent<DebrisObjectiveStep>();
+        Set(crateStep, "debris", new[] { crate1, crate2 });
+        var fires = Make("Fire site").AddComponent<MissionObjectiveSite>();
+        Set(fires, "steps", new MissionObjectiveStep[] { fireStep });
+        var crates = Make("Crate site", new Vector3(30, 0)).AddComponent<MissionObjectiveSite>();
+        Set(crates, "steps", new MissionObjectiveStep[] { crateStep });
+        var spawn = Make("Spawn", new Vector3(-50, 0)).AddComponent<MissionPoint>();
+        var mission = Make("Checklist mission").AddComponent<FireRescueMission>();
+        Set(mission, "spawnPoints", new[] { spawn }); Set(mission, "objectivePoints", new[] { fires, crates });
+        Set(mission, "objectiveCount", 2);
+        var player = Make("Player").AddComponent<PlayerHealth>();
+        yield return null;
+        player.GetComponent<Rigidbody2D>().simulated = false;
+        map.RefreshSources(); map.RenderMap();
+        Assert.That(map.MissionHud.Entries.Count, Is.EqualTo(2));
+        Assert.That(map.MissionHud.Entries.Any(e => e.Label.Contains("Put out fires")), Is.True);
+        Assert.That(map.MissionHud.Entries.Any(e => e.Label.Contains("Break crates")), Is.True);
+        var root = map.transform.Find("Pixel minimap HUD");
+        var panel = root.Find("Tactical map").GetComponent<RectTransform>();
+        Assert.That(panel.Find("Heading"), Is.Null); Assert.That(panel.Find("Legend"), Is.Null);
+        Assert.That(panel.sizeDelta.x, Is.EqualTo(panel.sizeDelta.y));
+        Set(map, "minimapSizePixels", 200); map.RenderMap(); Canvas.ForceUpdateCanvases();
+        Assert.That(panel.sizeDelta, Is.EqualTo(new Vector2(200, 200)));
+        var image = panel.Find("Map pixels").GetComponent<RectTransform>();
+        Assert.That(image.rect.width, Is.EqualTo(image.rect.height));
+        Assert.That(root.Find("Mission countdown").GetComponent<RectTransform>().sizeDelta.x, Is.EqualTo(200));
+        player.transform.position = new Vector3(1, 0); map.RenderMap();
+        Assert.That(map.MissionHud.Entries.Count(e => e.Child), Is.EqualTo(2), "Duplicate target references do not duplicate rows.");
+        fire1.ApplyWater(10000); map.RenderMap();
+        Assert.That(map.MissionHud.Entries.Single(e => e.Label == "Fire 1").Complete, Is.True);
+        Assert.That(root.GetComponentsInChildren<TMP_Text>(true).Any(t => t.text == "<s>Fire 1</s>"), Is.True);
+        fire2.ApplyWater(10000); map.RenderMap();
+        Assert.That(map.MissionHud.Entries.Single(e => !e.Child && e.Label.Contains("Put out fires")).Complete, Is.True);
+        player.transform.position = new Vector3(31, 0); map.RenderMap();
+        Assert.That(map.MissionHud.Entries.Count(e => e.Child), Is.EqualTo(4), "Visited checklist remains expanded.");
+        Assert.That(Count(map, MinimapSymbols.Crate), Is.GreaterThan(0));
+        crate1.Break(); map.RenderMap();
+        Assert.That(map.MissionHud.Entries.Single(e => e.Label == "Crate 1").Complete, Is.True);
+        Assert.That(map.MissionHud.Entries.Single(e => e.Label == "Crate 2").Complete, Is.False);
+        crate2.Break(); map.RenderMap();
+        Assert.That(mission.State, Is.EqualTo(FireRescueMission.Phase.Evacuate));
+        Assert.That(map.MissionHud.Entries.Last().Symbol, Is.EqualTo('E'));
+        Assert.That(map.MissionHud.Entries.Last().Complete, Is.False);
+        Assert.That(map.MissionHud.Entries.Take(map.MissionHud.Entries.Count - 1).All(e => e.Complete), Is.True);
+        var evacIcon = root.GetComponentsInChildren<RawImage>().Last(i => i.name == "Map indicator");
+        Assert.That(evacIcon.texture.filterMode, Is.EqualTo(FilterMode.Point));
+        yield return new WaitForSeconds(0.05f);
+        Assert.That(mission.ElapsedSeconds, Is.GreaterThan(0));
+        float elapsed = mission.ElapsedSeconds;
+        try
+        {
+            Time.timeScale = 0;
+            yield return new WaitForSecondsRealtime(0.05f);
+            Assert.That(mission.ElapsedSeconds, Is.EqualTo(elapsed));
+        }
+        finally { Time.timeScale = 1; }
+        Assert.That(MinimapMissionHud.FormatRemaining(600, 0), Is.EqualTo("10:00"));
+        Assert.That(MinimapMissionHud.FormatRemaining(600, 61), Is.EqualTo("08:59"));
+        Assert.That(MinimapMissionHud.FormatRemaining(600, 999), Is.EqualTo("00:00"));
+        mission.BeginMission(); map.RenderMap();
+        Assert.That(map.MissionHud.TimerText, Is.EqualTo("10:00"));
+        Assert.That(map.MissionHud.Entries.Count, Is.EqualTo(2));
+        Assert.That(map.MissionHud.Entries.Any(e => e.Complete), Is.False);
     }
 
     private static int Count(PixelMinimap map, Color32 color)

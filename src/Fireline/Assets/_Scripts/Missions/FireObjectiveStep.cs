@@ -10,6 +10,9 @@ namespace Fireline.Missions
         [SerializeField] private FireZone[] fires = new FireZone[0];
 
         public IReadOnlyList<FireZone> Fires => fires;
+        public override string DisplayName => "Put out fires";
+        protected override string ChecklistLabel => "Fire";
+        protected override char ChecklistSymbol => 'F';
         public override string Instruction => $"Extinguish marked fires: {Remaining} remaining";
 
         protected override IReadOnlyList<FireZone> Targets => fires;
@@ -18,6 +21,6 @@ namespace Fireline.Missions
         protected override void Watch(FireZone fire) => fire.OnExtinguished.AddListener(CheckProgress);
         protected override void Unwatch(FireZone fire) => fire.OnExtinguished.RemoveListener(CheckProgress);
         protected override string MarkerLabel => "FIRE";
-        protected override Color MarkerColor => new Color(1f, 0.65f, 0.15f);
+        protected override Color MarkerColor => MinimapSymbols.Fire;
     }
 }
