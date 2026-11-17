@@ -65,10 +65,17 @@ public class WaterTankController : MonoBehaviour
     {
         RefreshConnection();
         if (IsFree || amount <= 0f) return true;
-        if (Tank.Amount < amount) return false;
+        if (Tank.Amount < amount)
+        {
+            Tank.ReportEmptySpray(); // not enough for a full shot counts as empty
+            return false;
+        }
         Tank.Amount -= amount;
         return true;
     }
+
+    /// <summary>The player pulled the trigger but the tank is dry. Lets the UI react.</summary>
+    public void ReportEmptySpray() => Tank.ReportEmptySpray();
 
     /// <summary>Tops the tank off (respawn, pickups, cheats).</summary>
     public void Fill() => Tank.Amount = Tank.Capacity;

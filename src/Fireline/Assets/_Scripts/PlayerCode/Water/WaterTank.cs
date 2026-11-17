@@ -5,7 +5,7 @@ using UnityEngine;
 /// (1) DATA: one player's water tank. Just stores the numbers and announces changes.
 ///
 /// Doesn't decide anything: WaterTankController changes these values (refilling, spraying),
-/// and UI like WaterBarView listens to Changed to redraw. Plain C# class, not a component.
+/// and UI like WaterTankGauge listens to Changed to redraw. Plain C# class, not a component.
 /// </summary>
 public class WaterTank
 {
@@ -15,6 +15,12 @@ public class WaterTank
 
     /// <summary>Fired after any value below changes. Listeners re-read what they need.</summary>
     public event Action Changed;
+
+    /// <summary>
+    /// Fired when the player tries to spray but there isn't enough water. Not a value change,
+    /// so it's its own event. Fires every frame the trigger is held on an empty tank.
+    /// </summary>
+    public event Action EmptySprayAttempted;
 
     public WaterTank(float capacity)
     {
@@ -56,6 +62,9 @@ public class WaterTank
     public float Fraction => _amount / _capacity;
     public bool IsEmpty => _amount <= 0f;
     public bool IsFull => _amount >= _capacity;
+
+    /// <summary>Announces a failed spray. Called by WaterTankController.</summary>
+    public void ReportEmptySpray() => EmptySprayAttempted?.Invoke();
 
     private bool Set(ref float field, float value)
     {
