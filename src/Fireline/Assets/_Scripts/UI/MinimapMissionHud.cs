@@ -42,7 +42,7 @@ public sealed class MinimapMissionHud : IDisposable
     public MinimapMissionHud(Transform parent)
     {
         timerPanel = Panel("Mission countdown", parent);
-        timer = Text("Time remaining", timerPanel, 26);
+        timer = Text("Time remaining", timerPanel, 36);
         timer.alignment = TextAlignmentOptions.Center;
         Stretch(timer.rectTransform, 8);
         listPanel = Panel("Mission checklist", parent);
@@ -58,7 +58,7 @@ public sealed class MinimapMissionHud : IDisposable
         glyphs['E'] = MinimapSymbols.CreateTexture('E', MinimapSymbols.Evac);
     }
 
-    public void Refresh(FireRescueMission mission, float mapSize, float revealDistance, float duration)
+    public void Refresh(FireRescueMission mission, float mapSize, float revealDistance, float duration, int timerFontSize, int objectiveFontSize, int subtaskFontSize)
     {
         bool show = mission != null && mission.State != FireRescueMission.Phase.NotStarted
             && mission.State != FireRescueMission.Phase.InvalidSetup;
@@ -69,10 +69,13 @@ public sealed class MinimapMissionHud : IDisposable
             current = mission; runVersion = mission.RunVersion;
             visited.Clear(); scroll = 0; extracting = false;
         }
+        timer.enableAutoSizing = false;
+        timer.fontSize = Mathf.Clamp(timerFontSize, 16, 96);
         timer.text = FormatRemaining(duration, mission.ElapsedSeconds);
         timer.color = duration - mission.ElapsedSeconds <= 60 ? new Color(1, 0.45f, 0.3f) : Color.white;
         BuildEntries(mission, revealDistance);
-        float available = Mathf.Max(40, Screen.height - mapSize - 108);
+        float timerHeight = Mathf.Max(56, timer.GetPreferredValues(timer.text, Mathf.Max(48, mapSize - 16), 1000).y + 16);
+        float available = Mathf.Max(40, Screen.height - mapSize - timerHeight - 64);
         float height = 0, focusOffset = -1;
         for (int i = 0; i < entries.Count; i++)
         {
@@ -82,11 +85,15 @@ public sealed class MinimapMissionHud : IDisposable
             row.Rect.gameObject.SetActive(true);
             float indent = entry.Child ? 18 : 0;
             string label = entry.Label.Replace("<", "‹").Replace(">", "›");
-            row.Text.text = entry.Complete ? "<s>" + label + "</s>" : label;
-            row.Text.color = entry.Complete ? new Color(0.6f, 0.66f, 0.68f) : Color.white;
-            row.Text.fontSize = entry.Child ? 15 : 17;
+            row.Text.text = entry.Complete
+                ? "<s color=#FF4D57><b>" + label + "</b></s>"
+                    + (entry.Child ? "" : " <color=#FF7880><size=75%>COMPLETE</size></color>")
+                : label;
+            row.Text.color = entry.Complete ? new Color(0.78f, 0.8f, 0.82f) : Color.white;
+            row.Text.enableAutoSizing = false;
+            row.Text.fontSize = Mathf.Clamp(entry.Child ? subtaskFontSize : objectiveFontSize, 12, 64);
             float width = Mathf.Max(48, mapSize - 52 - indent);
-            float rowHeight = Mathf.Max(28, row.Text.GetPreferredValues(row.Text.text, width, 1000).y + 8);
+            float rowHeight = Mathf.Max(36, row.Text.GetPreferredValues(row.Text.text, width, 1000).y + 8);
             row.Rect.anchoredPosition = new Vector2(0, -height);
             row.Rect.sizeDelta = new Vector2(0, rowHeight);
             row.Icon.texture = glyphs.TryGetValue(entry.Symbol, out var glyph) ? glyph : glyphs['O'];
@@ -100,7 +107,7 @@ public sealed class MinimapMissionHud : IDisposable
         float listHeight = Mathf.Min(height + 16, available);
         listPanel.sizeDelta = new Vector2(mapSize, listHeight);
         listPanel.anchoredPosition = new Vector2(-18, mapSize + 26);
-        timerPanel.sizeDelta = new Vector2(mapSize, 44);
+        timerPanel.sizeDelta = new Vector2(mapSize, timerHeight);
         timerPanel.anchoredPosition = new Vector2(-18, mapSize + listHeight + 34);
         content.sizeDelta = new Vector2(0, height);
         maxScroll = Mathf.Max(0, height - (listHeight - 16));
@@ -145,7 +152,7 @@ public sealed class MinimapMissionHud : IDisposable
                     entries.Add(new Entry(target.Label, target.Complete, true, target.Symbol, target.Color));
         }
         if (mission.State == FireRescueMission.Phase.Evacuate || mission.State == FireRescueMission.Phase.Complete)
-            entries.Add(new Entry("Extract the team", mission.State == FireRescueMission.Phase.Complete, false, 'E', MinimapSymbols.Evac));
+            entries.Add(new Entry("Extraction Ready", mission.State == FireRescueMission.Phase.Complete, false, 'E', MinimapSymbols.Evac));
     }
 
     public void TickScroll()
@@ -163,7 +170,7 @@ public sealed class MinimapMissionHud : IDisposable
         icon.raycastTarget = false;
         icon.rectTransform.anchorMin = icon.rectTransform.anchorMax = icon.rectTransform.pivot = new Vector2(0, 1);
         icon.rectTransform.sizeDelta = new Vector2(20, 20);
-        var text = Text("Objective", rect, 17); Stretch(text.rectTransform, 0);
+        var text = Text("Objective", rect, 24); Stretch(text.rectTransform, 0);
         return new Row { Rect = rect, Icon = icon, Text = text };
     }
     private static RectTransform Rect(string name, Transform parent)
@@ -183,7 +190,7 @@ public sealed class MinimapMissionHud : IDisposable
     {
         var text = Rect(name, parent).gameObject.AddComponent<TextMeshProUGUI>();
         text.font = TMP_Settings.defaultFontAsset;
-        text.fontSize = size; text.richText = true; text.raycastTarget = false;
+        text.enableAutoSizing = false; text.fontSize = size; text.richText = true; text.raycastTarget = false;
         text.alignment = TextAlignmentOptions.MidlineLeft;
         return text;
     }

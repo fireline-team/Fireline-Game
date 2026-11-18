@@ -19,6 +19,11 @@ public sealed class PixelMinimap : MonoBehaviour
     [SerializeField, Min(1)] private float countdownSeconds = 600;
     [Tooltip("Reveal a site checklist when a standing teammate comes this close to the site or one of its targets.")]
     [SerializeField, Min(1)] private float objectiveRevealDistance = 8;
+    [Header("Mission text sizes")]
+    [Tooltip("Countdown font size. Applies live in Play Mode; edit the prefab outside Play Mode to save.")]
+    [SerializeField, Range(16, 96)] private int timerFontSize = 48;
+    [SerializeField, Range(12, 64)] private int objectiveFontSize = 30;
+    [SerializeField, Range(12, 64)] private int subtaskFontSize = 26;
     [SerializeField, Min(0.05f)] private float refreshInterval = 0.1f;
     [Tooltip("Optional explicit ground tilemaps. Empty discovers non-obstacle tilemaps in this scene.")]
     [SerializeField] private Tilemap[] groundTilemaps;
@@ -42,6 +47,7 @@ public sealed class PixelMinimap : MonoBehaviour
     private Camera view;
     private float nextRefresh, nextDiscovery;
     private Collider2D[] obstacles = new Collider2D[0];
+    private CivilianEscort[] civilians = new CivilianEscort[0];
     private FireZone[] fires = new FireZone[0];
     private HordeEnemy[] enemies = new HordeEnemy[0];
     private FireRescueMission[] missions = new FireRescueMission[0];
@@ -97,7 +103,7 @@ public sealed class PixelMinimap : MonoBehaviour
 
     private void UpdatePanelSize()
     {
-        float limit = Mathf.Max(96, Mathf.Min(Screen.width - 36, Screen.height - 156));
+        float limit = Mathf.Max(96, Mathf.Min(Screen.width - 36, Screen.height - (timerFontSize * 1.4f + 120)));
         float size = Mathf.Clamp(minimapSizePixels, 96, limit);
         panel.sizeDelta = new Vector2(size, size);
     }
@@ -119,6 +125,7 @@ public sealed class PixelMinimap : MonoBehaviour
         foreach (var collider in FindObjectsByType<Collider2D>(FindObjectsSortMode.None))
             if (collider.gameObject.scene == gameObject.scene && IsPermanentObstacle(collider, obstacleLayers)) walls.Add(collider);
         obstacles = walls.ToArray();
+        civilians = FindObjectsByType<CivilianEscort>(FindObjectsSortMode.None);
         fires = FindObjectsByType<FireZone>(FindObjectsSortMode.None);
         enemies = FindObjectsByType<HordeEnemy>(FindObjectsSortMode.None);
         missions = FindObjectsByType<FireRescueMission>(FindObjectsSortMode.None);
@@ -146,7 +153,7 @@ public sealed class PixelMinimap : MonoBehaviour
         foreach (var mission in missions)
             if (mission != null && mission.isActiveAndEnabled && mission.gameObject.scene == gameObject.scene)
             { activeMission = mission; break; }
-        missionHud.Refresh(activeMission, panel.sizeDelta.x, objectiveRevealDistance, countdownSeconds);
+        missionHud.Refresh(activeMission, panel.sizeDelta.x, objectiveRevealDistance, countdownSeconds, timerFontSize, objectiveFontSize, subtaskFontSize);
         Ray ray = view.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         var floor = new Plane(Vector3.forward, Vector3.zero);
         MapCenter = floor.Raycast(ray, out float distance) ? (Vector2)ray.GetPoint(distance) : (Vector2)view.transform.position;
@@ -198,6 +205,10 @@ public sealed class PixelMinimap : MonoBehaviour
             if (mission.ShowEvacuationGuidance && mission.Spawn != null)
                 Icon(mission.Spawn.transform.position, 'E', MinimapSymbols.Evac, true);
         }
+        foreach (var civilian in civilians)
+            if (civilian != null && civilian.isActiveAndEnabled && !civilian.IsResolved
+                && civilian.gameObject.scene == gameObject.scene)
+                Icon(civilian.transform.position, 'C', MinimapSymbols.Civilian, true);
         foreach (var player in PlayerHealth.ActivePlayers)
         {
             if (player == null || !player.isActiveAndEnabled || player.gameObject.scene != gameObject.scene) continue;

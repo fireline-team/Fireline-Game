@@ -101,13 +101,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c32c69a3f9c84e8cbcd7cd4bbd473f13, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::PixelMinimap
   resolution: 128
   worldSpan: 60
-  minimapSizePixels: 268
+  minimapSizePixels: 400
   countdownSeconds: 600
   objectiveRevealDistance: 8
+  timerFontSize: 48
+  objectiveFontSize: 30
+  subtaskFontSize: 26
   refreshInterval: 0.1
   groundTilemaps: []
   obstacleLayers:

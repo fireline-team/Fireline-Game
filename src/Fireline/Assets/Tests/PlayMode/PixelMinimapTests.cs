@@ -136,7 +136,7 @@ public class PixelMinimapTests
     [UnityTest]
     public IEnumerator SquareHudRevealsTargetsStrikesCompletedTasksAndAddsExtraction()
     {
-        var map = Map(out _);
+        var map = Map(out var camera);
         var fire1 = Make("Fire 1", new Vector3(0, 0)).AddComponent<FireZone>();
         var fire2 = Make("Fire 2", new Vector3(2, 0)).AddComponent<FireZone>();
         var fireStep = Make("Fires").AddComponent<FireObjectiveStep>();
@@ -170,13 +170,34 @@ public class PixelMinimapTests
         Assert.That(image.rect.width, Is.EqualTo(image.rect.height));
         Assert.That(root.Find("Mission countdown").GetComponent<RectTransform>().sizeDelta.x, Is.EqualTo(200));
         player.transform.position = new Vector3(1, 0); map.RenderMap();
+        Set(map, "timerFontSize", 60); Set(map, "objectiveFontSize", 34); Set(map, "subtaskFontSize", 29);
+        map.RenderMap(); Canvas.ForceUpdateCanvases();
+        var countdown = root.Find("Mission countdown/Time remaining").GetComponent<TMP_Text>();
+        Assert.That(countdown.fontSize, Is.EqualTo(60));
+        Assert.That(countdown.enableAutoSizing, Is.False);
+        var parentText = root.GetComponentsInChildren<TMP_Text>(true).First(t => t.text.Contains("Put out fires"));
+        var childText = root.GetComponentsInChildren<TMP_Text>(true).Single(t => t.text == "Fire 1");
+        Assert.That(parentText.fontSize, Is.EqualTo(34));
+        Assert.That(childText.fontSize, Is.EqualTo(29));
+        Assert.That(parentText.enableAutoSizing || childText.enableAutoSizing, Is.False);
+        Assert.That(root.Find("Mission countdown").GetComponent<RectTransform>().rect.height, Is.GreaterThan(60));
+        // Editing an Inspector value during play updates the already-created text too.
+        Set(map, "timerFontSize", 44); map.RenderMap();
+        Assert.That(countdown.fontSize, Is.EqualTo(44));
         Assert.That(map.MissionHud.Entries.Count(e => e.Child), Is.EqualTo(2), "Duplicate target references do not duplicate rows.");
         fire1.ApplyWater(10000); map.RenderMap();
         Assert.That(map.MissionHud.Entries.Single(e => e.Label == "Fire 1").Complete, Is.True);
-        Assert.That(root.GetComponentsInChildren<TMP_Text>(true).Any(t => t.text == "<s>Fire 1</s>"), Is.True);
+        var finishedText = root.GetComponentsInChildren<TMP_Text>(true).Single(t => t.text.Contains("<b>Fire 1</b>"));
+        finishedText.ForceMeshUpdate(true);
+        Assert.That(finishedText.textInfo.characterCount, Is.GreaterThan(0));
+        Assert.That(finishedText.textInfo.characterInfo[0].strikethroughColor, Is.EqualTo(new Color32(255, 77, 87, 255)));
+        Assert.That((finishedText.textInfo.characterInfo[0].style & FontStyles.Strikethrough) != 0, Is.True);
         fire2.ApplyWater(10000); map.RenderMap();
         Assert.That(map.MissionHud.Entries.Single(e => !e.Child && e.Label.Contains("Put out fires")).Complete, Is.True);
-        player.transform.position = new Vector3(31, 0); map.RenderMap();
+        Assert.That(root.GetComponentsInChildren<TMP_Text>(true).Any(t => t.text.Contains("Put out fires") && t.text.Contains("COMPLETE")), Is.True);
+        player.transform.position = new Vector3(31, 0);
+        camera.transform.position += Vector3.right * 25;
+        map.RenderMap();
         Assert.That(map.MissionHud.Entries.Count(e => e.Child), Is.EqualTo(4), "Visited checklist remains expanded.");
         Assert.That(Count(map, MinimapSymbols.Crate), Is.GreaterThan(0));
         crate1.Break(); map.RenderMap();
@@ -206,6 +227,29 @@ public class PixelMinimapTests
         Assert.That(map.MissionHud.TimerText, Is.EqualTo("10:00"));
         Assert.That(map.MissionHud.Entries.Count, Is.EqualTo(2));
         Assert.That(map.MissionHud.Entries.Any(e => e.Complete), Is.False);
+    }
+
+    [Test]
+    public void CiviliansAppearOnMapAndAtEdgesUntilSavedOrLost()
+    {
+        var map = Map(out _);
+        var site = Make("Civilian owner").AddComponent<MissionObjectiveSite>();
+        var civilian = Make("Civilian", new Vector3(10, 10)).AddComponent<CivilianEscort>();
+        civilian.Initialize(site, null);
+        map.RefreshSources(); map.RenderMap();
+        Assert.That(Count(map, MinimapSymbols.Civilian), Is.GreaterThan(0));
+        civilian.transform.position = new Vector3(100, 100); map.RenderMap();
+        Assert.That(Count(map, MinimapSymbols.Civilian), Is.GreaterThan(0), "Off-map civilians remain at the border.");
+        civilian.TakeDamage(10000); map.RenderMap();
+        Assert.That(civilian.IsResolved, Is.True);
+        Assert.That(Count(map, MinimapSymbols.Civilian), Is.Zero);
+        var rescued = Make("New survivor", new Vector3(-10, 10)).AddComponent<CivilianEscort>();
+        rescued.Initialize(site, null); map.RefreshSources(); map.RenderMap();
+        Assert.That(Count(map, MinimapSymbols.Civilian), Is.GreaterThan(0));
+        typeof(CivilianEscort).GetMethod("Resolve", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(rescued, new object[] { true });
+        map.RenderMap();
+        Assert.That(rescued.IsSaved, Is.True);
+        Assert.That(Count(map, MinimapSymbols.Civilian), Is.Zero);
     }
 
     private static int Count(PixelMinimap map, Color32 color)
