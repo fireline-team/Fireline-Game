@@ -25,6 +25,82 @@ public class HoseRopeTests
         yield return null;
     }
 
+    [Test]
+    public void ConnectingStartsStraightWithoutSlackAndReconnectResetsTrail()
+    {
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(103, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        for (int connection = 0; connection < 2; connection++)
+        {
+            rope.Bind(source, end, Vector3.zero, Vector3.back);
+            rope.SetMaximumLength(20);
+            float initialLength = Vector3.Distance(source.position, end.position);
+            Assert.That(rope.PaidOutLength, Is.EqualTo(initialLength).Within(0.0001f));
+            for (int step = 0; step < 30; step++) rope.Simulate(0.02f);
+            Assert.That(rope.PaidOutLength, Is.EqualTo(initialLength).Within(0.0001f), "Standing still added starting slack");
+            for (int i = 0; i < rope.PointCount; i++)
+                Assert.That(rope.GetPoint(i).y, Is.EqualTo(100).Within(0.0001f), "Connection created a sideways slack loop");
+            end.position += Vector3.right * 4;
+            rope.Simulate(0.02f);
+            float paidOut = rope.PaidOutLength;
+            end.position -= Vector3.right * 4;
+            rope.Simulate(0.02f);
+            Assert.That(rope.PaidOutLength, Is.EqualTo(paidOut), "Returning should retain earned slack");
+        }
+    }
+
+    [TestCase(0.5f)]
+    [TestCase(3f)]
+    public void ShortConnectionRendersFullWidthWithoutCrowdedJoins(float distance)
+    {
+        var source = Make("Source", new Vector3(100, 100, -0.2f)).transform;
+        var end = Make("Nozzle", new Vector3(100 + distance, 100, -0.6f)).transform;
+        var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
+        var camera = Make("Mesh verification camera", new Vector3(100 + distance / 2, 96, -8)).AddComponent<Camera>();
+        camera.transform.LookAt(new Vector3(100 + distance / 2, 100, 0), Vector3.up);
+        camera.orthographic = true;
+        rope.Bind(source, end, Vector3.zero, Vector3.back);
+        var line = rope.GetComponent<LineRenderer>();
+        var render = typeof(HoseRope).GetMethod("Render", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var mesh = new Mesh();
+        try
+        {
+            for (int frame = 0; frame < 30; frame++)
+            {
+                rope.Simulate(0.02f);
+                render.Invoke(rope, null);
+                Assert.That(line.positionCount, Is.LessThan(rope.PointCount / 2), "Dense straight particles leaked into rounded render joins");
+                Assert.That(line.GetPosition(0), Is.EqualTo(source.position));
+                Assert.That(line.GetPosition(line.positionCount - 1), Is.EqualTo(end.position));
+                line.BakeMesh(mesh, camera, true);
+                Assert.That(mesh.vertexCount, Is.GreaterThan(0));
+                var vertices = mesh.vertices;
+                for (int i = 0; i < vertices.Length; i++) vertices[i] = camera.transform.InverseTransformPoint(vertices[i]);
+                var triangles = mesh.triangles;
+                // Slice the actual ribbon mesh across its grounded middle, checking
+                // visible cross-section width rather than only the width property.
+                for (int sample = 1; sample < 10; sample++)
+                {
+                    float x = camera.transform.InverseTransformPoint(Vector3.Lerp(source.position, end.position, sample / 10f)).x;
+                    float min = float.PositiveInfinity, max = float.NegativeInfinity;
+                    for (int i = 0; i < triangles.Length; i += 3)
+                        for (int edge = 0; edge < 3; edge++)
+                        {
+                            Vector3 a = vertices[triangles[i + edge]], b = vertices[triangles[i + (edge + 1) % 3]];
+                            if (Mathf.Abs(b.x - a.x) < 0.000001f) continue;
+                            float t = (x - a.x) / (b.x - a.x);
+                            if (t < 0 || t > 1) continue;
+                            float y = Mathf.Lerp(a.y, b.y, t);
+                            min = Mathf.Min(min, y); max = Mathf.Max(max, y);
+                        }
+                    Assert.That(max - min, Is.GreaterThanOrEqualTo(rope.Radius * 1.8f), $"Ribbon pinched at sample {sample}, frame {frame}");
+                }
+            }
+        }
+        finally { Object.DestroyImmediate(mesh); }
+    }
+
     [UnityTest]
     public IEnumerator ChainStaysOnGroundWithPinnedEndsAndLimitedSegmentStretch()
     {
@@ -174,6 +250,13 @@ public class HoseRopeTests
         var end = Make("Nozzle", new Vector3(108, 100, -0.6f)).transform;
         var rope = Make("Rope", Vector3.zero).AddComponent<HoseRope>();
         rope.Bind(source, end, Vector3.zero, Vector3.back);
+        // Earn slack through movement now that a new connection starts without any.
+        for (int i = 0; i < 120; i++)
+        {
+            end.position += new Vector3(0.025f, 0.025f, 0) * (i < 60 ? 1 : -1);
+            rope.Simulate(0.02f);
+        }
+        Assert.That(rope.PaidOutLength, Is.GreaterThan(Vector3.Distance(source.position, end.position)));
         // Introduce contact near the player, with slack still lying beside the hydrant.
         int contact = rope.PointCount * 3 / 4;
         Vector3 center = (rope.GetPoint(contact) + rope.GetPoint(contact + 1)) * 0.5f;

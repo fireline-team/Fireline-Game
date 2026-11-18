@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -9,7 +10,6 @@ using UnityEngine;
 public class HoseRope : MonoBehaviour
 {
     [SerializeField, Min(4)] private int segments = 64;
-    [SerializeField, Min(0.1f)] private float minimumLength = 12f;
     [SerializeField, Min(0.1f)] private float payoutSlack = 2f;
     [SerializeField, Min(0.01f)] private float radius = 0.06f;
     [Tooltip("Height of the hose center above the source base ground plane, independent of hose thickness.")]
@@ -37,6 +37,7 @@ public class HoseRope : MonoBehaviour
     private Vector3[] points;
     private Vector3[] previous;
     private LineRenderer line;
+    private readonly List<Vector3> renderPoints = new List<Vector3>();
     private float maximumLength;
     private MaterialPropertyBlock colorProperties;
     private HoseVfxLibrary vfxLibrary;
@@ -67,7 +68,8 @@ public class HoseRope : MonoBehaviour
         line.useWorldSpace = true;
         line.widthMultiplier = radius * 2f;
         line.numCapVertices = 4;
-        line.numCornerVertices = 4;
+        // Miter joins preserve the ribbon width where a short ground run meets a raised fitting.
+        line.numCornerVertices = 0;
         line.enabled = source != null && nozzle != null;
         if (!line.enabled) return;
         segments = Mathf.Max(4, segments);
@@ -76,7 +78,8 @@ public class HoseRope : MonoBehaviour
         lengthWeights = new float[segments];
         for (int i = 0; i < segments; i++) lengthWeights[i] = 1f / segments;
         RefreshNozzlePosition();
-        PaidOutLength = Mathf.Max(minimumLength, Vector3.Distance(source.position, resolvedNozzle) + payoutSlack);
+        // Start with only the length needed to reach the player, without a pre-laid loop.
+        PaidOutLength = Vector3.Distance(source.position, resolvedNozzle);
         LayOut();
         ResolveObstacles();
         Render();
@@ -147,7 +150,7 @@ public class HoseRope : MonoBehaviour
             || float.IsNaN(deltaTime) || float.IsInfinity(deltaTime)) return;
         RefreshNozzlePosition();
         // The source is a reel: pay out when taut, but keep the trail when returning.
-        PaidOutLength = Mathf.Max(PaidOutLength, Vector3.Distance(source.position, resolvedNozzle) + payoutSlack);
+        PayOutIfNeeded(Vector3.Distance(source.position, resolvedNozzle));
         if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
         if ((source.position - lastSource).sqrMagnitude > teleportDistance * teleportDistance
             || (resolvedNozzle - lastNozzle).sqrMagnitude > teleportDistance * teleportDistance)
@@ -156,7 +159,7 @@ public class HoseRope : MonoBehaviour
             LayOut();
         }
         RefreshObstacleRoute();
-        PaidOutLength = Mathf.Max(PaidOutLength, obstacleRoute.Length + payoutSlack);
+        PayOutIfNeeded(obstacleRoute.Length);
         if (maximumLength > 0f) PaidOutLength = Mathf.Min(PaidOutLength, maximumLength);
         float dt = Mathf.Min(deltaTime, 0.05f) / substeps;
         float drag = Mathf.Exp(-airDrag * dt);
@@ -203,6 +206,14 @@ public class HoseRope : MonoBehaviour
         ResolveObstacles();
         lastSource = source.position;
         lastNozzle = resolvedNozzle;
+    }
+
+    private void PayOutIfNeeded(float requiredLength)
+    {
+        // Do not add the movement allowance just for standing at the initial length.
+        // Once the player pulls farther away, retain the existing payout/trailing behavior.
+        if (requiredLength > PaidOutLength + 0.0001f)
+            PaidOutLength = requiredLength + payoutSlack;
     }
 
     private bool UsesFootprints => Mathf.Abs(groundUp.z) > 0.999f;
@@ -373,8 +384,35 @@ public class HoseRope : MonoBehaviour
         RefreshNozzlePosition();
         PinEnds();
         ResolveObstacles();
-        line.positionCount = points.Length;
-        line.SetPositions(points);
+        BuildRenderPath();
+        line.positionCount = renderPoints.Count;
+        for (int i = 0; i < renderPoints.Count; i++) line.SetPosition(i, renderPoints[i]);
+    }
+
+    private void BuildRenderPath()
+    {
+        renderPoints.Clear();
+        // The simulation needs dense particles, but a short newly attached hose can
+        // put them closer together than its width. Rounded LineRenderer joins then
+        // overlap and pinch. Draw straight runs as single spans, keeping the solver intact.
+        float toleranceSquared = Mathf.Pow(radius * 0.05f, 2);
+        for (int i = 0; i < points.Length; i++)
+        {
+            renderPoints.Add(points[i]);
+            while (renderPoints.Count >= 3)
+            {
+                int middle = renderPoints.Count - 2;
+                Vector3 a = renderPoints[middle - 1];
+                Vector3 b = renderPoints[middle];
+                Vector3 c = renderPoints[middle + 1];
+                Vector3 span = c - a;
+                if (span.sqrMagnitude < 0.00000001f) break; // Preserve a folded-back slack loop.
+                float t = Vector3.Dot(b - a, span) / span.sqrMagnitude;
+                if (t < 0 || t > 1 || (b - (a + span * t)).sqrMagnitude > toleranceSquared) break;
+                if (UsesFootprints && obstacleRoute.Blocker(a, c) != null) break;
+                renderPoints.RemoveAt(middle);
+            }
+        }
     }
 
     private void OnDisable()
