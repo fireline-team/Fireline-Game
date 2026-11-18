@@ -91,8 +91,8 @@ namespace Fireline.Missions
             }
             var art = new GameObject("Civilian body");
             art.transform.SetParent(transform, false);
-            // Player body is 1.25; this is 70% of that visual size. Physics stays on XY.
-            art.transform.localScale = Vector3.one * 0.875f;
+            // Player body is 1.25; this is 95% of that visual size. Physics stays on XY.
+            art.transform.localScale = Vector3.one * 1.1875f;
             visual = art.AddComponent<SpriteRenderer>();
             if (sprite == null)
             {

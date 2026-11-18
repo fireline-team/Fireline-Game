@@ -17,7 +17,13 @@ public class PlayerRescueArrow : MaskableGraphic
         Vector2 direction = new Vector2(point.x, point.y) - bounds.center;
         if (point.z <= 0f) direction = -direction;
         if (direction.sqrMagnitude < 0.001f) direction = Vector2.down;
-        Vector2 halfSize = new Vector2(Mathf.Max(1, bounds.width / 2 - 36), Mathf.Max(1, bounds.height / 2 - 36));
+        // Reserve the rotated graphic's actual extents, including larger mission arrows.
+        Vector2 heading = direction.normalized;
+        Vector2 size = rectTransform.rect.size;
+        Vector2 extents = new Vector2(Mathf.Abs(heading.x) * size.x + Mathf.Abs(heading.y) * size.y,
+            Mathf.Abs(heading.y) * size.x + Mathf.Abs(heading.x) * size.y) * 0.5f;
+        Vector2 halfSize = new Vector2(Mathf.Max(1, bounds.width / 2 - extents.x - 8),
+            Mathf.Max(1, bounds.height / 2 - extents.y - 8));
         float scale = 1f / Mathf.Max(Mathf.Abs(direction.x) / halfSize.x, Mathf.Abs(direction.y) / halfSize.y);
         rectTransform.anchoredPosition = bounds.center + direction * scale;
         rectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg);

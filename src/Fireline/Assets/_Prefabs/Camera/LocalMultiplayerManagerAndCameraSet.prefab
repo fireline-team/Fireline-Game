@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 670016061370145636}
   - component: {fileID: 6884274397769943129}
   - component: {fileID: 8485511408987713356}
+  - component: {fileID: 810100001}
   m_Layer: 0
   m_Name: LocalMultiplayerManagerAndCameraSet
   m_TagString: Untagged
@@ -90,3 +91,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f2b215f60d8beaf99978d15f6f03c3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Fireline.Gameplay::CameraTargetSetter
+--- !u!114 &810100001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5803883257070478602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c32c69a3f9c84e8cbcd7cd4bbd473f13, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::PixelMinimap
+  resolution: 128
+  worldSpan: 60
+  minimapSizePixels: 400
+  countdownSeconds: 600
+  objectiveRevealDistance: 8
+  timerFontSize: 48
+  objectiveFontSize: 30
+  subtaskFontSize: 26
+  refreshInterval: 0.1
+  groundTilemaps: []
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  densityCellSize: 5
+  denseEnemyCount: 20
+  pulseFrequency: {x: 0.6, y: 2}

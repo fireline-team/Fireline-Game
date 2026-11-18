@@ -13,6 +13,9 @@ namespace Fireline.Missions
         [SerializeField] private Debris[] debris = new Debris[0];
 
         public IReadOnlyList<Debris> Pieces => debris;
+        public override string DisplayName => "Break crates";
+        protected override string ChecklistLabel => "Crate";
+        protected override char ChecklistSymbol => 'D';
         public override string Instruction => $"Break the marked debris: {Remaining} remaining";
 
         protected override IReadOnlyList<Debris> Targets => debris;
@@ -22,7 +25,7 @@ namespace Fireline.Missions
         protected override void Unwatch(Debris piece) => piece.Broken -= OnBroken;
         protected override void SetTargetAvailable(Debris piece, bool available) => piece.SetPresent(available);
         protected override string MarkerLabel => "DEBRIS";
-        protected override Color MarkerColor => new Color(0.85f, 0.6f, 0.35f);
+        protected override Color MarkerColor => MinimapSymbols.Crate;
 
         private void OnBroken(Debris _) => CheckProgress();
     }

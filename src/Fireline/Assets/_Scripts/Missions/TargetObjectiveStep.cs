@@ -11,7 +11,7 @@ namespace Fireline.Missions
     /// Inspector, e.g. "fires") and only describe how one target behaves. The tracking,
     /// configuration check, availability and HUD markers all live here.
     /// </summary>
-    public abstract class TargetObjectiveStep<TTarget> : MissionObjectiveStep, IObjectiveMarkerSource
+    public abstract class TargetObjectiveStep<TTarget> : MissionObjectiveStep, IObjectiveMarkerSource, IObjectiveChecklistSource
         where TTarget : Component
     {
         private readonly HashSet<TTarget> remaining = new HashSet<TTarget>();
@@ -32,6 +32,20 @@ namespace Fireline.Missions
         /// <summary>Marker text before the number, e.g. "FIRE" gives "FIRE 1".</summary>
         protected abstract string MarkerLabel { get; }
         protected abstract Color MarkerColor { get; }
+
+        protected virtual string ChecklistLabel => MarkerLabel;
+        protected virtual char ChecklistSymbol => 'O';
+        public void CollectChecklist(List<ObjectiveChecklistItem> items)
+        {
+            var seen = new HashSet<TTarget>();
+            int index = 0;
+            foreach (var target in Targets)
+            {
+                if (target == null || !seen.Add(target)) continue;
+                items.Add(new ObjectiveChecklistItem($"{ChecklistLabel} {++index}", target.transform.position,
+                    IsComplete || (IsRunning && IsResolved(target)), ChecklistSymbol, MarkerColor));
+            }
+        }
 
         public int Remaining => remaining.Count;
 

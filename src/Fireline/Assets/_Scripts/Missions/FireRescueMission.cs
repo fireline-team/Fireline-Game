@@ -71,11 +71,15 @@ namespace Fireline.Missions
             _ => "Preparing mission"
         };
 
+        public float ElapsedSeconds { get; private set; }
+        public int RunVersion { get; private set; }
         private void Start() => BeginMission();
 
         public bool BeginMission()
         {
             Unsubscribe();
+            ElapsedSeconds = 0;
+            RunVersion++;
             placedPlayers.Clear();
             evacuationTime = 0;
             reportedLosses = 0;
@@ -145,6 +149,8 @@ namespace Fireline.Missions
         {
             if (State != Phase.Objective && State != Phase.Evacuate) return;
             PlaceNewPlayers();
+            if (!GameManager.BlocksGameplay && PlayerHealth.ActivePlayers.Any(p => p != null && !p.IsDowned
+                && p.gameObject.scene == gameObject.scene)) ElapsedSeconds += Time.deltaTime;
             if (State == Phase.Objective)
             {
                 if (!PlayerHealth.ActivePlayers.Any(p => p != null && p.gameObject.scene == gameObject.scene)) return;
