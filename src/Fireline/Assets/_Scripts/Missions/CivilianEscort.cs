@@ -47,7 +47,9 @@ namespace Fireline.Missions
         private FireRescueMission mission;
         private Rigidbody2D body;
         private HealthPool health;
-        private SpriteRenderer visual;
+        [SerializeField] private SpriteRenderer visual;
+        private CivilianAppearance appearance;
+        private Color visualColor = Color.white;
         private Sprite fallbackSprite;
         private float nextDamageTime;
         private float nextPathTime;
@@ -77,10 +79,16 @@ namespace Fireline.Missions
             health = new HealthPool(maxHealth);
         }
 
-        public void Initialize(MissionObjectiveSite owner, FireRescueMission rescueMission, Sprite sprite)
+        public void Initialize(MissionObjectiveSite owner, FireRescueMission rescueMission, Sprite sprite = null)
         {
             site = owner;
             mission = rescueMission;
+            if (visual != null)
+            {
+                appearance = visual.GetComponent<CivilianAppearance>();
+                visualColor = visual.color;
+                return;
+            }
             var art = new GameObject("Civilian body");
             art.transform.SetParent(transform, false);
             // Player body is 1.25; this is 70% of that visual size. Physics stays on XY.
@@ -101,7 +109,7 @@ namespace Fireline.Missions
                 sprite = fallbackSprite;
             }
             visual.sprite = sprite;
-            visual.color = new Color(0.7f, 0.9f, 1f);
+            visualColor = visual.color = new Color(0.7f, 0.9f, 1f);
             art.AddComponent<StandUpright>();
         }
 
@@ -169,7 +177,7 @@ namespace Fireline.Missions
                 float clearance = ObstacleDistance(body.position, direction, travel + 0.02f);
                 travel = Mathf.Min(travel, Mathf.Max(0, clearance - 0.02f));
                 movement = direction * travel;
-                if (visual != null && travel > 0 && Mathf.Abs(direction.x) > 0.05f) visual.flipX = direction.x < 0;
+                if (appearance == null && visual != null && travel > 0 && Mathf.Abs(direction.x) > 0.05f) visual.flipX = direction.x < 0;
             }
             plannedPosition = body.position + movement;
             plannedAt = Time.fixedTime;
@@ -256,6 +264,7 @@ namespace Fireline.Missions
             IsSaved = saved;
             FollowTarget = null;
             body.simulated = false;
+            if (appearance != null) appearance.enabled = false;
             site.ResolveCivilian(saved);
             if (saved) gameObject.SetActive(false);
             else if (visual != null)
@@ -269,7 +278,9 @@ namespace Fireline.Missions
         {
             if (IsResolved || visual == null) return;
             float alpha = Time.time < nextDamageTime && Mathf.FloorToInt(Time.time * 12) % 2 == 0 ? 0.35f : 1;
-            visual.color = new Color(0.7f, 0.9f, 1f, alpha);
+            var color = visualColor;
+            color.a *= alpha;
+            visual.color = color;
         }
 
         private void OnDestroy() { if (fallbackSprite != null) Destroy(fallbackSprite); }

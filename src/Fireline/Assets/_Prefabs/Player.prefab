@@ -117,6 +117,10 @@ GameObject:
   - component: {fileID: 2109946662711708551}
   - component: {fileID: 5913907959130893562}
   - component: {fileID: 5909500234918799618}
+  - component: {fileID: 6649550115121710301}
+  - component: {fileID: 306204608767095612}
+  - component: {fileID: 4357210223480194735}
+  - component: {fileID: 1241828590948924752}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -355,6 +359,7 @@ MonoBehaviour:
   useVfxGraph: 1
   hoseVfx: {fileID: 0}
   damagePerSecond: 20
+  waterPerSecond: 10
   knockbackStrength: 24
 --- !u!114 &1000283584469985828
 MonoBehaviour:
@@ -394,6 +399,7 @@ MonoBehaviour:
   useVfxGraph: 1
   hoseVfx: {fileID: 0}
   damagePerSecond: 8
+  waterPerSecond: 6
   slowMultiplier: 0.4
   slowDuration: 1
 --- !u!114 &3818691781568856148
@@ -437,6 +443,7 @@ MonoBehaviour:
   fireInterval: 0.5
   knockbackImpulse: 6
   particlesPerShot: 34
+  waterPerShot: 8
 --- !u!114 &5178020514801643433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -573,6 +580,133 @@ MonoBehaviour:
   capacity: 100
   refillPerSecond: 25
   useTankWhileConnected: 0
+--- !u!114 &6649550115121710301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecb55b248be6540d1baafa5888220139, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::PlayerIdentity
+  roster: {fileID: 11400000, guid: 050ae688713034cd587e41ce0067f4f9, type: 2}
+--- !u!114 &306204608767095612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53f5edcaf4e674acaaea54904ae27d91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Fireline.Gameplay::PlayerRing
+  showRing: 1
+  ringSprite: {fileID: 0}
+  diameter: 1.2
+  thickness: 0.18
+  offset: {x: 0, y: 0}
+  opacity: 0.85
+  sortingOrder: -5
+  downedOpacity: 0.35
+--- !u!108 &4357210223480194735
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  serializedVersion: 13
+  m_Type: 2
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 4.33
+  m_Range: 10
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.802082
+  m_CookieSize2D: {x: 0.5, y: 0.5}
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1.21
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShapeRadius: 0.025
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!114 &1241828590948924752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591240336905840500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &1376534921308105634
 GameObject:
   m_ObjectHideFlags: 0
