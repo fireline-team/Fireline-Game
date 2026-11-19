@@ -348,6 +348,9 @@ MonoBehaviour:
   hitFlashMaterial: {fileID: 2100000, guid: addf6bd8a7adb43238a0bf72d1f7a0bb, type: 2}
   flashDuration: 0.06
   flashInterval: 0.12
+  minimumDamageScale: 0.35
+  damageShrinkSpeed: 5
+  deathShrinkDuration: 0.22
 --- !u!50 &-7706934376786935346
 Rigidbody2D:
   serializedVersion: 5

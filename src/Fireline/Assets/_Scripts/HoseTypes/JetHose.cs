@@ -43,7 +43,7 @@ public class JetHose : HoseWeapon
         for (int i = 0; i < hits.Count; i++)
         {
             hits[i].ApplyKnockback(knock);
-            hits[i].TakeDamage(damagePerShot); // last, since it can despawn the enemy
+            DamageEnemyWithWater(hits[i], damagePerShot); // last, since it can despawn the enemy
         }
 
         // Each pulse delivers a whole interval's worth of water, so over time the jet

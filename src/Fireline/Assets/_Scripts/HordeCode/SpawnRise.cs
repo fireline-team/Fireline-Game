@@ -17,6 +17,7 @@ namespace Game.Runtime
         private float _elapsed;
         private float _pivotFraction;
         private float _height;
+        private float _damageScale = 1f;
 
         public bool IsRising => _elapsed < _duration;
 
@@ -58,17 +59,23 @@ namespace Game.Runtime
             Apply(1f);
         }
 
+        public void SetDamageScale(float scale)
+        {
+            _damageScale = Mathf.Clamp01(scale);
+            Apply(IsRising ? Mathf.Clamp01(_elapsed / _duration) : 1f);
+        }
+
         private void Apply(float t)
         {
             if (_visual == null) return;
             float grown = 1f - (1f - t) * (1f - t) * (1f - t); // ease out: fast start, soft landing
-            float s = Mathf.Max(0.02f, grown);
+            float s = Mathf.Max(0.02f, grown) * _damageScale;
 
             // Grow from the feet: keep the sprite's bottom edge where it is while it scales.
             float sink = -_pivotFraction * _height * _restScale.y * (1f - s);
             float wobble = t < 1f ? Mathf.Sin(t * 40f) * 0.04f * (1f - t) : 0f;
 
-            _visual.localScale = new Vector3(_restScale.x, _restScale.y * s, _restScale.z);
+            _visual.localScale = new Vector3(_restScale.x * _damageScale, _restScale.y * s, _restScale.z);
             _visual.localPosition = _restPosition + _visual.localRotation * new Vector3(wobble, sink, 0f);
         }
     }

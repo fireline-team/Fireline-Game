@@ -158,10 +158,10 @@ public sealed class HoseGraphVisual : MonoBehaviour
         EmitSplash(new Impact { Position = point, Normal = normal }, _library.SplashAppearance.streamCount);
     }
 
-    public void WaterFire(Object fire, Vector3 contactPoint, float amount)
+    public void WaterFire(Object fire, Vector3 contactPoint, float amount, bool waitForStreamFront = true)
     {
         if (amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount)) return;
-        if (_streamRibbon != null && (!IsEmitting || Vector3.Dot(contactPoint - _streamRibbon.Origin,
+        if (waitForStreamFront && _streamRibbon != null && (!IsEmitting || Vector3.Dot(contactPoint - _streamRibbon.Origin,
             _streamRibbon.Direction) > _streamRibbon.Length + 0.05f)) return;
         SteamContact contact = null;
         int available = -1;

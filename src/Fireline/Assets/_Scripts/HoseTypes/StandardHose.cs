@@ -23,7 +23,7 @@ public class StandardHose : HoseWeapon
         for (int i = 0; i < hits.Count; i++)
         {
             hits[i].ApplyKnockback(push);
-            hits[i].TakeDamage(damage);
+            DamageEnemyWithWater(hits[i], damage);
         }
 
         WaterFiresInHitbox(ExtinguishPerSecond * deltaTime);

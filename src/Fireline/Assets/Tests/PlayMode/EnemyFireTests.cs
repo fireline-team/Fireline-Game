@@ -28,6 +28,75 @@ public class EnemyFireTests
         yield return null;
     }
 
+    private static void FinishRise(HordeEnemy enemy)
+    {
+        var rise = typeof(HordeEnemy).GetField("_rise", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(enemy);
+        rise.GetType().GetMethod("Finish").Invoke(rise, null);
+    }
+
+    [UnityTest]
+    public IEnumerator HealthShrinksArtAxeMakesNoSteamAndReuseRestoresSize()
+    {
+        var enemy = Spawn();
+        FinishRise(enemy);
+        Vector3 full = enemy.Sprite.transform.localScale;
+        Vector3 body = enemy.transform.localScale;
+        var collider = enemy.GetComponent<Collider2D>();
+        Physics2D.SyncTransforms(); // Include the definition's randomized spawn size in the baseline.
+        Vector3 colliderSize = collider.bounds.size;
+        enemy.OnAxeHit(new AxeHit(null, Vector2.zero, Vector2.right, Vector2.right,
+            enemy.transform.position, enemy.CurrentHealth * 0.5f, 0f));
+        yield return new WaitForSeconds(0.25f);
+        Assert.That(enemy.Sprite.transform.localScale.x, Is.EqualTo(full.x * 0.675f).Within(0.01f));
+        Assert.That(enemy.Sprite.transform.localScale.y, Is.EqualTo(full.y * 0.675f).Within(0.01f));
+        Assert.That(enemy.transform.localScale, Is.EqualTo(body));
+        Assert.That(collider.bounds.size, Is.EqualTo(colliderSize));
+        Assert.That(enemy.GetComponentsInChildren<UnityEngine.VFX.VisualEffect>().Length, Is.Zero);
+        enemy.gameObject.SetActive(false);
+        enemy.gameObject.SetActive(true);
+        FinishRise(enemy);
+        Assert.That(enemy.Sprite.transform.localScale, Is.EqualTo(full));
+        enemy.TakeDamage(enemy.CurrentHealth);
+        Assert.That(enemy.gameObject.activeSelf, Is.False, "Gameplay despawns immediately.");
+        var dying = Object.FindFirstObjectByType<EnemyDeathVisual>();
+        Assert.That(dying, Is.Not.Null, "The visible sprite survives to shrink away.");
+        _created.Add(dying.gameObject);
+        Assert.That(dying.GetComponentInChildren<Collider2D>(), Is.Null);
+        yield return new WaitForSeconds(0.08f);
+        Assert.That(dying.transform.localScale.x, Is.InRange(0.01f, 0.99f));
+        yield return new WaitForSeconds(0.25f);
+        Assert.That(dying == null, Is.True);
+    }
+
+    [UnityTest]
+    public IEnumerator EveryWaterNozzleCreatesLibrarySteamEvenOnLethalHits()
+    {
+        if (!SystemInfo.supportsComputeShaders) Assert.Ignore("Requires VFX Graph support.");
+        var library = Resources.Load<HoseVfxLibrary>(HoseVfxLibrary.ResourcePath);
+        foreach (var type in new[] { typeof(StandardHose), typeof(MistHose), typeof(JetHose) })
+        {
+            var enemy = Spawn();
+            FinishRise(enemy);
+            enemy.TakeDamage(enemy.CurrentHealth - 0.1f);
+            var owner = new GameObject(type.Name);
+            _created.Add(owner);
+            owner.transform.position = enemy.transform.position - Vector3.right;
+            var hose = (HoseWeapon)owner.AddComponent(type);
+            Physics2D.SyncTransforms();
+            hose.Spray(Vector2.right, 0.1f);
+            Assert.That(enemy.gameObject.activeSelf, Is.False, type.Name + " must damage the target.");
+            var graph = owner.GetComponentInChildren<HoseGraphVisual>();
+            var steam = graph.transform.Find("Fire contact steam");
+            Assert.That(steam, Is.Not.Null, type.Name + " must emit steam before the enemy despawns.");
+            var effect = steam.GetComponent<UnityEngine.VFX.VisualEffect>();
+            Assert.That(effect.visualEffectAsset, Is.EqualTo(library.Steam));
+            Assert.That(effect.GetFloat("PixelSize"), Is.EqualTo(library.SteamAppearance.pixelation.enabled
+                ? library.SteamAppearance.pixelation.pixelSize : 1));
+            hose.StopSpraying();
+            yield return new WaitForSeconds(0.3f);
+        }
+    }
+
     [UnityTest]
     public IEnumerator PrefabRetainsItsSpriteAndRestoresEmissionAfterHitAndReuse()
     {

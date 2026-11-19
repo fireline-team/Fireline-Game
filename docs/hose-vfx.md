@@ -97,3 +97,11 @@ Version-five captures include `Temp/HoseBeam-ground-splash.png`, `Temp/HoseBeam-
 Generated asset import checks require every runtime property to be present. Check the Console for graph/shader errors, then visually inspect the preview and a playable level for transparency, density, muzzle alignment, wall contact, and fire placement. C# compilation alone does not prove GPU appearance or performance.
 
 Validated on 2026-11-05 in Unity 6000.6.1f1: all 15 focused PlayMode checks passed. Ground landing, curved aim lag, nozzle filter comparison, and smoke renders were inspected. The runtime, Editor, and test assemblies also compile with Unity's Roslyn compiler. Existing Burst compiler named-pipe errors remain a separate Editor baseline issue. Shader Graph slider ranges must match their domains: strength 0–1, color steps 0–32, and alpha cutoff 0–0.95. VFX Graph applies these slider constraints to linked inputs, so copying the pixel-size range would clip soft droplets and smoke.
+
+## Enemy damage feedback
+
+All three water nozzles emit the library's pixelated Steam graph at damaged enemies, including lethal hits. Steam Appearance controls the look, puff interval, and bounded particle count. Axe and reflected-projectile damage reduce enemy size without emitting steam.
+
+Enemy sprites ease toward a size based on remaining HP: full size at full health, 67.5% at half health, approaching 35% near death. Tune Minimum Damage Scale and Damage Shrink Speed on HordeEnemy. Spawn-rise motion combines with damage shrinking, and pooled enemies restore their healthy size. Root scale, colliders, and movement stats are unchanged.
+
+A lethal hit removes the gameplay enemy immediately and leaves a visual-only sprite that shrinks to zero over Death Shrink Duration (0.22 seconds by default). This preserves pool reuse and prevents defeated enemies from attacking or blocking during the animation.

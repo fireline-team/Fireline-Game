@@ -24,7 +24,7 @@ public class MistHose : HoseWeapon
         for (int i = 0; i < hits.Count; i++)
         {
             hits[i].ApplySlow(slowMultiplier, slowDuration);
-            hits[i].TakeDamage(damage);
+            DamageEnemyWithWater(hits[i], damage);
         }
 
         WaterFiresInHitbox(ExtinguishPerSecond * deltaTime);
