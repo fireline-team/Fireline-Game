@@ -25,6 +25,13 @@ namespace Game.Runtime
         [Tooltip("Shortest time between flashes. Keeps enemies in a steady stream blinking instead of staying solid white.")]
         [SerializeField, Min(0.01f)] private float flashInterval = 0.12f;
 
+        [Header("Damage Appearance")]
+        [Tooltip("Sprite size near zero health, relative to its healthy size. Hitboxes stay unchanged.")]
+        [SerializeField, Range(0.1f, 1f)] private float minimumDamageScale = 0.35f;
+        [SerializeField, Min(0.01f)] private float damageShrinkSpeed = 5f;
+        [SerializeField, Min(0.01f)] private float deathShrinkDuration = 0.22f;
+        private float damageScale = 1f;
+
         public EnemyDefinition Definition => definition;
         public Transform CachedTransform { get; private set; }
         public SpriteRenderer Sprite => spriteRenderer;
@@ -128,16 +135,26 @@ namespace Game.Runtime
         
         public void TakeDamage(float amount)
         {
-            if (health == null) return;
+            if (health == null || health.IsDead || !isActiveAndEnabled) return;
 
             float before = health.Current;
             if (health.TakeDamage(amount))
             {
+                EndFlash();
+                EnemyDeathVisual.Play(spriteRenderer, deathShrinkDuration);
                 Despawn();
                 return;
             }
             if (health.Current < before)
                 StartFlash();
+        }
+
+        private void LateUpdate()
+        {
+            if (health == null || health.IsDead) return;
+            float target = Mathf.Lerp(minimumDamageScale, 1f, health.Current / health.Maximum);
+            damageScale = Mathf.MoveTowards(damageScale, target, damageShrinkSpeed * Time.deltaTime);
+            _rise?.SetDamageScale(damageScale);
         }
 
         // Swaps to the flash material. Swapping (instead of a per-renderer property) keeps
@@ -212,6 +229,8 @@ namespace Game.Runtime
         private void ResetState()
         {
             Generation++;
+            damageScale = 1f;
+            _rise?.SetDamageScale(1f);
             _holdUntil = 0f;
             MoveDirection = Vector2.zero;
             KnockbackVelocity = Vector2.zero;

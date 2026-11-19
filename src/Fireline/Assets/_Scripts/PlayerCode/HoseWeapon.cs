@@ -276,6 +276,19 @@ public abstract class HoseWeapon : MonoBehaviour
         return _fireHits;
     }
 
+    /// <summary>Water-only feedback, emitted before lethal damage can recycle the enemy.</summary>
+    protected void DamageEnemyWithWater(HordeEnemy enemy, float amount)
+    {
+        if (enemy == null || !enemy.isActiveAndEnabled || enemy.CurrentHealth <= 0f
+            || amount <= 0f || float.IsNaN(amount) || float.IsInfinity(amount)) return;
+        if (_graph != null)
+        {
+            Vector3 point = enemy.Sprite != null ? enemy.Sprite.bounds.center : enemy.transform.position;
+            _graph.WaterFire(enemy, point, Mathf.Min(amount, enemy.CurrentHealth), false);
+        }
+        enemy.TakeDamage(amount);
+    }
+
     /// <summary>Puts out every fire zone in the hitbox by <paramref name="amount"/>.</summary>
     protected void WaterFiresInHitbox(float amount)
     {
