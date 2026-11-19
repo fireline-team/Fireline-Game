@@ -69,7 +69,11 @@ Shader "Fireline/StructureDepth"
     output.positionCS = ApplyShadowClamping(output.positionCS);
     return output;
    }
-   half4 DepthFrag(Varyings input) : SV_Target { SampleSprite(input); return 0; }
+   half4 DepthFrag(Varyings input) : SV_Target {
+    // Camera occlusion changes renderer alpha. The physical silhouette stays solid.
+    clip(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv).a - _Cutoff);
+    return 0;
+   }
    ENDHLSL
   }
  }

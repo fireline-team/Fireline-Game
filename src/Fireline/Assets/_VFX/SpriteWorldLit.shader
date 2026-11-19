@@ -3,6 +3,7 @@ Shader "Fireline/SpriteWorldLit"
 {
  Properties {
   [PerRendererData] _MainTex ("Sprite", 2D) = "white" {}
+  _Cutoff ("Shadow Alpha Cutoff", Range(0,1)) = 0.5
 
 
  }
@@ -34,5 +35,6 @@ Shader "Fireline/SpriteWorldLit"
    ENDHLSL
   }
 
+  UsePass "Fireline/StructureDepth/SHADOWCASTER"
  }
 }
