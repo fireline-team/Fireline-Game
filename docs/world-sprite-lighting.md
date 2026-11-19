@@ -3,7 +3,7 @@
 Fireline uses a perspective camera, XY gameplay plane, and the Universal Renderer. Buildings and standard world sprites now receive URP **3D** directional, point, and spot lights. Light 2D is a different renderer path.
 
 - `Fireline/StructureDepth` retains opaque cutout, alpha cutoff, depth writing, two-sided drawing, and depth texture support. It now uses diffuse lighting, ambient spherical harmonics, realtime shadow receiving, and a cutout shadow-caster pass. Casting also requires the renderer's Cast Shadows setting; additional-light shadows remain governed by the existing URP asset.
-- `Fireline/SpriteWorldLit` / `Assets/_VFX/SpriteWorldLit.mat` provides transparent diffuse lighting, sprite tint/alpha, flips, and normal sprite sorting. The player, enemy, grass, hydrant, building fade material, and direct default sprite assignments in scenes use it. UI and custom VFX materials retain their existing shaders.
+- `Fireline/SpriteWorldLit` / `Assets/_VFX/SpriteWorldLit.mat` provides transparent diffuse lighting, sprite tint/alpha, flips, and normal sprite sorting. The player, grass, hydrant, building fade material, and direct default sprite assignments in scenes use it. Fire enemies use their own emissive sprite material and realtime point lights; see [enemy fire appearance](enemy-fire.md). UI and custom VFX materials retain their existing shaders.
 - `Fireline/SpriteFlash` lights the base sprite before blending toward the bright hit-flash color.
 - New Structure objects resolve the same transparent lit material in the Editor. Existing Structure depth material GUIDs and gameplay behavior are preserved.
 
