@@ -38,11 +38,11 @@ Configured in the open Unity 6000.6.1f1 Editor on 2026-11-12. The active scene i
 | Image features | HDR, HDR color grading, depth texture, 4x MSAA |
 | Scene post-processing | Neutral tonemapping; Bloom intensity `0.12`, threshold `1.1`, scatter `0.5` |
 
-`Assets/Settings/URPconfig/LevelRevampLighting.lighting` disables baked and
-Enlighten realtime GI and uses realtime environment lighting. The sprite shaders
-sample ambient spherical harmonics rather than baked lightmap UVs, so this scene
-uses direct realtime lights and the gradient for its illumination. The previous
-baked lighting data is detached from the scene; its assets are preserved.
+LevelRevamp uses `Assets/Settings/URPconfig/LevelRevampLighting.lighting`.
+In **Window > Rendering > Lighting > Scene**, Baked Global Illumination is enabled.
+Choose Mixed or Baked on each participating Light, then use Generate Lighting.
+The custom sprite shaders receive direct realtime light and sample ambient or
+probe lighting. They do not sample baked lightmap textures.
 
 The scene's **LevelRevamp Lighting** global Volume uses
 `Assets/Settings/URPconfig/LevelRevampLightingVolume.asset`. Tune the main light

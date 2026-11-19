@@ -6,8 +6,7 @@ using UnityEngine;
 /// never lose track of themselves behind buildings. Put it on the Structure root
 /// (Create Structure adds it automatically). It fades every sprite under this object.
 ///
-/// "Behind" means further up the screen than this object's position (the structure's front
-/// edge). "Hidden" means the player's body is inside the structure's area on screen.
+/// A face hides a player when the camera-to-body segment crosses its local sprite bounds.
 ///
 /// On a Structure using depth, the faces are switched to their normal sprite material while
 /// faded (a depth material can't be see-through) and back once fully solid again.
@@ -56,51 +55,40 @@ public class FadeWhenBehind : MonoBehaviour
         if (cam == null || _renderers.Length == 0) return false;
         RefreshPlayers();
 
-        bool haveRect = false;
-        Rect screenRect = default;
-
-        for (int i = 0; i < Players.Count; i++)
+        foreach (Transform player in Players)
         {
-            Transform player = Players[i];
             if (player == null || !player.gameObject.activeInHierarchy) continue;
-            if (player.position.y <= transform.position.y) continue; // in front of us
-
-            if (!haveRect)
-            {
-                screenRect = ScreenRect(cam);
-                haveRect = true;
-            }
-
             Vector3 body = player.position + TiltedView.Up * playerCheckHeight;
-            if (screenRect.Contains(cam.WorldToScreenPoint(body))) return true;
+            Vector3 viewport = cam.WorldToViewportPoint(body);
+            if (viewport.z <= cam.nearClipPlane || viewport.x < 0 || viewport.x > 1 ||
+                viewport.y < 0 || viewport.y > 1) continue;
+
+            Vector3 start = cam.ViewportToWorldPoint(new Vector3(viewport.x, viewport.y, cam.nearClipPlane));
+            foreach (SpriteRenderer face in _renderers)
+            {
+                if (face == null || !face.enabled || !face.gameObject.activeInHierarchy || face.sprite == null ||
+                    face.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly) continue;
+                if (OccludesBody(face, start, body)) return true;
+            }
         }
         return false;
     }
 
-    // The on-screen rectangle covered by all of this structure's sprites.
-    private Rect ScreenRect(Camera cam)
+    // Test the drawn plane in face space. This includes the roof depth, sprite pivot,
+    // perspective and the side faces' shear, without filling the gaps between faces.
+    internal static bool OccludesBody(SpriteRenderer face, Vector3 start, Vector3 body)
     {
-        Vector2 min = new Vector2(float.MaxValue, float.MaxValue);
-        Vector2 max = new Vector2(float.MinValue, float.MinValue);
-
-        foreach (SpriteRenderer r in _renderers)
-        {
-            if (r == null || !r.enabled || r.sprite == null) continue;
-            Bounds b = r.bounds;
-            for (int corner = 0; corner < 8; corner++)
-            {
-                Vector3 p = new Vector3(
-                    (corner & 1) == 0 ? b.min.x : b.max.x,
-                    (corner & 2) == 0 ? b.min.y : b.max.y,
-                    (corner & 4) == 0 ? b.min.z : b.max.z);
-                Vector2 s = cam.WorldToScreenPoint(p);
-                min = Vector2.Min(min, s);
-                max = Vector2.Max(max, s);
-            }
-        }
-        return Rect.MinMaxRect(min.x, min.y, max.x, max.y);
+        Matrix4x4 toLocal = face.transform.worldToLocalMatrix;
+        Vector3 from = toLocal.MultiplyPoint3x4(start);
+        Vector3 delta = toLocal.MultiplyVector(body - start);
+        if (Mathf.Abs(delta.z) < 0.00001f) return false;
+        Bounds bounds = face.localBounds;
+        float t = (bounds.center.z - from.z) / delta.z;
+        if (t < 0f || t >= 1f) return false;
+        Vector3 hit = from + delta * t;
+        return hit.x >= bounds.min.x && hit.x <= bounds.max.x &&
+               hit.y >= bounds.min.y && hit.y <= bounds.max.y;
     }
-
     private void SetFade(float fade)
     {
         _fade = fade;

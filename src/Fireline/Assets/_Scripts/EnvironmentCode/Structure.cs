@@ -87,6 +87,8 @@ public class Structure : MonoBehaviour
 
     private float _frontHeight;
     private bool _seeThrough;
+    private ShadowCastingMode _leftCastMode = ShadowCastingMode.TwoSided;
+    private ShadowCastingMode _rightCastMode = ShadowCastingMode.TwoSided;
 
     public Vector2 Footprint => footprint;
 
@@ -306,13 +308,13 @@ public class Structure : MonoBehaviour
         Camera cam = Camera.main;
         if (!hideSideFacingAway || cam == null)
         {
-            SetSideVisible(leftSide, true);
-            SetSideVisible(rightSide, true);
+            SetSideVisible(leftSide, true, ref _leftCastMode);
+            SetSideVisible(rightSide, true, ref _rightCastMode);
             return;
         }
 
-        SetSideVisible(leftSide, CameraSees(cam, -1f));
-        SetSideVisible(rightSide, CameraSees(cam, +1f));
+        SetSideVisible(leftSide, CameraSees(cam, -1f), ref _leftCastMode);
+        SetSideVisible(rightSide, CameraSees(cam, +1f), ref _rightCastMode);
     }
 
     // A side is visible when the camera is on its outer side. Orthographic cameras look along
@@ -325,9 +327,16 @@ public class Structure : MonoBehaviour
         return Vector3.Dot(toCamera, outward) > 0.001f;
     }
 
-    private static void SetSideVisible(SpriteRenderer side, bool visible)
+    private static void SetSideVisible(SpriteRenderer side, bool visible, ref ShadowCastingMode visibleMode)
     {
-        if (side != null && side.enabled != visible) side.enabled = visible;
+        if (side == null) return;
+        ShadowCastingMode mode = side.shadowCastingMode;
+        if (mode != ShadowCastingMode.ShadowsOnly) visibleMode = mode;
+        bool casts = visibleMode != ShadowCastingMode.Off;
+        ShadowCastingMode desired = !visible && casts ? ShadowCastingMode.ShadowsOnly : visibleMode;
+        if (mode != desired) side.shadowCastingMode = desired;
+        bool enabled = visible || casts;
+        if (side.enabled != enabled) side.enabled = enabled;
     }
 
     /// <summary>
